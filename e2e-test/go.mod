@@ -128,6 +128,7 @@ require (
 replace (
 	github.com/chaos-mesh/chaos-mesh => ../
 	github.com/chaos-mesh/chaos-mesh/api => ../api
+	github.com/mailru/easyjson => github.com/form3tech-oss/easyjson v0.7.7
 	k8s.io/api => k8s.io/api v0.26.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.26.1
 	k8s.io/apimachinery => k8s.io/apimachinery v0.26.1
