@@ -4884,6 +4884,26 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.AWSAzChaosSpec": {
+            "type": "object",
+            "properties": {
+                "az": {
+                    "description": "Ec2Instance indicates the ID of the ec2 instance.",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "type": "string"
+                },
+                "stack": {
+                    "description": "AWSRegion defines the region of aws.",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.AWSChaosSpec": {
             "type": "object",
             "properties": {
@@ -5132,6 +5152,10 @@ const docTemplate = `{
                 "awsChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
+                },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
                 },
                 "azureChaos": {
                     "description": "+optional",
@@ -7319,6 +7343,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
                 },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
+                },
                 "azureChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AzureChaosSpec"
@@ -7608,6 +7636,10 @@ const docTemplate = `{
                 "awsChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
+                },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
                 },
                 "azureChaos": {
                     "description": "+optional",

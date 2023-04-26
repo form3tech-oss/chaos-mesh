@@ -3114,6 +3114,22 @@ definitions:
           +optional
         type: string
     type: object
+  v1alpha1.AWSAzChaosSpec:
+    properties:
+      az:
+        description: Ec2Instance indicates the ID of the ec2 instance.
+        type: string
+      duration:
+        description: |-
+          Duration represents the duration of the chaos action
+          +optional
+        type: string
+      remoteCluster:
+        type: string
+      stack:
+        description: AWSRegion defines the region of aws.
+        type: string
+    type: object
   v1alpha1.AWSChaosSpec:
     properties:
       action:
@@ -3379,6 +3395,9 @@ definitions:
     properties:
       awsChaos:
         $ref: '#/definitions/v1alpha1.AWSChaosSpec'
+        description: +optional
+      awsazChaos:
+        $ref: '#/definitions/v1alpha1.AWSAzChaosSpec'
         description: +optional
       azureChaos:
         $ref: '#/definitions/v1alpha1.AzureChaosSpec'
@@ -5693,6 +5712,9 @@ definitions:
       awsChaos:
         $ref: '#/definitions/v1alpha1.AWSChaosSpec'
         description: +optional
+      awsazChaos:
+        $ref: '#/definitions/v1alpha1.AWSAzChaosSpec'
+        description: +optional
       azureChaos:
         $ref: '#/definitions/v1alpha1.AzureChaosSpec'
         description: +optional
@@ -6036,6 +6058,9 @@ definitions:
         type: boolean
       awsChaos:
         $ref: '#/definitions/v1alpha1.AWSChaosSpec'
+        description: +optional
+      awsazChaos:
+        $ref: '#/definitions/v1alpha1.AWSAzChaosSpec'
         description: +optional
       azureChaos:
         $ref: '#/definitions/v1alpha1.AzureChaosSpec'

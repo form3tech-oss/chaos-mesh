@@ -24,6 +24,7 @@ import (
 
 
 const (
+	ScheduleTypeAWSAzChaos ScheduleTemplateType = "AWSAzChaos"
 	ScheduleTypeAWSChaos ScheduleTemplateType = "AWSChaos"
 	ScheduleTypeAzureChaos ScheduleTemplateType = "AzureChaos"
 	ScheduleTypeBlockChaos ScheduleTemplateType = "BlockChaos"
@@ -43,6 +44,7 @@ const (
 )
 
 var allScheduleTemplateType = []ScheduleTemplateType{
+	ScheduleTypeAWSAzChaos,
 	ScheduleTypeAWSChaos,
 	ScheduleTypeAzureChaos,
 	ScheduleTypeBlockChaos,
@@ -63,6 +65,10 @@ var allScheduleTemplateType = []ScheduleTemplateType{
 
 func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (GenericChaos, error) {
 	switch templateType {
+	case ScheduleTypeAWSAzChaos:
+		result := AWSAzChaos{}
+		result.Spec = *it.AWSAzChaos
+		return &result, nil
 	case ScheduleTypeAWSChaos:
 		result := AWSChaos{}
 		result.Spec = *it.AWSChaos
@@ -131,6 +137,9 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 
 func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 	switch chaos := root.(type) {
+	case *AWSAzChaos:
+		*it.AWSAzChaos = chaos.Spec
+		return nil
 	case *AWSChaos:
 		*it.AWSChaos = chaos.Spec
 		return nil
