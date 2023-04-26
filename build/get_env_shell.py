@@ -79,6 +79,7 @@ def main():
     cwd = os.getcwd()
     cmd += ["--volume", f"{cwd}:{cwd}"]
     cmd += ["--user", f"{os.getuid()}:{os.getgid()}"]
+    cmd += ["--mount", 'type=bind,source=/etc/ssl/certs/ca-certificates.crt,target=/etc/ssl/certs/ca-certificates.crt,readonly']
 
     target_platform = utils.get_target_platform()
     # if the environment variable is not set, don't pass `--platform` argument,
