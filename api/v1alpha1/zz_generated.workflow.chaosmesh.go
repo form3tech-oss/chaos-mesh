@@ -24,6 +24,7 @@ import (
 
 
 const (
+	TypeAWSAzChaos TemplateType = "AWSAzChaos"
 	TypeAWSChaos TemplateType = "AWSChaos"
 	TypeAzureChaos TemplateType = "AzureChaos"
 	TypeBlockChaos TemplateType = "BlockChaos"
@@ -45,6 +46,7 @@ const (
 
 var allChaosTemplateType = []TemplateType{
 	TypeSchedule,
+	TypeAWSAzChaos,
 	TypeAWSChaos,
 	TypeAzureChaos,
 	TypeBlockChaos,
@@ -65,6 +67,8 @@ var allChaosTemplateType = []TemplateType{
 }
 
 type EmbedChaos struct {
+	// +optional
+	AWSAzChaos *AWSAzChaosSpec `json:"awsazChaos,omitempty"`
 	// +optional
 	AWSChaos *AWSChaosSpec `json:"awsChaos,omitempty"`
 	// +optional
@@ -102,6 +106,10 @@ type EmbedChaos struct {
 
 func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, error) {
 	switch templateType {
+	case TypeAWSAzChaos:
+		result := AWSAzChaos{}
+		result.Spec = *it.AWSAzChaos
+		return &result, nil
 	case TypeAWSChaos:
 		result := AWSChaos{}
 		result.Spec = *it.AWSChaos
@@ -174,6 +182,9 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 
 func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	switch chaos := root.(type) {
+	case *AWSAzChaos:
+		*it.AWSAzChaos = chaos.Spec
+		return nil
 	case *AWSChaos:
 		*it.AWSChaos = chaos.Spec
 		return nil
@@ -230,6 +241,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 
 func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList, error) {
 	switch templateType {
+	case TypeAWSAzChaos:
+		result := AWSAzChaosList{}
+		return &result, nil
 	case TypeAWSChaos:
 		result := AWSChaosList{}
 		return &result, nil
@@ -284,6 +298,14 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 	}
 }
 
+func (in *AWSAzChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
 func (in *AWSChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {

@@ -339,6 +339,23 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  // AWSAzChaos
+  AWSAzChaos: {
+    spec: {
+      stack: {
+        field: 'text',
+        label: 'Stack name',
+        value: '',
+        helperText: 'The name of the stack',
+      },
+      availabilityZone: {
+        field: 'text',
+        label: 'Availability zone',
+        value: '',
+        helperText: 'The name of the availability zone',
+      },
+    } as any,
+  },
   BlockChaos: {
     categories: [
       {
@@ -1429,6 +1446,12 @@ export const schema: Partial<Record<Kind, Record<string, Yup.ObjectSchema>>> = {
     'detach-volume': AWSChaosCommonSchema.shape({
       deviceName: Yup.string().required('The device name is required'),
       volumeID: Yup.string().required('The ID of the EBS volume is required'),
+    }),
+  },
+  AWSAzChaos: {
+    default: Yup.object({
+      stack: Yup.string().required('The stack name is required'),
+      availabilityZone: Yup.string().required('The availability zone is required'),
     }),
   },
   DNSChaos: {

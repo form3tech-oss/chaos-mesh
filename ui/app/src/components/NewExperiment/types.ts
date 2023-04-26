@@ -46,6 +46,11 @@ export interface AWS {
   deviceName?: string
 }
 
+export interface AWSAzChaos {
+  stack: string
+  availablityZone: string
+}
+
 export interface DNS {
   action: 'error' | 'random'
   patterns: string[]
@@ -172,6 +177,7 @@ export interface Time {
 
 export interface ExperimentType {
   AWSChaos: AWS
+  AWSAzChaos: AWSAzChaos
   AzureChaos?: unknown
   DNSChaos: DNS
   GCPAzChaos: GCPAz
