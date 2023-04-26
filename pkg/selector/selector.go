@@ -23,6 +23,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/awsaz"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
@@ -75,6 +76,7 @@ type SelectorParams struct {
 	GCPSelector             *gcp.SelectImpl
 	PhysicalMachineSelector *physicalmachine.SelectImpl
 	NodeVolumePath          *nodevolumepath.SelectImpl
+	AWSAZSelector           *awsaz.SelectImpl
 }
 
 func New(p SelectorParams) *Selector {
@@ -100,6 +102,7 @@ var Module = fx.Provide(
 	pod.New,
 	container.New,
 	aws.New,
+	awsaz.New,
 	azure.New,
 	gcp.New,
 	physicalmachine.New,
