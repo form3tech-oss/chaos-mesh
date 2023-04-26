@@ -4876,6 +4876,26 @@
                 }
             }
         },
+        "v1alpha1.AWSAzChaosSpec": {
+            "type": "object",
+            "properties": {
+                "az": {
+                    "description": "AZ indicates the Availability zone to be taken down",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "type": "string"
+                },
+                "stack": {
+                    "description": "AWSRegion defines the region of aws.",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.AWSChaosSpec": {
             "type": "object",
             "properties": {
@@ -5124,6 +5144,10 @@
                 "awsChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
+                },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
                 },
                 "azureChaos": {
                     "description": "+optional",
@@ -7311,6 +7335,10 @@
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
                 },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
+                },
                 "azureChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AzureChaosSpec"
@@ -7600,6 +7628,10 @@
                 "awsChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.AWSChaosSpec"
+                },
+                "awsazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.AWSAzChaosSpec"
                 },
                 "azureChaos": {
                     "description": "+optional",

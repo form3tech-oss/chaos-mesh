@@ -35,6 +35,144 @@ import (
 // updating spec of a chaos will have no effect, we'd better reject it
 var ErrCanNotUpdateChaos = errors.New("Cannot update chaos spec")
 
+const KindAWSAzChaos = "AWSAzChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *AWSAzChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *AWSAzChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *AWSAzChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *AWSAzChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *AWSAzChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *AWSAzChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *AWSAzChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// AWSAzChaosList contains a list of AWSAzChaos
+type AWSAzChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []AWSAzChaos `json:"items"`
+}
+
+func (in *AWSAzChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *AWSAzChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *AWSAzChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *AWSAzChaos) IsOneShot() bool {
+	return false
+}
+
+var AWSAzChaosWebhookLog = logf.Log.WithName("AWSAzChaos-resource")
+
+func (in *AWSAzChaos) ValidateCreate() (admission.Warnings, error) {
+	AWSAzChaosWebhookLog.Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *AWSAzChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	AWSAzChaosWebhookLog.Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*AWSAzChaos).Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *AWSAzChaos) ValidateDelete() (admission.Warnings, error) {
+	AWSAzChaosWebhookLog.Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil, nil
+}
+
+var _ webhook.Validator = &AWSAzChaos{}
+
+func (in *AWSAzChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &AWSAzChaos{}
+
+func (in *AWSAzChaos) Default() {
+	gw.Default(in)
+}
+
 const KindAWSChaos = "AWSChaos"
 
 // IsDeleted returns whether this resource has been deleted
@@ -2210,6 +2348,12 @@ func (in *TimeChaos) Default() {
 
 func init() {
 
+	SchemeBuilder.Register(&AWSAzChaos{}, &AWSAzChaosList{})
+	all.register(KindAWSAzChaos, &ChaosKind{
+		chaos: &AWSAzChaos{},
+		list:  &AWSAzChaosList{},
+	})
+
 	SchemeBuilder.Register(&AWSChaos{}, &AWSChaosList{})
 	all.register(KindAWSChaos, &ChaosKind{
 		chaos: &AWSChaos{},
@@ -2306,6 +2450,11 @@ func init() {
 		list:  &TimeChaosList{},
 	})
 
+
+	allScheduleItem.register(KindAWSAzChaos, &ChaosKind{
+		chaos: &AWSAzChaos{},
+		list:  &AWSAzChaosList{},
+	})
 
 	allScheduleItem.register(KindAWSChaos, &ChaosKind{
 		chaos: &AWSChaos{},
