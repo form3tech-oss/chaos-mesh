@@ -25,6 +25,69 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func TestAWSAzChaosIsDeleted(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &AWSAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsDeleted()
+}
+
+func TestAWSAzChaosIsIsPaused(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &AWSAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsPaused()
+}
+
+func TestAWSAzChaosGetDuration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &AWSAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.Spec.GetDuration()
+}
+
+func TestAWSAzChaosGetStatus(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &AWSAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.GetStatus()
+}
+
+func TestAWSAzChaosGetSpecAndMetaString(t *testing.T) {
+	g := NewGomegaWithT(t)
+	chaos := &AWSAzChaos{}
+	err := faker.FakeData(chaos)
+	g.Expect(err).To(BeNil())
+	chaos.GetSpecAndMetaString()
+}
+
+func TestAWSAzChaosListChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &AWSAzChaosList{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.ListChaos()
+}
+
 func TestAWSChaosIsDeleted(t *testing.T) {
 	g := NewGomegaWithT(t)
 
