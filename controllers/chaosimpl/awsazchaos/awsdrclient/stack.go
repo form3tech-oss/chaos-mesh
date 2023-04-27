@@ -234,6 +234,7 @@ func (a *StackScopedDRClient) CreateOrGetEmptyNetworkAcl(ctx context.Context, vp
 	}
 
 	if exisitngEmptyNetworkACL != "" {
+		a.log.Info(fmt.Sprintf("using the existing block-all network ACL %s", exisitngEmptyNetworkACL))
 		return exisitngEmptyNetworkACL, nil
 	}
 
