@@ -96,10 +96,11 @@ spec:
                       type: object
                     awsazChaos:
                       description: AWSAzChaosSpec is the content of the specification
-                        for a HelloWorldChaos
+                        for a AWSAzChaos
                       properties:
                         az:
-                          description: Ec2Instance indicates the ID of the ec2 instance.
+                          description: AZ indicates the Availability zone to be taken
+                            down
                           type: string
                         duration:
                           description: Duration represents the duration of the chaos
@@ -3121,11 +3122,11 @@ spec:
                           type: object
                         awsazChaos:
                           description: AWSAzChaosSpec is the content of the specification
-                            for a HelloWorldChaos
+                            for a AWSAzChaos
                           properties:
                             az:
-                              description: Ec2Instance indicates the ID of the ec2
-                                instance.
+                              description: AZ indicates the Availability zone to be
+                                taken down
                               type: string
                             duration:
                               description: Duration represents the duration of the
