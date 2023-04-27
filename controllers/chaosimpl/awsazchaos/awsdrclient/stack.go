@@ -282,13 +282,16 @@ func (a *StackScopedDRClient) GetEmptyNetworkACL(ctx context.Context, vpcId *str
 				Values: []string{"true"},
 			},
 		},
-		MaxResults: int32(1),
+		MaxResults: int32(10),
 	})
 	if err != nil {
 		return "", err
 	}
 	if len(existingEmptyNetworkAcl.NetworkAcls) == 0 {
 		return "", nil
+	}
+	if len(existingEmptyNetworkAcl.NetworkAcls) > 1 {
+		return "", fmt.Errorf("expected only one empty network ACL to exist, but got %d", len(existingEmptyNetworkAcl.NetworkAcls))
 	}
 	return *existingEmptyNetworkAcl.NetworkAcls[0].NetworkAclId, nil
 }
