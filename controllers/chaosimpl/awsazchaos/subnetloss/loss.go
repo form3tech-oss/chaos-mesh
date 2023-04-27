@@ -60,12 +60,13 @@ func (a *AWSSubnetsLoss) Start(ctx context.Context, originalSubnetToACL map[stri
 	a.log.Info(fmt.Sprintf("Created empty NACL with ID: %s", emptyAclId))
 
 	for sID, _ := range originalSubnetToACL {
+		a.log.Info(fmt.Sprintf("replacing Network ACL for subnet %s", sID))
 		// Replace ACL and keep track of old association
-		if err := a.client.ReplaceNetworkAclForSubnet(ctx, sID, emptyAclId); err != nil {
+		/*if err := a.client.ReplaceNetworkAclForSubnet(ctx, sID, emptyAclId); err != nil {
 			// Maybe do not clean up here and depend on the next apply run to take care of it
 			a.attemptCleanUp(ctx, originalSubnetToACL, emptyAclId)
 			return fmt.Errorf("error replacing Network ACL for subnet (%s): %w", sID, err)
-		}
+		}*/
 	}
 
 	return nil
@@ -90,7 +91,7 @@ func (a *AWSSubnetsLoss) Stop(ctx context.Context, originalSubnetToACL map[strin
 func (a *AWSSubnetsLoss) cleanUp(ctx context.Context, associations map[string]string, emptyACLID string) error {
 	a.log.Info("cleaning up resources")
 
-	if len(associations) > 0 {
+	/*if len(associations) > 0 {
 		a.log.Info("restoring Network ACL associations")
 		for subnetId, originalACLID := range associations {
 			a.log.Info(fmt.Sprintf("restoring subnet (%s) to Network ACL (%s)", subnetId, originalACLID))
@@ -98,7 +99,7 @@ func (a *AWSSubnetsLoss) cleanUp(ctx context.Context, associations map[string]st
 				return err
 			}
 		}
-	}
+	}*/
 
 	if emptyACLID != "" {
 		a.log.Info(fmt.Sprintf("deleting empty Network ACL (%s)", emptyACLID))
