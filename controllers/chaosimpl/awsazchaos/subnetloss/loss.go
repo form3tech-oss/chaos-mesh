@@ -62,11 +62,11 @@ func (a *AWSSubnetsLoss) Start(ctx context.Context, originalSubnetToACL map[stri
 	for sID, aclID := range originalSubnetToACL {
 		a.log.Info(fmt.Sprintf("replacing Network ACL %s of subnet %s with block-all ACL %s", aclID, sID, emptyAclId))
 		// Replace ACL and keep track of old association
-		/*if err := a.client.ReplaceNetworkAclForSubnet(ctx, sID, emptyAclId); err != nil {
+		if err := a.client.ReplaceNetworkAclForSubnet(ctx, sID, emptyAclId); err != nil {
 			// Maybe do not clean up here and depend on the next apply run to take care of it
 			a.attemptCleanUp(ctx, originalSubnetToACL, emptyAclId)
 			return fmt.Errorf("error replacing Network ACL for subnet (%s): %w", sID, err)
-		}*/
+		}
 	}
 
 	return nil
@@ -95,9 +95,9 @@ func (a *AWSSubnetsLoss) cleanUp(ctx context.Context, associations map[string]st
 		a.log.Info("restoring Network ACL associations")
 		for subnetId, originalACLID := range associations {
 			a.log.Info(fmt.Sprintf("restoring subnet (%s) to its original Network ACL (%s)", subnetId, originalACLID))
-			/*if err := a.client.ReplaceNetworkAclForSubnet(ctx, subnetId, originalACLID); err != nil {
+			if err := a.client.ReplaceNetworkAclForSubnet(ctx, subnetId, originalACLID); err != nil {
 				return err
-			}*/
+			}
 		}
 	}
 
