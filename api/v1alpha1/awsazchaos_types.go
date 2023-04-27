@@ -23,7 +23,7 @@ var _ InnerObjectWithCustomStatus = (*AWSAzChaos)(nil)
 var _ InnerObjectWithSelector = (*AWSAzChaos)(nil)
 var _ InnerObject = (*AWSAzChaos)(nil)
 
-// AWSAzChaosSpec is the content of the specification for a HelloWorldChaos
+// AWSAzChaosSpec is the content of the specification for a AWSAzChaos
 type AWSAzChaosSpec struct {
 	// ContainerSelector specifies target
 	AWSAZSelector `json:",inline"`
@@ -49,7 +49,7 @@ type AWSAZSelector struct {
 	// AWSRegion defines the region of aws.
 	Stack string `json:"stack"`
 
-	// Ec2Instance indicates the ID of the ec2 instance.
+	// AZ indicates the Availability zone to be taken down
 	AZ string `json:"az"`
 }
 
