@@ -135,7 +135,7 @@ func isSubnetIdInSubnetsAssociations(subnetId string, subnetAssociations []ec2ty
 	return false
 }
 
-func (a *StackScopedDRClient) DescribeNetworkAclsForStackSubnets(ctx context.Context) (map[string]string, error) {
+func (a *StackScopedDRClient) DescribeNetworkAclsForStackSubnets(ctx context.Context, az string) (map[string]string, error) {
 	vpc, err := a.DescribeMainVPC(ctx)
 	if err != nil {
 		return nil, err
@@ -164,6 +164,9 @@ func (a *StackScopedDRClient) DescribeNetworkAclsForStackSubnets(ctx context.Con
 
 	// check if all subnets have a corresponding network Acl
 	for _, subnet := range subnets {
+		if az != "" && *subnet.AvailabilityZone != az {
+			continue
+		}
 		aclID := a.getACLAssociatedToSubnet(subnet, networkAcls.NetworkAcls)
 		if aclID == "" {
 			return nil, fmt.Errorf("subnet %s does not have a corresponding ACL", *subnet.SubnetId)

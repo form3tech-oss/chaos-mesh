@@ -44,7 +44,7 @@ func NewAWSAzLoss(ctx context.Context, stack string, az string, log logr.Logger)
 	}, nil
 }
 func (a *AWSSubnetsLoss) GetSubnetToACL(ctx context.Context) (map[string]string, error) {
-	return a.client.DescribeNetworkAclsForStackSubnets(ctx)
+	return a.client.DescribeNetworkAclsForStackSubnets(ctx, a.az)
 }
 
 func (a *AWSSubnetsLoss) Start(ctx context.Context, originalSubnetToACL map[string]string) error {
