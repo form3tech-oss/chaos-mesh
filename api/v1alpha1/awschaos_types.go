@@ -105,12 +105,37 @@ type AWSSelector struct {
 	// +ui:form:when=action=='detach-volume'
 	// +optional
 	DeviceName *string `json:"deviceName,omitempty" webhook:"AWSDeviceName,nilable"`
+
+	// Filters defines the filters to pass to the AWS api to query the list of instances.
+	// Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+	// Any parameter supported by AWS DescribeInstances method can be used.
+	// For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
+	Filters []*AWSFilter `json:"filters,omitempty"`
+
+	// Mode defines the mode to run chaos action.
+	// Used only if Filters is specified.
+	// Supported mode: one / all / fixed / fixed-percent / random-max-percent
+	// +kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent
+	Mode SelectorMode `json:"mode"`
+
+	// Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+	// If `FixedMode`, provide an integer of pods to do chaos action.
+	// If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+	// IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+	// +optional
+	Value string `json:"value,omitempty"`
+}
+
+type AWSFilter struct {
+	Name   string   `json:"name"`
+	Values []string `json:"values"`
 }
 
 func (obj *AWSChaos) GetSelectorSpecs() map[string]interface{} {
-	return map[string]interface{}{
+	selectors := map[string]interface{}{
 		".": &obj.Spec.AWSSelector,
 	}
+	return selectors
 }
 
 func (selector *AWSSelector) Id() string {
