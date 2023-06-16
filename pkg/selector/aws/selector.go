@@ -136,7 +136,7 @@ func newEc2Client(ctx context.Context, awsSelector *v1alpha1.AWSSelector) (*ec2.
 	return ec2.NewFromConfig(cfg), nil
 }
 
-// filterPodsByMode filters pods by mode from pod list
+// filterInstancesByMode filters instances by mode from a list
 func filterInstancesByMode(instances []*v1alpha1.AWSSelector, mode v1alpha1.SelectorMode, value string) ([]*v1alpha1.AWSSelector, error) {
 	indexes, err := generic.FilterObjectsByMode(mode, value, len(instances))
 	if err != nil {
