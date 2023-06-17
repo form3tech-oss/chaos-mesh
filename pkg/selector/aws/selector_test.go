@@ -35,9 +35,12 @@ type StubClient struct {
 }
 
 func (s StubClient) DescribeInstances(ctx context.Context, in *ec2.DescribeInstancesInput, opt ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error) {
-	s.Input = in
+	if s.Input != nil {
+		*s.Input = *in
+	}
 	return s.Output, nil
 }
+
 func TestSelect(t *testing.T) {
 	ctx := context.Background()
 
@@ -50,23 +53,14 @@ func TestSelect(t *testing.T) {
 	}
 
 	ec2Client := StubClient{
-		Output: &ec2.DescribeInstancesOutput{
-			Reservations: []ec2types.Reservation{{
-				Instances: []ec2types.Instance{{
-					InstanceId: ptr.String("1111"),
-				}}}, {
-				Instances: []ec2types.Instance{{
-					InstanceId: ptr.String("2222"),
-				}}}, {
-				Instances: []ec2types.Instance{{
-					InstanceId: ptr.String("3333"),
-				}},
-			}},
-		},
+		Input:  &ec2.DescribeInstancesInput{},
+		Output: buildInstancesOutput("1111", "2222", "3333"),
 	}
 	s := selector.New(
 		selector.SelectorParams{
-			AWSSelector: aws.New(ec2Client),
+			AWSSelector: &aws.SelectImpl{
+				EC2Client: ec2Client,
+			},
 		})
 
 	result, err := s.Select(ctx, sel)
@@ -79,4 +73,24 @@ func TestSelect(t *testing.T) {
 		[]string{"1111", "2222", "3333"},
 		[]string{result[0].(*v1alpha1.AWSSelector).Ec2Instance},
 	)
+	require.Equal(t, &ec2.DescribeInstancesInput{
+		Filters: []ec2types.Filter{{
+			Name:   ptr.String("tag:Stack"),
+			Values: []string{"staging"},
+		}},
+	}, ec2Client.Input)
+}
+
+func buildInstancesOutput(instanceIDs ...string) *ec2.DescribeInstancesOutput {
+	reservations := []ec2types.Reservation{}
+
+	for _, instanceID := range instanceIDs {
+		reservations = append(reservations, ec2types.Reservation{
+			Instances: []ec2types.Instance{{
+				InstanceId: &instanceID,
+			}},
+		})
+	}
+
+	return &ec2.DescribeInstancesOutput{Reservations: reservations}
 }
