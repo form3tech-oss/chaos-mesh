@@ -134,10 +134,9 @@ type AWSFilter struct {
 }
 
 func (obj *AWSChaos) GetSelectorSpecs() map[string]interface{} {
-	selectors := map[string]interface{}{
+	return map[string]interface{}{
 		".": &obj.Spec.AWSSelector,
 	}
-	return selectors
 }
 
 func (selector *AWSSelector) Id() string {

@@ -33,7 +33,7 @@ type EC2Client interface {
 }
 
 type SelectImpl struct {
-	e EC2Client
+	EC2Client EC2Client
 }
 
 func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSelector) ([]*v1alpha1.AWSSelector, error) {
@@ -46,15 +46,15 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 	// we have filters, so we should lookup the cloud resources
 
 	// TODO: for now, lazy load the client if not set - I'm unsure how to pass it in the main application
-	if impl.e == nil {
+	if impl.EC2Client == nil {
 		ec2client, err := newEc2Client(ctx, awsSelector)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create client: %w", err)
 		}
-		impl.e = ec2client
+		impl.EC2Client = ec2client
 	}
 
-	result, err := impl.e.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+	result, err := impl.EC2Client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
 		Filters: buildEc2Filters(awsSelector.Filters),
 	})
 	if err != nil {
@@ -81,10 +81,8 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 	return filteredInstances, nil
 }
 
-func New(e EC2Client) *SelectImpl {
-	return &SelectImpl{
-		e: e,
-	}
+func New() *SelectImpl {
+	return &SelectImpl{}
 }
 
 func buildEc2Filters(filters []*v1alpha1.AWSFilter) []ec2types.Filter {
