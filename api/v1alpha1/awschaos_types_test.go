@@ -59,6 +59,7 @@ var _ = Describe("AWSChaos", func() {
 					Action: Ec2Stop,
 					AWSSelector: AWSSelector{
 						Ec2Instance: testInstance,
+						Mode:        OneMode,
 					},
 					SecretName: &testSecretName,
 				},
