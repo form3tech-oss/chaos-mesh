@@ -23,6 +23,7 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/smithy-go/ptr"
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
+	"github.com/chaos-mesh/chaos-mesh/pkg/mock"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/stretchr/testify/require"
@@ -52,15 +53,15 @@ func TestSelect(t *testing.T) {
 		Mode: v1alpha1.OneMode,
 	}
 
-	ec2Client := StubClient{
+	ec2client := StubClient{
 		Input:  &ec2.DescribeInstancesInput{},
 		Output: buildInstancesOutput("1111", "2222", "3333"),
 	}
+	defer mock.With("MockCreateEc2Client", ec2client)()
+
 	s := selector.New(
 		selector.SelectorParams{
-			AWSSelector: &aws.SelectImpl{
-				EC2Client: ec2Client,
-			},
+			AWSSelector: &aws.SelectImpl{},
 		})
 
 	result, err := s.Select(ctx, sel)
@@ -78,7 +79,7 @@ func TestSelect(t *testing.T) {
 			Name:   ptr.String("tag:Stack"),
 			Values: []string{"staging"},
 		}},
-	}, ec2Client.Input)
+	}, ec2client.Input)
 }
 
 func buildInstancesOutput(instanceIDs ...string) *ec2.DescribeInstancesOutput {
