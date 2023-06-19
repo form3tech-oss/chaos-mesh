@@ -65,10 +65,6 @@ type AWSChaosSpec struct {
 	// +optional
 	Duration *string `json:"duration,omitempty" webhook:"Duration"`
 
-	// SecretName defines the name of kubernetes secret.
-	// +optional
-	SecretName *string `json:"secretName,omitempty" webhook:",nilable"`
-
 	AWSSelector `json:",inline"`
 
 	// RemoteCluster represents the remote cluster where the chaos will be deployed
@@ -92,6 +88,10 @@ type AWSSelector struct {
 
 	// AWSRegion defines the region of aws.
 	AWSRegion string `json:"awsRegion"`
+
+	// SecretName defines the name of kubernetes secret.
+	// +optional
+	SecretName *string `json:"secretName,omitempty" webhook:",nilable"`
 
 	// Ec2Instance indicates the ID of the ec2 instance.
 	Ec2Instance string `json:"ec2Instance"`

@@ -211,11 +211,6 @@ func (in *AWSChaosSpec) DeepCopyInto(out *AWSChaosSpec) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.SecretName != nil {
-		in, out := &in.SecretName, &out.SecretName
-		*out = new(string)
-		**out = **in
-	}
 	in.AWSSelector.DeepCopyInto(&out.AWSSelector)
 }
 
@@ -270,6 +265,11 @@ func (in *AWSSelector) DeepCopyInto(out *AWSSelector) {
 	*out = *in
 	if in.Endpoint != nil {
 		in, out := &in.Endpoint, &out.Endpoint
+		*out = new(string)
+		**out = **in
+	}
+	if in.SecretName != nil {
+		in, out := &in.SecretName, &out.SecretName
 		*out = new(string)
 		**out = **in
 	}
