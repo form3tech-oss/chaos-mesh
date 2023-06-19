@@ -24,7 +24,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
+	"github.com/chaos-mesh/chaos-mesh/controllers/config"
+	"github.com/chaos-mesh/chaos-mesh/pkg/mock"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/generic"
+	"go.uber.org/fx"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // EC2Client defines the minimum client interface required for this package
@@ -33,7 +37,8 @@ type EC2Client interface {
 }
 
 type SelectImpl struct {
-	EC2Client EC2Client
+	c client.Client
+	generic.Option
 }
 
 func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSelector) ([]*v1alpha1.AWSSelector, error) {
@@ -41,20 +46,15 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 		return []*v1alpha1.AWSSelector{awsSelector}, nil
 	}
 
+	// we have filters, so we should lookup the cloud resources
 	instances := []*v1alpha1.AWSSelector{}
 
-	// we have filters, so we should lookup the cloud resources
-
-	// TODO: for now, lazy load the client if not set - I'm unsure how to pass it in the main application
-	if impl.EC2Client == nil {
-		ec2client, err := newEc2Client(ctx, awsSelector)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create client: %w", err)
-		}
-		impl.EC2Client = ec2client
+	ec2client, err := impl.newEc2Client(ctx, awsSelector)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create client: %w", err)
 	}
 
-	result, err := impl.EC2Client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+	result, err := ec2client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
 		Filters: buildEc2Filters(awsSelector.Filters),
 	})
 	if err != nil {
@@ -66,6 +66,7 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 			Ec2Instance: *r.Instances[0].InstanceId,
 			Endpoint:    awsSelector.Endpoint,
 			AWSRegion:   awsSelector.AWSRegion,
+			SecretName:  awsSelector.SecretName,
 			EbsVolume:   awsSelector.EbsVolume,
 			DeviceName:  awsSelector.DeviceName,
 		})
@@ -81,8 +82,19 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 	return filteredInstances, nil
 }
 
-func New() *SelectImpl {
-	return &SelectImpl{}
+type Params struct {
+	fx.In
+
+	Client client.Client
+}
+
+func New(params Params) *SelectImpl {
+	return &SelectImpl{
+		params.Client,
+		generic.Option{
+			TargetNamespace: config.ControllerCfg.TargetNamespace,
+		},
+	}
 }
 
 func buildEc2Filters(filters []*v1alpha1.AWSFilter) []ec2types.Filter {
@@ -97,8 +109,11 @@ func buildEc2Filters(filters []*v1alpha1.AWSFilter) []ec2types.Filter {
 	return ec2Filters
 }
 
-func newEc2Client(ctx context.Context, awsSelector *v1alpha1.AWSSelector) (*ec2.Client, error) {
+func (impl *SelectImpl) newEc2Client(ctx context.Context, awsSelector *v1alpha1.AWSSelector) (EC2Client, error) {
 
+	if ec2client := mock.On("MockCreateEc2Client"); ec2client != nil {
+		return ec2client.(EC2Client), nil
+	}
 	opts := []func(*awscfg.LoadOptions) error{
 		awscfg.WithRegion(awsSelector.AWSRegion),
 	}
@@ -109,16 +124,15 @@ func newEc2Client(ctx context.Context, awsSelector *v1alpha1.AWSSelector) (*ec2.
 		})))
 	}
 
-	// TODO: no access to secret here, need to solve this
-	// if awschaos.Spec.SecretName != nil {
+	// TODO How to get namespace for secret??
+	// if awsSelector.SecretName != nil {
 	// 	secret := &v1.Secret{}
-	// 	err := impl.Client.Get(ctx, types.NamespacedName{
-	// 		Name:      *awschaos.Spec.SecretName,
-	// 		Namespace: awschaos.Namespace,
+	// 	err := impl.c.Get(ctx, types.NamespacedName{
+	// 		Name:      *awsSelector.SecretName,
+	// 		Namespace: impl.TargetNamespace,
 	// 	}, secret)
 	// 	if err != nil {
-	// 		impl.Log.Error(err, "fail to get cloud secret")
-	// 		return v1alpha1.NotInjected, err
+	// 		return nil, fmt.Errorf("fail to get cloud secret: %w", err)
 	// 	}
 	// 	opts = append(opts, awscfg.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
 	// 		string(secret.Data["aws_access_key_id"]),
