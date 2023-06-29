@@ -21,6 +21,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
@@ -28,6 +29,8 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/mock"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/generic"
 	"go.uber.org/fx"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -41,13 +44,33 @@ type SelectImpl struct {
 	generic.Option
 }
 
-func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSelector) ([]*v1alpha1.AWSSelector, error) {
+type Instance struct {
+	InstanceID string
+	AWSRegion  string
+	Endpoint   *string
+	SecretName *string
+	EbsVolume  *string
+	DeviceName *string
+}
+
+func (instance *Instance) Id() string {
+	return instance.InstanceID
+}
+
+func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSelector) ([]*Instance, error) {
 	if len(awsSelector.Filters) == 0 {
-		return []*v1alpha1.AWSSelector{awsSelector}, nil
+		return []*Instance{{
+			InstanceID: awsSelector.Ec2Instance,
+			Endpoint:   awsSelector.Endpoint,
+			AWSRegion:  awsSelector.AWSRegion,
+			SecretName: awsSelector.SecretName,
+			EbsVolume:  awsSelector.EbsVolume,
+			DeviceName: awsSelector.DeviceName,
+		}}, nil
 	}
 
 	// we have filters, so we should lookup the cloud resources
-	instances := []*v1alpha1.AWSSelector{}
+	instances := []*Instance{}
 
 	ec2client, err := impl.newEc2Client(ctx, awsSelector)
 	if err != nil {
@@ -62,13 +85,13 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 	}
 	for _, r := range result.Reservations {
 		// Set the Ec2Instance, and copy over the other attributes, except the filter
-		instances = append(instances, &v1alpha1.AWSSelector{
-			Ec2Instance: *r.Instances[0].InstanceId,
-			Endpoint:    awsSelector.Endpoint,
-			AWSRegion:   awsSelector.AWSRegion,
-			SecretName:  awsSelector.SecretName,
-			EbsVolume:   awsSelector.EbsVolume,
-			DeviceName:  awsSelector.DeviceName,
+		instances = append(instances, &Instance{
+			InstanceID: *r.Instances[0].InstanceId,
+			Endpoint:   awsSelector.Endpoint,
+			AWSRegion:  awsSelector.AWSRegion,
+			SecretName: awsSelector.SecretName,
+			EbsVolume:  awsSelector.EbsVolume,
+			DeviceName: awsSelector.DeviceName,
 		})
 	}
 	mode := awsSelector.Mode
@@ -124,22 +147,21 @@ func (impl *SelectImpl) newEc2Client(ctx context.Context, awsSelector *v1alpha1.
 		})))
 	}
 
-	// TODO How to get namespace for secret??
-	// if awsSelector.SecretName != nil {
-	// 	secret := &v1.Secret{}
-	// 	err := impl.c.Get(ctx, types.NamespacedName{
-	// 		Name:      *awsSelector.SecretName,
-	// 		Namespace: impl.TargetNamespace,
-	// 	}, secret)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("fail to get cloud secret: %w", err)
-	// 	}
-	// 	opts = append(opts, awscfg.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-	// 		string(secret.Data["aws_access_key_id"]),
-	// 		string(secret.Data["aws_secret_access_key"]),
-	// 		"",
-	// 	)))
-	// }
+	if awsSelector.SecretName != nil {
+		secret := &v1.Secret{}
+		err := impl.c.Get(ctx, types.NamespacedName{
+			Name:      *awsSelector.SecretName,
+			Namespace: impl.TargetNamespace,
+		}, secret)
+		if err != nil {
+			return nil, fmt.Errorf("fail to get cloud secret: %w", err)
+		}
+		opts = append(opts, awscfg.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
+			string(secret.Data["aws_access_key_id"]),
+			string(secret.Data["aws_secret_access_key"]),
+			"",
+		)))
+	}
 
 	cfg, err := awscfg.LoadDefaultConfig(ctx, opts...)
 	if err != nil {
@@ -149,13 +171,13 @@ func (impl *SelectImpl) newEc2Client(ctx context.Context, awsSelector *v1alpha1.
 }
 
 // filterInstancesByMode filters instances by mode from a list
-func filterInstancesByMode(instances []*v1alpha1.AWSSelector, mode v1alpha1.SelectorMode, value string) ([]*v1alpha1.AWSSelector, error) {
+func filterInstancesByMode(instances []*Instance, mode v1alpha1.SelectorMode, value string) ([]*Instance, error) {
 	indexes, err := generic.FilterObjectsByMode(mode, value, len(instances))
 	if err != nil {
 		return nil, err
 	}
 
-	var filtered []*v1alpha1.AWSSelector
+	var filtered []*Instance
 
 	for _, index := range indexes {
 		index := index
