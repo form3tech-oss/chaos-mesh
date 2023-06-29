@@ -88,6 +88,25 @@ spec:
                 - awsRegion
                 - ec2Instance
                 type: object
+              awsazChaos:
+                description: AWSAzChaosSpec is the content of the specification for
+                  a AWSAzChaos
+                properties:
+                  az:
+                    description: AZ indicates the Availability zone to be taken down
+                    type: string
+                  duration:
+                    description: Duration represents the duration of the chaos action
+                    type: string
+                  remoteCluster:
+                    type: string
+                  stack:
+                    description: AWSRegion defines the region of aws.
+                    type: string
+                required:
+                - az
+                - stack
+                type: object
               azureChaos:
                 description: AzureChaosSpec is the content of the specification for
                   an AzureChaos
@@ -2979,6 +2998,27 @@ spec:
                     - action
                     - awsRegion
                     - ec2Instance
+                    type: object
+                  awsazChaos:
+                    description: AWSAzChaosSpec is the content of the specification
+                      for a AWSAzChaos
+                    properties:
+                      az:
+                        description: AZ indicates the Availability zone to be taken
+                          down
+                        type: string
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action
+                        type: string
+                      remoteCluster:
+                        type: string
+                      stack:
+                        description: AWSRegion defines the region of aws.
+                        type: string
+                    required:
+                    - az
+                    - stack
                     type: object
                   azureChaos:
                     description: AzureChaosSpec is the content of the specification
@@ -6294,6 +6334,27 @@ spec:
                               - awsRegion
                               - ec2Instance
                               type: object
+                            awsazChaos:
+                              description: AWSAzChaosSpec is the content of the specification
+                                for a AWSAzChaos
+                              properties:
+                                az:
+                                  description: AZ indicates the Availability zone
+                                    to be taken down
+                                  type: string
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action
+                                  type: string
+                                remoteCluster:
+                                  type: string
+                                stack:
+                                  description: AWSRegion defines the region of aws.
+                                  type: string
+                              required:
+                              - az
+                              - stack
+                              type: object
                             azureChaos:
                               description: AzureChaosSpec is the content of the specification
                                 for an AzureChaos
@@ -9481,6 +9542,28 @@ spec:
                                   - action
                                   - awsRegion
                                   - ec2Instance
+                                  type: object
+                                awsazChaos:
+                                  description: AWSAzChaosSpec is the content of the
+                                    specification for a AWSAzChaos
+                                  properties:
+                                    az:
+                                      description: AZ indicates the Availability zone
+                                        to be taken down
+                                      type: string
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action
+                                      type: string
+                                    remoteCluster:
+                                      type: string
+                                    stack:
+                                      description: AWSRegion defines the region of
+                                        aws.
+                                      type: string
+                                  required:
+                                  - az
+                                  - stack
                                   type: object
                                 azureChaos:
                                   description: AzureChaosSpec is the content of the
