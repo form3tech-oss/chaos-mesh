@@ -72,7 +72,7 @@ func TestSelect(t *testing.T) {
 	require.Len(t, result, 1)
 	require.Subset(t,
 		[]string{"1111", "2222", "3333"},
-		[]string{result[0].(*v1alpha1.AWSSelector).Ec2Instance},
+		[]string{result[0].(*aws.Instance).InstanceID},
 	)
 	require.Equal(t, &ec2.DescribeInstancesInput{
 		Filters: []ec2types.Filter{{
