@@ -1,0 +1,52 @@
+name: CI v2
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  calculate-tag:
+    runs-on: ubuntu-20.04
+    permissions: read-all
+    outputs:
+      tag: ${{ steps.compute_next_tag.outputs.next_tag }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v2
+
+      - name: Determine latest release tag
+        id: latest_tag
+        run: |
+          latest_tag=$(git tag -l | grep -E "v[0-9]+\.[0-9]+\.[0-9]+$" | tail -n 1)
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: "Calculate prerelease suffix"
+        id: tag-suffix
+        run: |
+          PRERELEASE="${{ github.head_ref }}.${{ github.run_id }}"
+          underscores_and_slashes_to_dashes_suffix="${PRERELEASE//[\/_]/-}"
+          echo "tag-suffix=${underscores_and_slashes_to_dashes_suffix}" >> $GITHUB_OUTPUT
+
+      - name: Compute next tag
+        id: compute_next_tag
+        run: |
+          latest_tag="${{ steps.latest_tag.outputs.latest_tag }}"
+          next_tag="${latest_tag}-${{steps.tag-suffix.outputs.tag-suffix}}"
+          echo "next_tag=$next_tag" >> $GITHUB_OUTPUT
+
+  release:
+    runs-on: ubuntu-20.04
+    needs: calculate-tag
+    permissions: write-all
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          generate_release_notes: true
+          tag_name: ${{ needs.calculate-tag.outputs.tag }}
