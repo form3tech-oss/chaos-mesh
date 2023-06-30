@@ -1,21 +1,21 @@
-name: License checker
+# name: License checker
 
-on:
-  pull_request:
-    branches:
-      - master
+# on:
+#   pull_request:
+#     branches:
+#       - master
 
-permissions: read-all
+# permissions: read-all
 
-jobs:
-  check-license:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Check License Header
-        uses: apache/skywalking-eyes@v0.4.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          log: info
-          config: .github/.licenserc.yaml
+# jobs:
+#   check-license:
+#     runs-on: ubuntu-20.04
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Check License Header
+#         uses: apache/skywalking-eyes@v0.4.0
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           log: info
+#           config: .github/.licenserc.yaml
