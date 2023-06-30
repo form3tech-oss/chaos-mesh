@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.0.1](https://github.com/form3tech-oss/chaos-mesh/compare/v2.0.0...v2.0.1) (2023-06-30)
+
 ## 2.0.0 (2023-06-30)
 
 
