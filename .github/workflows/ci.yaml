@@ -79,7 +79,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `### Created new release based on commit https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{github.event.after}}
+              body: `### Created new release based on commit https://github.com/${{ github.repository }}/pull/${{ github.event.number }}/commits/${{ github.sha }}
 
               **Release tag**: v2.6.1-f3-c64ec-builder
 
