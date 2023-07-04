@@ -39,7 +39,7 @@ func (it *workflowCodeGenerator) AppendTypes(typeName string) {
 }
 
 func (it *workflowCodeGenerator) Render() string {
-
+	fmt.Print("foobar")
 	workflowTemplateTypesEntries := ""
 	for _, item := range it.chaosTypes {
 		workflowTemplateTypesEntries += generateTemplateTypes(item)
