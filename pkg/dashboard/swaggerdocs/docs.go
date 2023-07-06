@@ -5430,6 +5430,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
                 },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -5772,6 +5776,31 @@ const docTemplate = `{
                 },
                 "predicate": {
                     "description": "Predicate will access the arguments of this Frame, example with Parameters's, you can\nset it to ` + "`" + `STRNCMP(name-\u003ename, \"bananas\", 8)` + "`" + ` to make inject only with it, or omit it\nto inject for all d_alloc_parallel call chain.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.GCPAzChaosSpec": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Filter defines the filter used when fetching GCP instance groups.\nFilter reference: https://google.aip.dev/160\n+optional",
+                    "type": "string"
+                },
+                "project": {
+                    "description": "Project defines the GCP project.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "zone": {
+                    "description": "Zone defines the zone of GCP project.",
                     "type": "string"
                 }
             }
@@ -7617,6 +7646,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
                 },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -7973,6 +8006,10 @@ const docTemplate = `{
                 "gcpChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
+                },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
                 },
                 "httpChaos": {
                     "description": "+optional",
