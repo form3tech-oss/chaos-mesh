@@ -55,6 +55,14 @@ func TestChaosKindMapShouldContainsDNSChaos(t *testing.T) {
 	_, ok := all.kinds[string(requiredType)]
 	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
 }
+func TestChaosKindMapShouldContainsGCPAzChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeGCPAzChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
 func TestChaosKindMapShouldContainsGCPChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 	var requiredType TemplateType
