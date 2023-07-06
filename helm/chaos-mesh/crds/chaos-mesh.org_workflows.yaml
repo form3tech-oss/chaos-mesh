@@ -589,6 +589,32 @@ spec:
                       - project
                       - zone
                       type: object
+                    gcpazChaos:
+                      description: GCPAzChaosSpec is the content of the specification
+                        for a GCPAzChaos
+                      properties:
+                        duration:
+                          description: Duration represents the duration of the chaos
+                            action
+                          type: string
+                        filter:
+                          description: 'Filter defines the filter used when fetching
+                            GCP instance groups. Filter reference: https://google.aip.dev/160'
+                          type: string
+                        project:
+                          description: Project defines the GCP project.
+                          type: string
+                        remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
+                          type: string
+                        zone:
+                          description: Zone defines the zone of GCP project.
+                          type: string
+                      required:
+                      - project
+                      - zone
+                      type: object
                     httpChaos:
                       properties:
                         abort:
@@ -3645,6 +3671,32 @@ spec:
                           required:
                           - action
                           - instance
+                          - project
+                          - zone
+                          type: object
+                        gcpazChaos:
+                          description: GCPAzChaosSpec is the content of the specification
+                            for a GCPAzChaos
+                          properties:
+                            duration:
+                              description: Duration represents the duration of the
+                                chaos action
+                              type: string
+                            filter:
+                              description: 'Filter defines the filter used when fetching
+                                GCP instance groups. Filter reference: https://google.aip.dev/160'
+                              type: string
+                            project:
+                              description: Project defines the GCP project.
+                              type: string
+                            remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
+                              type: string
+                            zone:
+                              description: Zone defines the zone of GCP project.
+                              type: string
+                          required:
                           - project
                           - zone
                           type: object

@@ -66,6 +66,12 @@ export interface GCP {
   deviceNames?: string[]
 }
 
+export interface GCPAz {
+  project: string
+  zone: string
+  filter?: string
+}
+
 export interface IO {
   action: 'latency' | 'fault' | 'attrOverride'
   delay?: string
@@ -168,6 +174,7 @@ export interface ExperimentType {
   AWSAzChaos: AWSAzChaos
   AzureChaos?: unknown
   DNSChaos: DNS
+  GCPAzChaos: GCPAz
   GCPChaos: GCP
   HTTPChaos?: unknown
   IOChaos: IO
