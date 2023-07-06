@@ -442,6 +442,29 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  // GCPAzChaos
+  GCPAzChaos: {
+    spec: {
+      project: {
+        field: 'text',
+        label: 'Project',
+        value: '',
+        helperText: 'The ID of a GCP project',
+      },
+      zone: {
+        field: 'text',
+        label: 'Zone',
+        value: '',
+        helperText: 'The zone of a GCP project',
+      },
+      filter: {
+        field: 'text',
+        label: 'Filter',
+        value: '',
+        helperText: 'The filter used when fetching GCP instance groups',
+      },
+    } as any,
+  },
   // IO Injection
   IOChaos: {
     categories: [
@@ -1421,6 +1444,13 @@ export const schema: Partial<Record<Kind, Record<string, Yup.ObjectSchema>>> = {
     'node-reset': GCPChaosCommonSchema,
     'disk-loss': GCPChaosCommonSchema.shape({
       deviceNames: Yup.array().of(Yup.string()).required('At least one device name is required'),
+    }),
+  },
+  GCPAzChaos: {
+    default: Yup.object({
+      project: Yup.string().required('The project is required'),
+      zone: Yup.string().required('The zone is required'),
+      filter: Yup.string(),
     }),
   },
   IOChaos: {

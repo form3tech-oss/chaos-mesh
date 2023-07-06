@@ -3911,6 +3911,9 @@ definitions:
       gcpChaos:
         $ref: '#/definitions/v1alpha1.GCPChaosSpec'
         description: +optional
+      gcpazChaos:
+        $ref: '#/definitions/v1alpha1.GCPAzChaosSpec'
+        description: +optional
       historyLimit:
         description: |-
           +optional
@@ -4241,6 +4244,31 @@ definitions:
           Predicate will access the arguments of this Frame, example with Parameters's, you can
           set it to `STRNCMP(name->name, "bananas", 8)` to make inject only with it, or omit it
           to inject for all d_alloc_parallel call chain.
+        type: string
+    type: object
+  v1alpha1.GCPAzChaosSpec:
+    properties:
+      duration:
+        description: |-
+          Duration represents the duration of the chaos action
+          +optional
+        type: string
+      filter:
+        description: |-
+          Filter defines the filter used when fetching GCP instance groups.
+          Filter reference: https://google.aip.dev/160
+          +optional
+        type: string
+      project:
+        description: Project defines the GCP project.
+        type: string
+      remoteCluster:
+        description: |-
+          RemoteCluster represents the remote cluster where the chaos will be deployed
+          +optional
+        type: string
+      zone:
+        description: Zone defines the zone of GCP project.
         type: string
     type: object
   v1alpha1.GCPChaosSpec:
@@ -6230,6 +6258,9 @@ definitions:
       gcpChaos:
         $ref: '#/definitions/v1alpha1.GCPChaosSpec'
         description: +optional
+      gcpazChaos:
+        $ref: '#/definitions/v1alpha1.GCPAzChaosSpec'
+        description: +optional
       historyLimit:
         description: |-
           +optional
@@ -6638,6 +6669,9 @@ definitions:
         description: +optional
       gcpChaos:
         $ref: '#/definitions/v1alpha1.GCPChaosSpec'
+        description: +optional
+      gcpazChaos:
+        $ref: '#/definitions/v1alpha1.GCPAzChaosSpec'
         description: +optional
       httpChaos:
         $ref: '#/definitions/v1alpha1.HTTPChaosSpec'
