@@ -17,6 +17,7 @@ package chaosimpl
 
 import (
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awsazchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/gcpazchaos"
 	"go.uber.org/fx"
 
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awschaos"
@@ -52,4 +53,5 @@ var AllImpl = fx.Options(
 	physicalmachinechaos.Module,
 	blockchaos.Module,
 	awsazchaos.Module,
+	gcpazchaos.Module,
 	utils.Module)

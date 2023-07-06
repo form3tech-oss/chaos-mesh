@@ -29,6 +29,7 @@ const (
 	TypeAzureChaos TemplateType = "AzureChaos"
 	TypeBlockChaos TemplateType = "BlockChaos"
 	TypeDNSChaos TemplateType = "DNSChaos"
+	TypeGCPAzChaos TemplateType = "GCPAzChaos"
 	TypeGCPChaos TemplateType = "GCPChaos"
 	TypeHTTPChaos TemplateType = "HTTPChaos"
 	TypeIOChaos TemplateType = "IOChaos"
@@ -49,6 +50,7 @@ var allChaosTemplateType = []TemplateType{
 	TypeAzureChaos,
 	TypeBlockChaos,
 	TypeDNSChaos,
+	TypeGCPAzChaos,
 	TypeGCPChaos,
 	TypeHTTPChaos,
 	TypeIOChaos,
@@ -73,6 +75,8 @@ type EmbedChaos struct {
 	BlockChaos *BlockChaosSpec `json:"blockChaos,omitempty"`
 	// +optional
 	DNSChaos *DNSChaosSpec `json:"dnsChaos,omitempty"`
+	// +optional
+	GCPAzChaos *GCPAzChaosSpec `json:"gcpazChaos,omitempty"`
 	// +optional
 	GCPChaos *GCPChaosSpec `json:"gcpChaos,omitempty"`
 	// +optional
@@ -117,6 +121,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeDNSChaos:
 		result := DNSChaos{}
 		result.Spec = *it.DNSChaos
+		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaos{}
+		result.Spec = *it.GCPAzChaos
 		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaos{}
@@ -181,6 +189,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *DNSChaos:
 		*it.DNSChaos = chaos.Spec
 		return nil
+	case *GCPAzChaos:
+		*it.GCPAzChaos = chaos.Spec
+		return nil
 	case *GCPChaos:
 		*it.GCPChaos = chaos.Spec
 		return nil
@@ -233,6 +244,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeDNSChaos:
 		result := DNSChaosList{}
+		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaosList{}
 		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaosList{}
@@ -303,6 +317,14 @@ func (in *BlockChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *DNSChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *GCPAzChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item

@@ -520,6 +520,25 @@ spec:
                 - project
                 - zone
                 type: object
+              gcpazChaos:
+                description: GCPAzChaosSpec is the content of the specification for
+                  a GCPAzChaos
+                properties:
+                  duration:
+                    description: Duration represents the duration of the chaos action
+                    type: string
+                  remoteCluster:
+                    type: string
+                  stack:
+                    description: Project defines the GCP project.
+                    type: string
+                  zone:
+                    description: AZ indicates the Availability zone to be taken down
+                    type: string
+                required:
+                - stack
+                - zone
+                type: object
               httpChaos:
                 properties:
                   abort:
@@ -3426,6 +3445,27 @@ spec:
                     - action
                     - instance
                     - project
+                    - zone
+                    type: object
+                  gcpazChaos:
+                    description: GCPAzChaosSpec is the content of the specification
+                      for a GCPAzChaos
+                    properties:
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action
+                        type: string
+                      remoteCluster:
+                        type: string
+                      stack:
+                        description: Project defines the GCP project.
+                        type: string
+                      zone:
+                        description: AZ indicates the Availability zone to be taken
+                          down
+                        type: string
+                    required:
+                    - stack
                     - zone
                     type: object
                   historyLimit:
@@ -6815,6 +6855,27 @@ spec:
                               - project
                               - zone
                               type: object
+                            gcpazChaos:
+                              description: GCPAzChaosSpec is the content of the specification
+                                for a GCPAzChaos
+                              properties:
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action
+                                  type: string
+                                remoteCluster:
+                                  type: string
+                                stack:
+                                  description: Project defines the GCP project.
+                                  type: string
+                                zone:
+                                  description: AZ indicates the Availability zone
+                                    to be taken down
+                                  type: string
+                              required:
+                              - stack
+                              - zone
+                              type: object
                             httpChaos:
                               properties:
                                 abort:
@@ -10009,6 +10070,27 @@ spec:
                                   - action
                                   - instance
                                   - project
+                                  - zone
+                                  type: object
+                                gcpazChaos:
+                                  description: GCPAzChaosSpec is the content of the
+                                    specification for a GCPAzChaos
+                                  properties:
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action
+                                      type: string
+                                    remoteCluster:
+                                      type: string
+                                    stack:
+                                      description: Project defines the GCP project.
+                                      type: string
+                                    zone:
+                                      description: AZ indicates the Availability zone
+                                        to be taken down
+                                      type: string
+                                  required:
+                                  - stack
                                   - zone
                                   type: object
                                 historyLimit:
