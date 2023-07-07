@@ -5448,12 +5448,15 @@ spec:
                   a AWSAzChaos
                 properties:
                   az:
-                    description: AZ indicates the Availability zone to be taken down
+                    description: AvailabilityZone indicates the Availability zone
+                      to be taken down
                     type: string
                   duration:
                     description: Duration represents the duration of the chaos action
                     type: string
                   remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
                     type: string
                   stack:
                     description: AWSRegion defines the region of aws.
@@ -8711,14 +8714,16 @@ spec:
                             for a AWSAzChaos
                           properties:
                             az:
-                              description: AZ indicates the Availability zone to be
-                                taken down
+                              description: AvailabilityZone indicates the Availability
+                                zone to be taken down
                               type: string
                             duration:
                               description: Duration represents the duration of the
                                 chaos action
                               type: string
                             remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
                               type: string
                             stack:
                               description: AWSRegion defines the region of aws.
@@ -11825,14 +11830,16 @@ spec:
                                 for a AWSAzChaos
                               properties:
                                 az:
-                                  description: AZ indicates the Availability zone
-                                    to be taken down
+                                  description: AvailabilityZone indicates the Availability
+                                    zone to be taken down
                                   type: string
                                 duration:
                                   description: Duration represents the duration of
                                     the chaos action
                                   type: string
                                 remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
                                   type: string
                                 stack:
                                   description: AWSRegion defines the region of aws.
@@ -20021,12 +20028,15 @@ spec:
                   a AWSAzChaos
                 properties:
                   az:
-                    description: AZ indicates the Availability zone to be taken down
+                    description: AvailabilityZone indicates the Availability zone
+                      to be taken down
                     type: string
                   duration:
                     description: Duration represents the duration of the chaos action
                     type: string
                   remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
                     type: string
                   stack:
                     description: AWSRegion defines the region of aws.
@@ -22932,14 +22942,16 @@ spec:
                       for a AWSAzChaos
                     properties:
                       az:
-                        description: AZ indicates the Availability zone to be taken
-                          down
+                        description: AvailabilityZone indicates the Availability zone
+                          to be taken down
                         type: string
                       duration:
                         description: Duration represents the duration of the chaos
                           action
                         type: string
                       remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
                         type: string
                       stack:
                         description: AWSRegion defines the region of aws.
@@ -26267,14 +26279,16 @@ spec:
                                 for a AWSAzChaos
                               properties:
                                 az:
-                                  description: AZ indicates the Availability zone
-                                    to be taken down
+                                  description: AvailabilityZone indicates the Availability
+                                    zone to be taken down
                                   type: string
                                 duration:
                                   description: Duration represents the duration of
                                     the chaos action
                                   type: string
                                 remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
                                   type: string
                                 stack:
                                   description: AWSRegion defines the region of aws.
@@ -29476,14 +29490,16 @@ spec:
                                     specification for a AWSAzChaos
                                   properties:
                                     az:
-                                      description: AZ indicates the Availability zone
-                                        to be taken down
+                                      description: AvailabilityZone indicates the
+                                        Availability zone to be taken down
                                       type: string
                                     duration:
                                       description: Duration represents the duration
                                         of the chaos action
                                       type: string
                                     remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
                                       type: string
                                     stack:
                                       description: AWSRegion defines the region of
@@ -40507,14 +40523,16 @@ spec:
                         for a AWSAzChaos
                       properties:
                         az:
-                          description: AZ indicates the Availability zone to be taken
-                            down
+                          description: AvailabilityZone indicates the Availability
+                            zone to be taken down
                           type: string
                         duration:
                           description: Duration represents the duration of the chaos
                             action
                           type: string
                         remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
                           type: string
                         stack:
                           description: AWSRegion defines the region of aws.
@@ -43533,14 +43551,16 @@ spec:
                             for a AWSAzChaos
                           properties:
                             az:
-                              description: AZ indicates the Availability zone to be
-                                taken down
+                              description: AvailabilityZone indicates the Availability
+                                zone to be taken down
                               type: string
                             duration:
                               description: Duration represents the duration of the
                                 chaos action
                               type: string
                             remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
                               type: string
                             stack:
                               description: AWSRegion defines the region of aws.
