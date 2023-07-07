@@ -38,7 +38,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, err
 	}
 
-	azLoss, err := subnetloss.NewAWSAzLoss(ctx, selected.Stack, selected.AZ, impl.Log)
+	azLoss, err := subnetloss.NewAWSAzLoss(ctx, selected.Stack, selected.AvailabilityZone, impl.Log)
 	if err != nil {
 		impl.Log.Error(err, "fail to create NewAWSAzLoss")
 		return v1alpha1.NotInjected, err
@@ -46,7 +46,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	phase := record.Phase
 	if phase == waitForApplySync {
-		impl.Log.Info(fmt.Sprintf("Applying awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AZ))
+		impl.Log.Info(fmt.Sprintf("Applying awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AvailabilityZone))
 		err := azLoss.Start(ctx, awsAZChaos.Status.SubnetToACL)
 		if err != nil {
 			impl.Log.Error(err, "fail to start NewAWSAzLoss")
@@ -78,15 +78,15 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, err
 	}
 
-	azLoss, err := subnetloss.NewAWSAzLoss(ctx, selected.Stack, selected.AZ, impl.Log)
+	azLoss, err := subnetloss.NewAWSAzLoss(ctx, selected.Stack, selected.AvailabilityZone, impl.Log)
 	if err != nil {
 		impl.Log.Error(err, "fail to create NewAWSAzLoss")
 		return v1alpha1.Injected, err
 	}
-	impl.Log.Info(fmt.Sprintf("Recovering awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AZ))
+	impl.Log.Info(fmt.Sprintf("Recovering awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AvailabilityZone))
 	err = azLoss.Stop(ctx, awsAZChaos.Status.SubnetToACL)
 	if err != nil {
-		impl.Log.Error(err, fmt.Sprintf("failed to recover awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AZ))
+		impl.Log.Error(err, fmt.Sprintf("failed to recover awsazchaos chaos for stack (%s) and AZ (%s)", selected.Stack, selected.AvailabilityZone))
 		return v1alpha1.Injected, err
 	}
 	return v1alpha1.NotInjected, nil

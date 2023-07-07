@@ -4888,7 +4888,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "az": {
-                    "description": "Ec2Instance indicates the ID of the ec2 instance.",
+                    "description": "AZ indicates the Availability zone to be taken down",
                     "type": "string"
                 },
                 "duration": {
@@ -4896,6 +4896,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
                     "type": "string"
                 },
                 "stack": {

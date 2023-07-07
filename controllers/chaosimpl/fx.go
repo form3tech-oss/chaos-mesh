@@ -16,9 +16,9 @@
 package chaosimpl
 
 import (
-	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awsazchaos"
 	"go.uber.org/fx"
 
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awsazchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awschaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/azurechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/blockchaos"

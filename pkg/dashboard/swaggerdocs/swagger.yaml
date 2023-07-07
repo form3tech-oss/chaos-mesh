@@ -3117,7 +3117,7 @@ definitions:
   v1alpha1.AWSAzChaosSpec:
     properties:
       az:
-        description: Ec2Instance indicates the ID of the ec2 instance.
+        description: AZ indicates the Availability zone to be taken down
         type: string
       duration:
         description: |-
@@ -3125,6 +3125,9 @@ definitions:
           +optional
         type: string
       remoteCluster:
+        description: |-
+          RemoteCluster represents the remote cluster where the chaos will be deployed
+          +optional
         type: string
       stack:
         description: AWSRegion defines the region of aws.
