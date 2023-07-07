@@ -19,9 +19,11 @@ type AWSAzChaos struct {
 	Status AWSAzChaosStatus `json:"status,omitempty"`
 }
 
-var _ InnerObjectWithCustomStatus = (*AWSAzChaos)(nil)
-var _ InnerObjectWithSelector = (*AWSAzChaos)(nil)
-var _ InnerObject = (*AWSAzChaos)(nil)
+var (
+	_ InnerObjectWithCustomStatus = (*AWSAzChaos)(nil)
+	_ InnerObjectWithSelector     = (*AWSAzChaos)(nil)
+	_ InnerObject                 = (*AWSAzChaos)(nil)
+)
 
 // AWSAzChaosSpec is the content of the specification for a AWSAzChaos
 type AWSAzChaosSpec struct {
@@ -32,6 +34,8 @@ type AWSAzChaosSpec struct {
 	// +optional
 	Duration *string `json:"duration,omitempty"`
 
+	// RemoteCluster represents the remote cluster where the chaos will be deployed
+	// +optional
 	RemoteCluster string `json:"remoteCluster,omitempty"`
 }
 
@@ -49,8 +53,8 @@ type AWSAZSelector struct {
 	// AWSRegion defines the region of aws.
 	Stack string `json:"stack"`
 
-	// AZ indicates the Availability zone to be taken down
-	AZ string `json:"az"`
+	// AvailabilityZone indicates the Availability zone to be taken down
+	AvailabilityZone string `json:"az"`
 }
 
 // GetSelectorSpecs is a getter for selectors
