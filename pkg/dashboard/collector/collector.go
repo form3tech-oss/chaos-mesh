@@ -174,7 +174,7 @@ func convertInnerObjectToExperiment(obj v1alpha1.InnerObject) (*core.Experiment,
 		archive.Action = string(chaos.Spec.Action)
 	case *v1alpha1.IOChaos:
 		archive.Action = string(chaos.Spec.Action)
-	case *v1alpha1.TimeChaos, *v1alpha1.KernelChaos, *v1alpha1.StressChaos, *v1alpha1.HTTPChaos, *v1alpha1.GCPAzChaos:
+	case *v1alpha1.TimeChaos, *v1alpha1.KernelChaos, *v1alpha1.StressChaos, *v1alpha1.HTTPChaos, *v1alpha1.GKENodePoolChaos, *v1alpha1.GCPAzChaos:
 		archive.Action = ""
 	case *v1alpha1.DNSChaos:
 		archive.Action = string(chaos.Spec.Action)

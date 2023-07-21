@@ -27,6 +27,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcpaz"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gkenodepool"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/physicalmachine"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/pod"
@@ -75,6 +76,7 @@ type SelectorParams struct {
 	AzureSelector           *azure.SelectImpl
 	GCPSelector             *gcp.SelectImpl
 	GCPAzSelector           *gcpaz.SelectImpl
+	GKENodePoolSelector     *gkenodepool.SelectImpl
 	PhysicalMachineSelector *physicalmachine.SelectImpl
 	NodeVolumePath          *nodevolumepath.SelectImpl
 }
@@ -105,6 +107,7 @@ var Module = fx.Provide(
 	azure.New,
 	gcp.New,
 	gcpaz.New,
+	gkenodepool.New,
 	physicalmachine.New,
 	nodevolumepath.New,
 )

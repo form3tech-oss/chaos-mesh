@@ -5133,6 +5133,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
                 },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -5540,6 +5544,31 @@ const docTemplate = `{
                 },
                 "zone": {
                     "description": "Zone defines the zone of gcp project.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.GKENodePoolChaosSpec": {
+            "type": "object",
+            "properties": {
+                "cluster": {
+                    "description": "Cluster defines the Kubernetes cluster to target.",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos\n+optional",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Location defines the location/region of the Kubernetes cluster.",
+                    "type": "string"
+                },
+                "project": {
+                    "description": "Project defines the ID of GCP project.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
                     "type": "string"
                 }
             }
@@ -7349,6 +7378,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
                 },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -7657,6 +7690,10 @@ const docTemplate = `{
                 "gcpazChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
                 },
                 "httpChaos": {
                     "description": "+optional",
