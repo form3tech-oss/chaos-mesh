@@ -4895,7 +4895,7 @@ const docTemplate = `{
                     }
                 },
                 "mode": {
-                    "description": "Mode defines the mode to run chaos action.\nUsed only if Filters is specified.\nSupported mode: one / all / fixed / fixed-percent / random-max-percent\n+kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent",
+                    "description": "Mode defines the mode to run chaos action.\nUsed only if Filters is specified.\nSupported mode: one / all / fixed / fixed-percent / random-max-percent\n+kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent\n+optional",
                     "type": "string"
                 },
                 "remoteCluster": {
