@@ -31,6 +31,7 @@ const (
 	TypeDNSChaos TemplateType = "DNSChaos"
 	TypeGCPAzChaos TemplateType = "GCPAzChaos"
 	TypeGCPChaos TemplateType = "GCPChaos"
+	TypeGKENodePoolChaos TemplateType = "GKENodePoolChaos"
 	TypeHTTPChaos TemplateType = "HTTPChaos"
 	TypeIOChaos TemplateType = "IOChaos"
 	TypeJVMChaos TemplateType = "JVMChaos"
@@ -52,6 +53,7 @@ var allChaosTemplateType = []TemplateType{
 	TypeDNSChaos,
 	TypeGCPAzChaos,
 	TypeGCPChaos,
+	TypeGKENodePoolChaos,
 	TypeHTTPChaos,
 	TypeIOChaos,
 	TypeJVMChaos,
@@ -79,6 +81,8 @@ type EmbedChaos struct {
 	GCPAzChaos *GCPAzChaosSpec `json:"gcpazChaos,omitempty"`
 	// +optional
 	GCPChaos *GCPChaosSpec `json:"gcpChaos,omitempty"`
+	// +optional
+	GKENodePoolChaos *GKENodePoolChaosSpec `json:"gkenodepoolChaos,omitempty"`
 	// +optional
 	HTTPChaos *HTTPChaosSpec `json:"httpChaos,omitempty"`
 	// +optional
@@ -129,6 +133,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeGCPChaos:
 		result := GCPChaos{}
 		result.Spec = *it.GCPChaos
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaos{}
+		result.Spec = *it.GKENodePoolChaos
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaos{}
@@ -195,6 +203,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *GCPChaos:
 		*it.GCPChaos = chaos.Spec
 		return nil
+	case *GKENodePoolChaos:
+		*it.GKENodePoolChaos = chaos.Spec
+		return nil
 	case *HTTPChaos:
 		*it.HTTPChaos = chaos.Spec
 		return nil
@@ -250,6 +261,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaosList{}
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaosList{}
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaosList{}
@@ -333,6 +347,14 @@ func (in *GCPAzChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *GCPChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *GKENodePoolChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item

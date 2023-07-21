@@ -72,6 +72,12 @@ export interface GCPAz {
   filter?: string
 }
 
+export interface GKENodePool {
+  project: string
+  cluster: string
+  location: string
+}
+
 export interface IO {
   action: 'latency' | 'fault' | 'attrOverride'
   delay?: string
@@ -176,6 +182,7 @@ export interface ExperimentType {
   DNSChaos: DNS
   GCPAzChaos: GCPAz
   GCPChaos: GCP
+  GKENodePoolChaos: GKENodePool
   HTTPChaos?: unknown
   IOChaos: IO
   JVMChaos?: unknown
