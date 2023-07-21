@@ -526,6 +526,31 @@ spec:
                 - project
                 - zone
                 type: object
+              gkenodepoolChaos:
+                description: GKENodePoolChaosSpec defines the desired state of GKENodePoolChaos
+                properties:
+                  cluster:
+                    description: Cluster defines the Kubernetes cluster to target.
+                    type: string
+                  duration:
+                    description: Duration represents the duration of the chaos
+                    type: string
+                  location:
+                    description: Location defines the location/region of the Kubernetes
+                      cluster.
+                    type: string
+                  project:
+                    description: Project defines the ID of GCP project.
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                required:
+                - cluster
+                - location
+                - project
+                type: object
               httpChaos:
                 properties:
                   abort:
@@ -3438,6 +3463,32 @@ spec:
                     required:
                     - project
                     - zone
+                    type: object
+                  gkenodepoolChaos:
+                    description: GKENodePoolChaosSpec defines the desired state of
+                      GKENodePoolChaos
+                    properties:
+                      cluster:
+                        description: Cluster defines the Kubernetes cluster to target.
+                        type: string
+                      duration:
+                        description: Duration represents the duration of the chaos
+                        type: string
+                      location:
+                        description: Location defines the location/region of the Kubernetes
+                          cluster.
+                        type: string
+                      project:
+                        description: Project defines the ID of GCP project.
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                    required:
+                    - cluster
+                    - location
+                    - project
                     type: object
                   historyLimit:
                     minimum: 1
@@ -6832,6 +6883,34 @@ spec:
                               - project
                               - zone
                               type: object
+                            gkenodepoolChaos:
+                              description: GKENodePoolChaosSpec defines the desired
+                                state of GKENodePoolChaos
+                              properties:
+                                cluster:
+                                  description: Cluster defines the Kubernetes cluster
+                                    to target.
+                                  type: string
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos
+                                  type: string
+                                location:
+                                  description: Location defines the location/region
+                                    of the Kubernetes cluster.
+                                  type: string
+                                project:
+                                  description: Project defines the ID of GCP project.
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                              required:
+                              - cluster
+                              - location
+                              - project
+                              type: object
                             httpChaos:
                               properties:
                                 abort:
@@ -10032,6 +10111,34 @@ spec:
                                   required:
                                   - project
                                   - zone
+                                  type: object
+                                gkenodepoolChaos:
+                                  description: GKENodePoolChaosSpec defines the desired
+                                    state of GKENodePoolChaos
+                                  properties:
+                                    cluster:
+                                      description: Cluster defines the Kubernetes
+                                        cluster to target.
+                                      type: string
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos
+                                      type: string
+                                    location:
+                                      description: Location defines the location/region
+                                        of the Kubernetes cluster.
+                                      type: string
+                                    project:
+                                      description: Project defines the ID of GCP project.
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                  required:
+                                  - cluster
+                                  - location
+                                  - project
                                   type: object
                                 historyLimit:
                                   minimum: 1
