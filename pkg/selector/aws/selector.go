@@ -17,6 +17,7 @@ package aws
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -55,7 +56,9 @@ type Instance struct {
 }
 
 func (instance *Instance) Id() string {
-	return instance.InstanceID
+	json, _ := json.Marshal(instance)
+
+	return string(json)
 }
 
 func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSelector) ([]*Instance, error) {
