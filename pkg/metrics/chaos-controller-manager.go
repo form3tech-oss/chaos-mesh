@@ -62,16 +62,10 @@ func NewChaosControllerManagerMetricsCollector(manager ctrl.Manager, registerer 
 		logger: logger,
 		store:  store,
 		chaosExperiments: prometheus.NewGaugeVec(prometheus.GaugeOpts{
-<<<<<<< HEAD
 			Subsystem: chaosControllerManagerMetricsSubsystem,
 			Name:      "chaos_experiments",
 			Help:      "Total number of chaos experiments and their phases",
-		}, []string{"namespace", "kind", "phase"}),
-=======
-			Name: "chaos_controller_manager_chaos_experiments",
-			Help: "Total number of chaos experiments and their phases",
 		}, []string{"namespace", "kind", "phase", "name"}),
->>>>>>> a2a8f94e (chore: Add name label to chaos_experiments metric)
 		SidecarTemplates: prometheus.NewGauge(prometheus.GaugeOpts{
 			Subsystem: chaosControllerManagerMetricsSubsystem,
 			Name:      "chaos_mesh_templates",
