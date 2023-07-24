@@ -80,13 +80,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	_, err = ec2client.DetachVolume(context.TODO(), &ec2.DetachVolumeInput{
 		VolumeId:   selected.EbsVolume,
 		Device:     selected.DeviceName,
-<<<<<<< HEAD
 		Force:      &force,
-		InstanceId: &selected.Ec2Instance,
-=======
-		Force:      true,
 		InstanceId: &selected.InstanceID,
->>>>>>> 9df16631 (feat: improve aws chaos, adding filters support (#93))
 	})
 
 	if err != nil {
