@@ -1233,6 +1233,30 @@ spec:
                 - mode
                 - selector
                 type: object
+              k8sChaos:
+                description: K8SChaosSpec defines the desired state of K8SChaos
+                properties:
+                  apiObjects:
+                    description: K8SChaosAPIObjects defines ways to specify Kubernetes
+                      API resources to be applied by K8SChaos
+                    properties:
+                      value:
+                        description: Literal string containing Kubernetes API resources
+                        type: string
+                    required:
+                    - value
+                    type: object
+                  duration:
+                    description: Duration represents the duration of the chaos action
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                required:
+                - apiObjects
+                - duration
+                type: object
               kernelChaos:
                 description: KernelChaosSpec defines the desired state of KernelChaos
                 properties:
@@ -4139,6 +4163,32 @@ spec:
                     - action
                     - mode
                     - selector
+                    type: object
+                  k8sChaos:
+                    description: K8SChaosSpec defines the desired state of K8SChaos
+                    properties:
+                      apiObjects:
+                        description: K8SChaosAPIObjects defines ways to specify Kubernetes
+                          API resources to be applied by K8SChaos
+                        properties:
+                          value:
+                            description: Literal string containing Kubernetes API
+                              resources
+                            type: string
+                        required:
+                        - value
+                        type: object
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                    required:
+                    - apiObjects
+                    - duration
                     type: object
                   kernelChaos:
                     description: KernelChaosSpec defines the desired state of KernelChaos
@@ -7551,6 +7601,34 @@ spec:
                               - mode
                               - selector
                               type: object
+                            k8sChaos:
+                              description: K8SChaosSpec defines the desired state
+                                of K8SChaos
+                              properties:
+                                apiObjects:
+                                  description: K8SChaosAPIObjects defines ways to
+                                    specify Kubernetes API resources to be applied
+                                    by K8SChaos
+                                  properties:
+                                    value:
+                                      description: Literal string containing Kubernetes
+                                        API resources
+                                      type: string
+                                  required:
+                                  - value
+                                  type: object
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                              required:
+                              - apiObjects
+                              - duration
+                              type: object
                             kernelChaos:
                               description: KernelChaosSpec defines the desired state
                                 of KernelChaos
@@ -10757,6 +10835,34 @@ spec:
                                   - action
                                   - mode
                                   - selector
+                                  type: object
+                                k8sChaos:
+                                  description: K8SChaosSpec defines the desired state
+                                    of K8SChaos
+                                  properties:
+                                    apiObjects:
+                                      description: K8SChaosAPIObjects defines ways
+                                        to specify Kubernetes API resources to be
+                                        applied by K8SChaos
+                                      properties:
+                                        value:
+                                          description: Literal string containing Kubernetes
+                                            API resources
+                                          type: string
+                                      required:
+                                      - value
+                                      type: object
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                  required:
+                                  - apiObjects
+                                  - duration
                                   type: object
                                 kernelChaos:
                                   description: KernelChaosSpec defines the desired
