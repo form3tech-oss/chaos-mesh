@@ -28,7 +28,9 @@ const (
 	TypeAzureChaos TemplateType = "AzureChaos"
 	TypeBlockChaos TemplateType = "BlockChaos"
 	TypeDNSChaos TemplateType = "DNSChaos"
+	TypeGCPAzChaos TemplateType = "GCPAzChaos"
 	TypeGCPChaos TemplateType = "GCPChaos"
+	TypeGKENodePoolChaos TemplateType = "GKENodePoolChaos"
 	TypeHTTPChaos TemplateType = "HTTPChaos"
 	TypeIOChaos TemplateType = "IOChaos"
 	TypeJVMChaos TemplateType = "JVMChaos"
@@ -47,7 +49,9 @@ var allChaosTemplateType = []TemplateType{
 	TypeAzureChaos,
 	TypeBlockChaos,
 	TypeDNSChaos,
+	TypeGCPAzChaos,
 	TypeGCPChaos,
+	TypeGKENodePoolChaos,
 	TypeHTTPChaos,
 	TypeIOChaos,
 	TypeJVMChaos,
@@ -70,7 +74,11 @@ type EmbedChaos struct {
 	// +optional
 	DNSChaos *DNSChaosSpec `json:"dnsChaos,omitempty"`
 	// +optional
+	GCPAzChaos *GCPAzChaosSpec `json:"gcpazChaos,omitempty"`
+	// +optional
 	GCPChaos *GCPChaosSpec `json:"gcpChaos,omitempty"`
+	// +optional
+	GKENodePoolChaos *GKENodePoolChaosSpec `json:"gkenodepoolChaos,omitempty"`
 	// +optional
 	HTTPChaos *HTTPChaosSpec `json:"httpChaos,omitempty"`
 	// +optional
@@ -110,9 +118,17 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 		result := DNSChaos{}
 		result.Spec = *it.DNSChaos
 		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaos{}
+		result.Spec = *it.GCPAzChaos
+		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaos{}
 		result.Spec = *it.GCPChaos
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaos{}
+		result.Spec = *it.GKENodePoolChaos
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaos{}
@@ -170,8 +186,14 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *DNSChaos:
 		*it.DNSChaos = chaos.Spec
 		return nil
+	case *GCPAzChaos:
+		*it.GCPAzChaos = chaos.Spec
+		return nil
 	case *GCPChaos:
 		*it.GCPChaos = chaos.Spec
+		return nil
+	case *GKENodePoolChaos:
+		*it.GKENodePoolChaos = chaos.Spec
 		return nil
 	case *HTTPChaos:
 		*it.HTTPChaos = chaos.Spec
@@ -220,8 +242,14 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 	case TypeDNSChaos:
 		result := DNSChaosList{}
 		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaosList{}
+		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaosList{}
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaosList{}
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaosList{}
@@ -288,7 +316,23 @@ func (in *DNSChaosList) GetItems() []GenericChaos {
 	}
 	return result
 }
+func (in *GCPAzChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
 func (in *GCPChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *GKENodePoolChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item

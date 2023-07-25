@@ -277,6 +277,69 @@ func TestDNSChaosListChaos(t *testing.T) {
 	chaos.ListChaos()
 }
 
+func TestGCPAzChaosIsDeleted(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GCPAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsDeleted()
+}
+
+func TestGCPAzChaosIsIsPaused(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GCPAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsPaused()
+}
+
+func TestGCPAzChaosGetDuration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GCPAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.Spec.GetDuration()
+}
+
+func TestGCPAzChaosGetStatus(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GCPAzChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.GetStatus()
+}
+
+func TestGCPAzChaosGetSpecAndMetaString(t *testing.T) {
+	g := NewGomegaWithT(t)
+	chaos := &GCPAzChaos{}
+	err := faker.FakeData(chaos)
+	g.Expect(err).To(BeNil())
+	chaos.GetSpecAndMetaString()
+}
+
+func TestGCPAzChaosListChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GCPAzChaosList{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.ListChaos()
+}
+
 func TestGCPChaosIsDeleted(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -333,6 +396,69 @@ func TestGCPChaosListChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	chaos := &GCPChaosList{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.ListChaos()
+}
+
+func TestGKENodePoolChaosIsDeleted(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GKENodePoolChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsDeleted()
+}
+
+func TestGKENodePoolChaosIsIsPaused(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GKENodePoolChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsPaused()
+}
+
+func TestGKENodePoolChaosGetDuration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GKENodePoolChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.Spec.GetDuration()
+}
+
+func TestGKENodePoolChaosGetStatus(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GKENodePoolChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.GetStatus()
+}
+
+func TestGKENodePoolChaosGetSpecAndMetaString(t *testing.T) {
+	g := NewGomegaWithT(t)
+	chaos := &GKENodePoolChaos{}
+	err := faker.FakeData(chaos)
+	g.Expect(err).To(BeNil())
+	chaos.GetSpecAndMetaString()
+}
+
+func TestGKENodePoolChaosListChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &GKENodePoolChaosList{}
 	err := faker.FakeData(chaos)
 
 	g.Expect(err).To(BeNil())

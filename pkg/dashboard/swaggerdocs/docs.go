@@ -5129,6 +5129,14 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
                 },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -5475,6 +5483,31 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.GCPAzChaosSpec": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Filter defines the filter used when fetching GCP instance groups.\nFilter reference: https://google.aip.dev/160\n+optional",
+                    "type": "string"
+                },
+                "project": {
+                    "description": "Project defines the GCP project.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "zone": {
+                    "description": "Zone defines the zone of GCP project.",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.GCPChaosSpec": {
             "type": "object",
             "properties": {
@@ -5511,6 +5544,31 @@ const docTemplate = `{
                 },
                 "zone": {
                     "description": "Zone defines the zone of gcp project.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.GKENodePoolChaosSpec": {
+            "type": "object",
+            "properties": {
+                "cluster": {
+                    "description": "Cluster defines the Kubernetes cluster to target.",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos\n+optional",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Location defines the location/region of the Kubernetes cluster.",
+                    "type": "string"
+                },
+                "project": {
+                    "description": "Project defines the ID of GCP project.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
                     "type": "string"
                 }
             }
@@ -7316,6 +7374,14 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
                 },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
+                },
                 "historyLimit": {
                     "description": "+optional\n+kubebuilder:validation:Minimum=1",
                     "type": "integer"
@@ -7620,6 +7686,14 @@ const docTemplate = `{
                 "gcpChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.GCPChaosSpec"
+                },
+                "gcpazChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GCPAzChaosSpec"
+                },
+                "gkenodepoolChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.GKENodePoolChaosSpec"
                 },
                 "httpChaos": {
                     "description": "+optional",

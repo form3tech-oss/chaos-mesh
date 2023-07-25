@@ -595,6 +595,144 @@ func (in *DNSChaos) Default() {
 	gw.Default(in)
 }
 
+const KindGCPAzChaos = "GCPAzChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *GCPAzChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *GCPAzChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *GCPAzChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *GCPAzChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *GCPAzChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *GCPAzChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *GCPAzChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// GCPAzChaosList contains a list of GCPAzChaos
+type GCPAzChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []GCPAzChaos `json:"items"`
+}
+
+func (in *GCPAzChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *GCPAzChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *GCPAzChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *GCPAzChaos) IsOneShot() bool {
+	return false
+}
+
+var GCPAzChaosWebhookLog = logf.Log.WithName("GCPAzChaos-resource")
+
+func (in *GCPAzChaos) ValidateCreate() error {
+	GCPAzChaosWebhookLog.Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *GCPAzChaos) ValidateUpdate(old runtime.Object) error {
+	GCPAzChaosWebhookLog.Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*GCPAzChaos).Spec) {
+		return ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *GCPAzChaos) ValidateDelete() error {
+	GCPAzChaosWebhookLog.Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil
+}
+
+var _ webhook.Validator = &GCPAzChaos{}
+
+func (in *GCPAzChaos) Validate() error {
+	errs := gw.Validate(in)
+	return gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &GCPAzChaos{}
+
+func (in *GCPAzChaos) Default() {
+	gw.Default(in)
+}
+
 const KindGCPChaos = "GCPChaos"
 
 // IsDeleted returns whether this resource has been deleted
@@ -734,6 +872,144 @@ func (in *GCPChaos) Validate() error {
 var _ webhook.Defaulter = &GCPChaos{}
 
 func (in *GCPChaos) Default() {
+	gw.Default(in)
+}
+
+const KindGKENodePoolChaos = "GKENodePoolChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *GKENodePoolChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *GKENodePoolChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *GKENodePoolChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *GKENodePoolChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *GKENodePoolChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *GKENodePoolChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *GKENodePoolChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// GKENodePoolChaosList contains a list of GKENodePoolChaos
+type GKENodePoolChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []GKENodePoolChaos `json:"items"`
+}
+
+func (in *GKENodePoolChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *GKENodePoolChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *GKENodePoolChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *GKENodePoolChaos) IsOneShot() bool {
+	return false
+}
+
+var GKENodePoolChaosWebhookLog = logf.Log.WithName("GKENodePoolChaos-resource")
+
+func (in *GKENodePoolChaos) ValidateCreate() error {
+	GKENodePoolChaosWebhookLog.Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *GKENodePoolChaos) ValidateUpdate(old runtime.Object) error {
+	GKENodePoolChaosWebhookLog.Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*GKENodePoolChaos).Spec) {
+		return ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *GKENodePoolChaos) ValidateDelete() error {
+	GKENodePoolChaosWebhookLog.Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil
+}
+
+var _ webhook.Validator = &GKENodePoolChaos{}
+
+func (in *GKENodePoolChaos) Validate() error {
+	errs := gw.Validate(in)
+	return gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &GKENodePoolChaos{}
+
+func (in *GKENodePoolChaos) Default() {
 	gw.Default(in)
 }
 
@@ -2234,10 +2510,22 @@ func init() {
 		list:  &DNSChaosList{},
 	})
 
+	SchemeBuilder.Register(&GCPAzChaos{}, &GCPAzChaosList{})
+	all.register(KindGCPAzChaos, &ChaosKind{
+		chaos: &GCPAzChaos{},
+		list:  &GCPAzChaosList{},
+	})
+
 	SchemeBuilder.Register(&GCPChaos{}, &GCPChaosList{})
 	all.register(KindGCPChaos, &ChaosKind{
 		chaos: &GCPChaos{},
 		list:  &GCPChaosList{},
+	})
+
+	SchemeBuilder.Register(&GKENodePoolChaos{}, &GKENodePoolChaosList{})
+	all.register(KindGKENodePoolChaos, &ChaosKind{
+		chaos: &GKENodePoolChaos{},
+		list:  &GKENodePoolChaosList{},
 	})
 
 	SchemeBuilder.Register(&HTTPChaos{}, &HTTPChaosList{})
@@ -2327,9 +2615,19 @@ func init() {
 		list:  &DNSChaosList{},
 	})
 
+	allScheduleItem.register(KindGCPAzChaos, &ChaosKind{
+		chaos: &GCPAzChaos{},
+		list:  &GCPAzChaosList{},
+	})
+
 	allScheduleItem.register(KindGCPChaos, &ChaosKind{
 		chaos: &GCPChaos{},
 		list:  &GCPChaosList{},
+	})
+
+	allScheduleItem.register(KindGKENodePoolChaos, &ChaosKind{
+		chaos: &GKENodePoolChaos{},
+		list:  &GKENodePoolChaosList{},
 	})
 
 	allScheduleItem.register(KindHTTPChaos, &ChaosKind{

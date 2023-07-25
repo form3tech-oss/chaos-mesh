@@ -425,6 +425,52 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  // GCPAzChaos
+  GCPAzChaos: {
+    spec: {
+      project: {
+        field: 'text',
+        label: 'Project',
+        value: '',
+        helperText: 'The ID of a GCP project',
+      },
+      zone: {
+        field: 'text',
+        label: 'Zone',
+        value: '',
+        helperText: 'The zone of a GCP project',
+      },
+      filter: {
+        field: 'text',
+        label: 'Filter',
+        value: '',
+        helperText: 'The filter used when fetching GCP instance groups',
+      },
+    } as any,
+  },
+  // GKENodePool
+  GKENodePoolChaos: {
+    spec: {
+      project: {
+        field: 'text',
+        label: 'Project',
+        value: '',
+        helperText: 'The ID of a GCP project',
+      },
+      location: {
+        field: 'text',
+        label: 'Location',
+        value: '',
+        helperText: 'The location of the Kubernetes cluster',
+      },
+      cluster: {
+        field: 'text',
+        label: 'Cluster',
+        value: '',
+        helperText: 'The Kubernetes cluster to target',
+      },
+    } as any,
+  },
   // IO Injection
   IOChaos: {
     categories: [
@@ -1398,6 +1444,20 @@ export const schema: Partial<Record<Kind, Record<string, Yup.ObjectSchema>>> = {
     'node-reset': GCPChaosCommonSchema,
     'disk-loss': GCPChaosCommonSchema.shape({
       deviceNames: Yup.array().of(Yup.string()).required('At least one device name is required'),
+    }),
+  },
+  GCPAzChaos: {
+    default: Yup.object({
+      project: Yup.string().required('The project is required'),
+      zone: Yup.string().required('The zone is required'),
+      filter: Yup.string(),
+    }),
+  },
+  GKENodePoolChaos: {
+    default: Yup.object({
+      project: Yup.string().required('The project is required'),
+      location: Yup.string().required('The location is required'),
+      cluster: Yup.string().required('The cluster is required'),
     }),
   },
   IOChaos: {
