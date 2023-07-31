@@ -29,6 +29,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/httpchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/iochaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/jvmchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/k8schaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/kernelchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/networkchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/physicalmachinechaos"
@@ -56,4 +57,5 @@ var AllImpl = fx.Options(
 	physicalmachinechaos.Module,
 	blockchaos.Module,
 	awsazchaos.Module,
+	k8schaos.Module,
 	utils.Module)
