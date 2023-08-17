@@ -130,7 +130,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	if !isManaged(existingResource) {
-		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by %s", managedBy)
+		return v1alpha1.Injected, fmt.Errorf("resource is not managed by %s", managedBy)
 	}
 
 	err = resourceClient.Delete(ctx, resource.GetName(), v1.DeleteOptions{})
