@@ -120,9 +120,9 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	existingResource, err := client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Get(ctx, resource.GetName(), v1.GetOptions{})
 	if err != nil {
 		if apiErrors.IsNotFound(err) {
-			return v1alpha1.Injected, err
+			return v1alpha1.Injected, nil
 		}
-		return v1alpha1.NotInjected, nil
+		return v1alpha1.NotInjected, err
 	}
 
 	existingAnnotations := existingResource.GetAnnotations()
