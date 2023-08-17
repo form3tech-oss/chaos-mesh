@@ -127,7 +127,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	existingAnnotations := existingResource.GetAnnotations()
 	if existingAnnotations == nil || existingAnnotations[managedByAnnotation] != managedBy {
-		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by chaos-mesh")
+		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by %s", managedBy)
 	}
 
 	err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Delete(ctx, resource.GetName(), v1.DeleteOptions{})
