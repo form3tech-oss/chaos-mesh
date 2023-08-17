@@ -126,7 +126,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.NotInjected, err
 	}
 
-	if !isManagedResource(existingResource) {
+	if !isManaged(existingResource) {
 		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by %s", managedBy)
 	}
 
@@ -138,7 +138,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	return v1alpha1.NotInjected, nil
 }
 
-func isManagedResource(resource *unstructured.Unstructured) bool {
+func isManaged(resource *unstructured.Unstructured) bool {
 	existingAnnotations := resource.GetAnnotations()
 	return existingAnnotations != nil && existingAnnotations[managedByAnnotation] == managedBy
 }
