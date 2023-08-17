@@ -117,7 +117,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("get rest mapping: %w", err)
 	}
 
-	existingResource, err := client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Get(ctx, resource.GetName(), v1.GetOptions{})
+	resourceClient := client.Resource(mapping.Resource).Namespace(resource.GetNamespace())
+	existingResource, err := resourceClient.Get(ctx, resource.GetName(), v1.GetOptions{})
 	if err != nil {
 		if apiErrors.IsNotFound(err) {
 			return v1alpha1.Injected, nil
@@ -125,17 +126,21 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.NotInjected, err
 	}
 
-	existingAnnotations := existingResource.GetAnnotations()
-	if existingAnnotations == nil || existingAnnotations[managedByAnnotation] != managedBy {
+	if !isManagedBy(existingResource) {
 		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by %s", managedBy)
 	}
 
-	err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Delete(ctx, resource.GetName(), v1.DeleteOptions{})
+	err = resourceClient.Delete(ctx, resource.GetName(), v1.DeleteOptions{})
 	if err != nil && !apiErrors.IsNotFound(err) {
 		return v1alpha1.Injected, err
 	}
 
 	return v1alpha1.NotInjected, nil
+}
+
+func isManagedBy(resource *unstructured.Unstructured) bool {
+	existingAnnotations := resource.GetAnnotations()
+	return existingAnnotations != nil && existingAnnotations[managedByAnnotation] == managedBy
 }
 
 func (impl *Impl) dynamicClient() (dynamic.Interface, error) {
