@@ -43,8 +43,8 @@ type Impl struct {
 }
 
 const (
-	managedByAnnotation = "app.kubernetes.io/managed-by"
-	managedBy           = "chaos-mesh"
+	managedByLabel = "app.kubernetes.io/managed-by"
+	managedBy      = "chaos-mesh"
 )
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
@@ -69,9 +69,12 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, err
 	}
 
-	resource.SetAnnotations(map[string]string{
-		managedByAnnotation: managedBy,
-	})
+	labels := resource.GetLabels()
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	labels[managedByLabel] = managedBy
+	resource.SetLabels(labels)
 
 	gvk := resource.GroupVersionKind()
 
@@ -139,8 +142,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 }
 
 func isManaged(resource *unstructured.Unstructured) bool {
-	existingAnnotations := resource.GetAnnotations()
-	return existingAnnotations != nil && existingAnnotations[managedByAnnotation] == managedBy
+	labels := resource.GetLabels()
+	return labels != nil && labels[managedByLabel] == managedBy
 }
 
 func (impl *Impl) dynamicClient() (dynamic.Interface, error) {
