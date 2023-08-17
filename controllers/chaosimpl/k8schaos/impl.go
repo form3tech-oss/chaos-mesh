@@ -42,6 +42,11 @@ type Impl struct {
 	Log logr.Logger
 }
 
+const (
+	managedByAnnotation = "app.kubernetes.io/managed-by"
+	managedBy           = "chaos-mesh"
+)
+
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	impl.Log.Info("k8schaos Apply", "namespace", obj.GetNamespace(), "name", obj.GetName())
 
@@ -64,6 +69,10 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, err
 	}
 
+	resource.SetAnnotations(map[string]string{
+		managedByAnnotation: managedBy,
+	})
+
 	gvk := resource.GroupVersionKind()
 
 	mapping, err := impl.Client.RESTMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
@@ -71,7 +80,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("get rest mapping: %w", err)
 	}
 
-	_, err = client.Resource(mapping.Resource).Create(ctx, resource, v1.CreateOptions{})
+	_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Create(ctx, resource, v1.CreateOptions{})
 	if err != nil {
 		return v1alpha1.NotInjected, err
 	}
@@ -108,7 +117,20 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("get rest mapping: %w", err)
 	}
 
-	err = client.Resource(mapping.Resource).Delete(ctx, resource.GetName(), v1.DeleteOptions{})
+	existingResource, err := client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Get(ctx, resource.GetName(), v1.GetOptions{})
+	if err != nil {
+		if apiErrors.IsNotFound(err) {
+			return v1alpha1.Injected, err
+		}
+		return v1alpha1.NotInjected, nil
+	}
+
+	existingAnnotations := existingResource.GetAnnotations()
+	if existingAnnotations == nil || existingAnnotations[managedByAnnotation] != managedBy {
+		return v1alpha1.NotInjected, fmt.Errorf("resource is not managed by chaos-mesh")
+	}
+
+	err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Delete(ctx, resource.GetName(), v1.DeleteOptions{})
 	if err != nil && !apiErrors.IsNotFound(err) {
 		return v1alpha1.Injected, err
 	}
