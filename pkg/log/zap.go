@@ -28,7 +28,7 @@ import (
 // logger of your application, and provide it to your components, by fx or manually.
 func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
-	zapLogger, err := zap.NewDevelopment()
+	zapLogger, err := zap.NewDevelopment(zap.IncreaseLevel(zapcore.LevelEnabler(zapcore.WarnLevel)))
 	if err != nil {
 		return logr.Discard(), err
 	}
