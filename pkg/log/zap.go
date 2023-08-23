@@ -39,7 +39,7 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 	if err != nil {
 		return logr.Discard(), err
 	}
-	options = append(options, zap.IncreaseLevel(zapcore.LevelEnabler(parsedLevel)))
+	options = append(options, zap.IncreaseLevel(parsedLevel))
 
 	zapLogger, err := zap.NewDevelopment(options...)
 	if err != nil {
