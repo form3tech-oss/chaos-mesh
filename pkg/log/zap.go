@@ -16,7 +16,10 @@
 package log
 
 import (
+	"encoding/json"
 	"io"
+	"os"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -28,12 +31,85 @@ import (
 // logger of your application, and provide it to your components, by fx or manually.
 func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
-	zapLogger, err := zap.NewDevelopment()
+	envLevel := os.Getenv("LOG_LEVEL")
+	logLevel := zap.InfoLevel
+	if envLevel != "" {
+		var err error
+		logLevel, err = zapcore.ParseLevel(envLevel)
+		if err != nil {
+			return logr.Discard(), err
+		}
+	}
+
+	envMaxFieldSize := os.Getenv("LOG_MAX_FIELD_SIZE")
+	maxFieldSize := 16000
+	if envMaxFieldSize != "" {
+		var err error
+		maxFieldSize, err = strconv.Atoi(envMaxFieldSize)
+		if err != nil {
+			return logr.Discard(), err
+		}
+	}
+
+	encoderConfig := zapcore.EncoderConfig{
+		MessageKey:     "message",
+		LevelKey:       "level",
+		TimeKey:        "@timestamp",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		FunctionKey:    zapcore.OmitKey,
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.RFC3339NanoTimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+		NewReflectedEncoder: func(w io.Writer) zapcore.ReflectedEncoder {
+			enc := json.NewEncoder(newTruncatingWriter(w, maxFieldSize))
+			enc.SetEscapeHTML(false)
+			return enc
+		},
+	}
+
+	config := zap.NewProductionConfig()
+	config.EncoderConfig = encoderConfig
+	config.Development = true
+
+	zapLogger, err := config.Build(zap.IncreaseLevel(logLevel))
 	if err != nil {
 		return logr.Discard(), err
 	}
+
 	logger := zapr.NewLogger(zapLogger)
 	return logger, nil
+}
+
+type truncatingWriter struct {
+	writer    io.Writer
+	enc       *json.Encoder
+	maxLength int
+}
+
+func newTruncatingWriter(writer io.Writer, maxLength int) truncatingWriter {
+	enc := json.NewEncoder(writer)
+	enc.SetEscapeHTML(false)
+
+	return truncatingWriter{
+		writer:    writer,
+		maxLength: maxLength,
+		enc:       enc,
+	}
+}
+
+func (tr truncatingWriter) Write(bytes []byte) (int, error) {
+	if len(bytes) > tr.maxLength {
+		// Truncating a JSON object most likely yields invalid JSON
+		// Passing the truncated string through the JSON encoder yields a valid JSON string
+		// This preserves the validity of the overall JSON log entry, while including as much detail as possible of the field being encoded
+		return 0, tr.enc.Encode(string(append([]byte("TRUNCATED "), bytes[:tr.maxLength]...)))
+	}
+
+	return tr.writer.Write(bytes)
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
