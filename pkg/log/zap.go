@@ -30,7 +30,6 @@ import (
 func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
 	logLevel := os.Getenv("LOG_LEVEL")
-
 	var options []zap.Option
 	if logLevel != "" {
 		parsedLevel, err := zapcore.ParseLevel(logLevel)
