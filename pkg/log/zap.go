@@ -29,29 +29,31 @@ import (
 // logger of your application, and provide it to your components, by fx or manually.
 func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
-	logLevel, err := parseLevel()
+	logLevel := os.Getenv("LOG_LEVEL")
+	var zapLogger *zap.Logger
+	var err error
+
+	if logLevel == "" {
+		zapLogger, err = zap.NewDevelopment()
+		if err != nil {
+			return logr.Discard(), err
+		}
+		return zapr.NewLogger(zapLogger), nil
+	}
+
+	var parsedLevel zapcore.Level
+	parsedLevel, err = zapcore.ParseLevel(logLevel)
 	if err != nil {
 		return logr.Discard(), err
 	}
-	zapLogger, err := zap.NewDevelopment(zap.IncreaseLevel(zapcore.LevelEnabler(logLevel)))
+
+	zapLogger, err = zap.NewDevelopment(zap.IncreaseLevel(zapcore.LevelEnabler(parsedLevel)))
 	if err != nil {
 		return logr.Discard(), err
 	}
+
 	logger := zapr.NewLogger(zapLogger)
 	return logger, nil
-}
-
-func parseLevel() (*zapcore.Level, error) {
-	levelConfig := os.Getenv("LOG_LEVEL")
-	if levelConfig == "" {
-		levelConfig = "INFO"
-	}
-
-	parsedLevel, err := zapcore.ParseLevel(levelConfig)
-	if err != nil {
-		return nil, err
-	}
-	return &parsedLevel, nil
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
