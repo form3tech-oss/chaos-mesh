@@ -57,20 +57,20 @@ type LargeMessageSkippingCore struct {
 	maxSize int
 }
 
-func (d LargeMessageSkippingCore) Enabled(level zapcore.Level) bool {
-	return d.core.Enabled(level)
+func (c LargeMessageSkippingCore) Enabled(level zapcore.Level) bool {
+	return c.core.Enabled(level)
 }
-func (d LargeMessageSkippingCore) With(fields []zapcore.Field) zapcore.Core {
-	return d.core.With(fields)
+func (c LargeMessageSkippingCore) With(fields []zapcore.Field) zapcore.Core {
+	return c.core.With(fields)
 }
-func (d LargeMessageSkippingCore) Check(entry zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	return ce.AddCore(entry, d)
+func (c LargeMessageSkippingCore) Check(entry zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	return ce.AddCore(entry, c)
 }
-func (d LargeMessageSkippingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	return d.core.Write(entry, fields)
+func (c LargeMessageSkippingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	return c.core.Write(entry, fields)
 }
-func (d LargeMessageSkippingCore) Sync() error {
-	return d.core.Sync()
+func (c LargeMessageSkippingCore) Sync() error {
+	return c.core.Sync()
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
