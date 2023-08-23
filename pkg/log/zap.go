@@ -16,6 +16,7 @@
 package log
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -31,15 +32,17 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
 	logLevel := os.Getenv("LOG_LEVEL")
 	var options []zap.Option
-	if logLevel == "" {
-		logLevel = "WARN"
+	if logLevel != "" {
+		parsedLevel, err := zapcore.ParseLevel(logLevel)
+		if err != nil {
+			return logr.Discard(), err
+		}
+		options = append(options, zap.IncreaseLevel(parsedLevel))
 	}
 
-	parsedLevel, err := zapcore.ParseLevel(logLevel)
-	if err != nil {
-		return logr.Discard(), err
-	}
-	options = append(options, zap.IncreaseLevel(parsedLevel))
+	options = append(options, zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return LargeMessageSkippingCore{core: core, maxSize: 250}
+	}))
 
 	zapLogger, err := zap.NewDevelopment(options...)
 	if err != nil {
@@ -48,6 +51,34 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 
 	logger := zapr.NewLogger(zapLogger)
 	return logger, nil
+}
+
+type LargeMessageSkippingCore struct {
+	core    zapcore.Core
+	maxSize int
+}
+
+func (d LargeMessageSkippingCore) Enabled(level zapcore.Level) bool {
+	return d.core.Enabled(level)
+}
+func (d LargeMessageSkippingCore) With(fields []zapcore.Field) zapcore.Core {
+	return d.core.With(fields)
+}
+func (d LargeMessageSkippingCore) Check(entry zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	// if the entry message is too large, then we skip it
+	if len(entry.Message) > d.maxSize {
+		fmt.Printf("------Dropping message with size: %d-------\n", len(entry.Message))
+		return ce
+	} else {
+		fmt.Printf("------NOT Dropping message with size: %+v-------\n", len(entry.Message))
+	}
+	return ce.AddCore(entry, d)
+}
+func (d LargeMessageSkippingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	return d.core.Write(entry, fields)
+}
+func (d LargeMessageSkippingCore) Sync() error {
+	return d.core.Sync()
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
