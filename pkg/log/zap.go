@@ -17,6 +17,7 @@ package log
 
 import (
 	"io"
+	"os"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -28,16 +29,29 @@ import (
 // logger of your application, and provide it to your components, by fx or manually.
 func NewDefaultZapLogger() (logr.Logger, error) {
 	// change the configuration in the future if needed.
-	level, err := zapcore.ParseLevel("warn") // get from env?
+	logLevel, err := parseLevel()
 	if err != nil {
 		return logr.Discard(), err
 	}
-	zapLogger, err := zap.NewDevelopment(zap.IncreaseLevel(zapcore.LevelEnabler(level)))
+	zapLogger, err := zap.NewDevelopment(zap.IncreaseLevel(zapcore.LevelEnabler(logLevel)))
 	if err != nil {
 		return logr.Discard(), err
 	}
 	logger := zapr.NewLogger(zapLogger)
 	return logger, nil
+}
+
+func parseLevel() (*zapcore.Level, error) {
+	levelConfig := os.Getenv("LOG_LEVEL")
+	if levelConfig == "" {
+		levelConfig = "INFO"
+	}
+
+	parsedLevel, err := zapcore.ParseLevel(levelConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &parsedLevel, nil
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
