@@ -16,7 +16,6 @@
 package log
 
 import (
-	"fmt"
 	"io"
 	"os"
 
@@ -65,13 +64,6 @@ func (d LargeMessageSkippingCore) With(fields []zapcore.Field) zapcore.Core {
 	return d.core.With(fields)
 }
 func (d LargeMessageSkippingCore) Check(entry zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	// if the entry message is too large, then we skip it
-	if len(entry.Message) > d.maxSize {
-		fmt.Printf("------Dropping message with size: %d-------\n", len(entry.Message))
-		return ce
-	} else {
-		fmt.Printf("------NOT Dropping message with size: %+v-------\n", len(entry.Message))
-	}
 	return ce.AddCore(entry, d)
 }
 func (d LargeMessageSkippingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
