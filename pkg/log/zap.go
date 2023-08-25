@@ -42,7 +42,7 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 	}
 
 	envMaxFieldSize := os.Getenv("LOG_MAX_FIELD_SIZE")
-	maxFieldSize := 16000
+	maxFieldSize := 8000
 	if envMaxFieldSize != "" {
 		var err error
 		maxFieldSize, err = strconv.Atoi(envMaxFieldSize)
@@ -102,14 +102,16 @@ func newTruncatingWriter(writer io.Writer, maxLength int) truncatingWriter {
 }
 
 func (tr truncatingWriter) Write(bytes []byte) (int, error) {
+	output := bytes
+
 	if len(bytes) > tr.maxLength {
-		// Truncating a JSON object most likely yields invalid JSON
-		// Passing the truncated string through the JSON encoder yields a valid JSON string
-		// This preserves the validity of the overall JSON log entry, while including as much detail as possible of the field being encoded
-		return 0, tr.enc.Encode(string(append([]byte("TRUNCATED "), bytes[:tr.maxLength]...)))
+		output = append([]byte("TRUNCATED "), bytes[:tr.maxLength]...)
 	}
 
-	return tr.writer.Write(bytes)
+	// Encode the (possibly truncated) JSON bytes as a JSON string to included in the JSON log entry.
+	// This prevents arbitrary JSON objects from being supplied as field values, which can cause problems for ingestion in logz.io
+	// E.g. k8s objects may include objects with `".":{}` in `FieldsV1` metadata which causes index failure in logz.io
+	return 0, tr.enc.Encode(string(output))
 }
 
 // NewZapLoggerWithWriter creates a new logger with io.writer
