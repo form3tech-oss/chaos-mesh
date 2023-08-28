@@ -19,11 +19,11 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/chaos-mesh/chaos-mesh/pkg/selector/awsaz"
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/awsaz"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
