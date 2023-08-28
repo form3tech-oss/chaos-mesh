@@ -118,6 +118,7 @@ type AWSSelector struct {
 	// Used only if Filters is specified.
 	// Supported mode: one / all / fixed / fixed-percent / random-max-percent
 	// +kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent
+	// +optional
 	Mode SelectorMode `json:"mode"`
 
 	// Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
