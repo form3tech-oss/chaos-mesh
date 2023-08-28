@@ -3681,6 +3681,7 @@ definitions:
           Used only if Filters is specified.
           Supported mode: one / all / fixed / fixed-percent / random-max-percent
           +kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent
+          +optional
         type: string
       remoteCluster:
         description: |-

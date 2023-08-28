@@ -119,7 +119,6 @@ spec:
             - action
             - awsRegion
             - ec2Instance
-            - mode
             type: object
           status:
             description: AWSChaosStatus represents the status of an AWSChaos

@@ -124,7 +124,6 @@ spec:
                 - action
                 - awsRegion
                 - ec2Instance
-                - mode
                 type: object
               awsazChaos:
                 description: AWSAzChaosSpec is the content of the specification for
@@ -3153,7 +3152,6 @@ spec:
                     - action
                     - awsRegion
                     - ec2Instance
-                    - mode
                     type: object
                   awsazChaos:
                     description: AWSAzChaosSpec is the content of the specification
@@ -6607,7 +6605,6 @@ spec:
                               - action
                               - awsRegion
                               - ec2Instance
-                              - mode
                               type: object
                             awsazChaos:
                               description: AWSAzChaosSpec is the content of the specification
@@ -9944,7 +9941,6 @@ spec:
                                   - action
                                   - awsRegion
                                   - ec2Instance
-                                  - mode
                                   type: object
                                 awsazChaos:
                                   description: AWSAzChaosSpec is the content of the
