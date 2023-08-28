@@ -4872,7 +4872,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/v1.LabelSelector"
                 },
                 "matchLabelKeys": {
-                    "description": "MatchLabelKeys is a set of pod label keys to select the pods over which\nspreading will be calculated. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are ANDed with labelSelector\nto select the group of existing pods over which spreading will be calculated\nfor the incoming pod. Keys that don't exist in the incoming pod labels will\nbe ignored. A null or empty list means only match against labelSelector.\n+listType=atomic\n+optional",
+                    "description": "MatchLabelKeys is a set of pod label keys to select the pods over which\nspreading will be calculated. The keys are used to lookup values from the\nincoming pod labels, those key-value labels are ANDed with labelSelector\nto select the group of existing pods over which spreading will be calculated\nfor the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.\nMatchLabelKeys cannot be set when LabelSelector isn't set.\nKeys that don't exist in the incoming pod labels will\nbe ignored. A null or empty list means only match against labelSelector.\n\nThis is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).\n+listType=atomic\n+optional",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -5189,7 +5189,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "az": {
-                    "description": "AZ indicates the Availability zone to be taken down",
+                    "description": "AvailabilityZone indicates the Availability zone to be taken down",
                     "type": "string"
                 },
                 "duration": {

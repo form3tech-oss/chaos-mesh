@@ -954,8 +954,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.13.0
   name: gcpazchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -1102,12 +1101,6 @@ spec:
     served: true
     storage: true
     subresources: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -1290,8 +1283,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.13.0
   name: gkenodepoolchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -1438,12 +1430,6 @@ spec:
     served: true
     storage: true
     subresources: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -2566,7 +2552,6 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.13.0
-  creationTimestamp: null
   name: k8schaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -2713,19 +2698,12 @@ spec:
     served: true
     storage: true
     subresources: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.13.0
   name: kernelchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -16553,6 +16531,7 @@ spec:
                                                   type: object
                                                 type: array
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           weight:
                                             description: Weight associated with matching
                                               the corresponding nodeSelectorTerm,
@@ -16666,10 +16645,12 @@ spec:
                                                   type: object
                                                 type: array
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           type: array
                                       required:
                                       - nodeSelectorTerms
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                   type: object
                                 podAffinity:
                                   description: Describes pod affinity scheduling rules
@@ -16762,6 +16743,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaceSelector:
                                                 description: A label query over the
                                                   set of namespaces that the term
@@ -16831,6 +16813,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaces:
                                                 description: namespaces specifies
                                                   a static list of namespace names
@@ -16950,6 +16933,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaceSelector:
                                             description: A label query over the set
                                               of namespaces that the term applies
@@ -17013,6 +16997,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaces:
                                             description: namespaces specifies a static
                                               list of namespace names that the term
@@ -17133,6 +17118,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaceSelector:
                                                 description: A label query over the
                                                   set of namespaces that the term
@@ -17202,6 +17188,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaces:
                                                 description: namespaces specifies
                                                   a static list of namespace names
@@ -17321,6 +17308,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaceSelector:
                                             description: A label query over the set
                                               of namespaces that the term applies
@@ -17384,6 +17372,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaces:
                                             description: namespaces specifies a static
                                               list of namespace names that the term
@@ -18858,6 +18847,7 @@ spec:
                                       uid?'
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               type: array
                             nodeSelector:
                               additionalProperties:
@@ -18967,7 +18957,8 @@ spec:
                                         The profile must be preconfigured on the node
                                         to work. Must be a descending path, relative
                                         to the kubelet's configured seccomp profile
-                                        location. Must only be set if type is "Localhost".
+                                        location. Must be set if type is "Localhost".
+                                        Must NOT be set for any other type.
                                       type: string
                                     type:
                                       description: "type indicates which kind of seccomp
@@ -19040,14 +19031,10 @@ spec:
                                     hostProcess:
                                       description: HostProcess determines if a container
                                         should be run as a 'Host Process' container.
-                                        This field is alpha-level and will only be
-                                        honored by components that enable the WindowsHostProcessContainers
-                                        feature flag. Setting this field without the
-                                        feature flag will result in errors when validating
-                                        the Pod. All of a Pod's containers must have
-                                        the same effective HostProcess value (it is
-                                        not allowed to have a mix of HostProcess containers
-                                        and non-HostProcess containers).  In addition,
+                                        All of a Pod's containers must have the same
+                                        effective HostProcess value (it is not allowed
+                                        to have a mix of HostProcess containers and
+                                        non-HostProcess containers). In addition,
                                         if HostProcess is true then HostNetwork must
                                         also be set to true.
                                       type: boolean
@@ -19168,17 +19155,23 @@ spec:
                                           "value". The requirements are ANDed.
                                         type: object
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   matchLabelKeys:
-                                    description: MatchLabelKeys is a set of pod label
+                                    description: "MatchLabelKeys is a set of pod label
                                       keys to select the pods over which spreading
                                       will be calculated. The keys are used to lookup
                                       values from the incoming pod labels, those key-value
                                       labels are ANDed with labelSelector to select
                                       the group of existing pods over which spreading
-                                      will be calculated for the incoming pod. Keys
-                                      that don't exist in the incoming pod labels
-                                      will be ignored. A null or empty list means
-                                      only match against labelSelector.
+                                      will be calculated for the incoming pod. The
+                                      same key is forbidden to exist in both MatchLabelKeys
+                                      and LabelSelector. MatchLabelKeys cannot be
+                                      set when LabelSelector isn't set. Keys that
+                                      don't exist in the incoming pod labels will
+                                      be ignored. A null or empty list means only
+                                      match against labelSelector. \n This is a beta
+                                      field and requires the MatchLabelKeysInPodTopologySpread
+                                      feature gate to be enabled (enabled by default)."
                                     items:
                                       type: string
                                     type: array
@@ -19286,12 +19279,12 @@ spec:
                                       spread constraint. - DoNotSchedule (default)
                                       tells the scheduler not to schedule it. - ScheduleAnyway
                                       tells the scheduler to schedule the pod in any
-                                      location,   but giving higher precedence to
-                                      topologies that would help reduce the   skew.
-                                      A constraint is considered "Unsatisfiable" for
-                                      an incoming pod if and only if every possible
-                                      node assignment for that pod would violate "MaxSkew"
-                                      on some topology. For example, in a 3-zone cluster,
+                                      location, but giving higher precedence to topologies
+                                      that would help reduce the skew. A constraint
+                                      is considered "Unsatisfiable" for an incoming
+                                      pod if and only if every possible node assignment
+                                      for that pod would violate "MaxSkew" on some
+                                      topology. For example, in a 3-zone cluster,
                                       MaxSkew is set to 1, and pods with the same
                                       labelSelector spread as 3/1/1: | zone1 | zone2
                                       | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable
@@ -36329,6 +36322,7 @@ spec:
                                                       type: object
                                                     type: array
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               weight:
                                                 description: Weight associated with
                                                   matching the corresponding nodeSelectorTerm,
@@ -36456,10 +36450,12 @@ spec:
                                                       type: object
                                                     type: array
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               type: array
                                           required:
                                           - nodeSelectorTerms
                                           type: object
+                                          x-kubernetes-map-type: atomic
                                       type: object
                                     podAffinity:
                                       description: Describes pod affinity scheduling
@@ -36564,6 +36560,7 @@ spec:
                                                           are ANDed.
                                                         type: object
                                                     type: object
+                                                    x-kubernetes-map-type: atomic
                                                   namespaceSelector:
                                                     description: A label query over
                                                       the set of namespaces that the
@@ -36642,6 +36639,7 @@ spec:
                                                           are ANDed.
                                                         type: object
                                                     type: object
+                                                    x-kubernetes-map-type: atomic
                                                   namespaces:
                                                     description: namespaces specifies
                                                       a static list of namespace names
@@ -36771,6 +36769,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaceSelector:
                                                 description: A label query over the
                                                   set of namespaces that the term
@@ -36840,6 +36839,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaces:
                                                 description: namespaces specifies
                                                   a static list of namespace names
@@ -36973,6 +36973,7 @@ spec:
                                                           are ANDed.
                                                         type: object
                                                     type: object
+                                                    x-kubernetes-map-type: atomic
                                                   namespaceSelector:
                                                     description: A label query over
                                                       the set of namespaces that the
@@ -37051,6 +37052,7 @@ spec:
                                                           are ANDed.
                                                         type: object
                                                     type: object
+                                                    x-kubernetes-map-type: atomic
                                                   namespaces:
                                                     description: namespaces specifies
                                                       a static list of namespace names
@@ -37180,6 +37182,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaceSelector:
                                                 description: A label query over the
                                                   set of namespaces that the term
@@ -37249,6 +37252,7 @@ spec:
                                                       are ANDed.
                                                     type: object
                                                 type: object
+                                                x-kubernetes-map-type: atomic
                                               namespaces:
                                                 description: namespaces specifies
                                                   a static list of namespace names
@@ -38805,6 +38809,7 @@ spec:
                                           kind, uid?'
                                         type: string
                                     type: object
+                                    x-kubernetes-map-type: atomic
                                   type: array
                                 nodeSelector:
                                   additionalProperties:
@@ -38916,8 +38921,9 @@ spec:
                                             should be used. The profile must be preconfigured
                                             on the node to work. Must be a descending
                                             path, relative to the kubelet's configured
-                                            seccomp profile location. Must only be
-                                            set if type is "Localhost".
+                                            seccomp profile location. Must be set
+                                            if type is "Localhost". Must NOT be set
+                                            for any other type.
                                           type: string
                                         type:
                                           description: "type indicates which kind
@@ -38993,18 +38999,12 @@ spec:
                                         hostProcess:
                                           description: HostProcess determines if a
                                             container should be run as a 'Host Process'
-                                            container. This field is alpha-level and
-                                            will only be honored by components that
-                                            enable the WindowsHostProcessContainers
-                                            feature flag. Setting this field without
-                                            the feature flag will result in errors
-                                            when validating the Pod. All of a Pod's
-                                            containers must have the same effective
-                                            HostProcess value (it is not allowed to
-                                            have a mix of HostProcess containers and
-                                            non-HostProcess containers).  In addition,
-                                            if HostProcess is true then HostNetwork
-                                            must also be set to true.
+                                            container. All of a Pod's containers must
+                                            have the same effective HostProcess value
+                                            (it is not allowed to have a mix of HostProcess
+                                            containers and non-HostProcess containers).
+                                            In addition, if HostProcess is true then
+                                            HostNetwork must also be set to true.
                                           type: boolean
                                         runAsUserName:
                                           description: The UserName in Windows to
@@ -39131,18 +39131,24 @@ spec:
                                               only "value". The requirements are ANDed.
                                             type: object
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       matchLabelKeys:
-                                        description: MatchLabelKeys is a set of pod
+                                        description: "MatchLabelKeys is a set of pod
                                           label keys to select the pods over which
                                           spreading will be calculated. The keys are
                                           used to lookup values from the incoming
                                           pod labels, those key-value labels are ANDed
                                           with labelSelector to select the group of
                                           existing pods over which spreading will
-                                          be calculated for the incoming pod. Keys
+                                          be calculated for the incoming pod. The
+                                          same key is forbidden to exist in both MatchLabelKeys
+                                          and LabelSelector. MatchLabelKeys cannot
+                                          be set when LabelSelector isn't set. Keys
                                           that don't exist in the incoming pod labels
                                           will be ignored. A null or empty list means
-                                          only match against labelSelector.
+                                          only match against labelSelector. \n This
+                                          is a beta field and requires the MatchLabelKeysInPodTopologySpread
+                                          feature gate to be enabled (enabled by default)."
                                         items:
                                           type: string
                                         type: array
@@ -39258,16 +39264,16 @@ spec:
                                           the spread constraint. - DoNotSchedule (default)
                                           tells the scheduler not to schedule it.
                                           - ScheduleAnyway tells the scheduler to
-                                          schedule the pod in any location,   but
-                                          giving higher precedence to topologies that
-                                          would help reduce the   skew. A constraint
-                                          is considered "Unsatisfiable" for an incoming
-                                          pod if and only if every possible node assignment
-                                          for that pod would violate "MaxSkew" on
-                                          some topology. For example, in a 3-zone
-                                          cluster, MaxSkew is set to 1, and pods with
-                                          the same labelSelector spread as 3/1/1:
-                                          | zone1 | zone2 | zone3 | | P P P |   P   |   P   |
+                                          schedule the pod in any location, but giving
+                                          higher precedence to topologies that would
+                                          help reduce the skew. A constraint is considered
+                                          "Unsatisfiable" for an incoming pod if and
+                                          only if every possible node assignment for
+                                          that pod would violate "MaxSkew" on some
+                                          topology. For example, in a 3-zone cluster,
+                                          MaxSkew is set to 1, and pods with the same
+                                          labelSelector spread as 3/1/1: | zone1 |
+                                          zone2 | zone3 | | P P P |   P   |   P   |
                                           If WhenUnsatisfiable is set to DoNotSchedule,
                                           incoming pod can only be scheduled to zone2(zone3)
                                           to become 3/2/1(3/1/2) as ActualSkew(2-1)
@@ -41815,6 +41821,7 @@ spec:
                                         type: object
                                       type: array
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 weight:
                                   description: Weight associated with matching the
                                     corresponding nodeSelectorTerm, in the range 1-100.
@@ -41920,10 +41927,12 @@ spec:
                                         type: object
                                       type: array
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 type: array
                             required:
                             - nodeSelectorTerms
                             type: object
+                            x-kubernetes-map-type: atomic
                         type: object
                       podAffinity:
                         description: Describes pod affinity scheduling rules (e.g.
@@ -42004,6 +42013,7 @@ spec:
                                             only "value". The requirements are ANDed.
                                           type: object
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -42061,6 +42071,7 @@ spec:
                                             only "value". The requirements are ANDed.
                                           type: object
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     namespaces:
                                       description: namespaces specifies a static list
                                         of namespace names that the term applies to.
@@ -42165,6 +42176,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -42221,6 +42233,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaces:
                                   description: namespaces specifies a static list
                                     of namespace names that the term applies to. The
@@ -42324,6 +42337,7 @@ spec:
                                             only "value". The requirements are ANDed.
                                           type: object
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -42381,6 +42395,7 @@ spec:
                                             only "value". The requirements are ANDed.
                                           type: object
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     namespaces:
                                       description: namespaces specifies a static list
                                         of namespace names that the term applies to.
@@ -42485,6 +42500,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -42541,6 +42557,7 @@ spec:
                                         The requirements are ANDed.
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 namespaces:
                                   description: namespaces specifies a static list
                                     of namespace names that the term applies to. The
@@ -43882,6 +43899,7 @@ spec:
                             TODO: Add other useful fields. apiVersion, kind, uid?'
                           type: string
                       type: object
+                      x-kubernetes-map-type: atomic
                     type: array
                   nodeSelector:
                     additionalProperties:
@@ -43980,7 +43998,8 @@ spec:
                               in a file on the node should be used. The profile must
                               be preconfigured on the node to work. Must be a descending
                               path, relative to the kubelet's configured seccomp profile
-                              location. Must only be set if type is "Localhost".
+                              location. Must be set if type is "Localhost". Must NOT
+                              be set for any other type.
                             type: string
                           type:
                             description: "type indicates which kind of seccomp profile
@@ -44045,15 +44064,12 @@ spec:
                             type: string
                           hostProcess:
                             description: HostProcess determines if a container should
-                              be run as a 'Host Process' container. This field is
-                              alpha-level and will only be honored by components that
-                              enable the WindowsHostProcessContainers feature flag.
-                              Setting this field without the feature flag will result
-                              in errors when validating the Pod. All of a Pod's containers
-                              must have the same effective HostProcess value (it is
-                              not allowed to have a mix of HostProcess containers
-                              and non-HostProcess containers).  In addition, if HostProcess
-                              is true then HostNetwork must also be set to true.
+                              be run as a 'Host Process' container. All of a Pod's
+                              containers must have the same effective HostProcess
+                              value (it is not allowed to have a mix of HostProcess
+                              containers and non-HostProcess containers). In addition,
+                              if HostProcess is true then HostNetwork must also be
+                              set to true.
                             type: boolean
                           runAsUserName:
                             description: The UserName in Windows to run the entrypoint
@@ -44162,15 +44178,21 @@ spec:
                                 contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                          x-kubernetes-map-type: atomic
                         matchLabelKeys:
-                          description: MatchLabelKeys is a set of pod label keys to
-                            select the pods over which spreading will be calculated.
+                          description: "MatchLabelKeys is a set of pod label keys
+                            to select the pods over which spreading will be calculated.
                             The keys are used to lookup values from the incoming pod
                             labels, those key-value labels are ANDed with labelSelector
                             to select the group of existing pods over which spreading
-                            will be calculated for the incoming pod. Keys that don't
-                            exist in the incoming pod labels will be ignored. A null
-                            or empty list means only match against labelSelector.
+                            will be calculated for the incoming pod. The same key
+                            is forbidden to exist in both MatchLabelKeys and LabelSelector.
+                            MatchLabelKeys cannot be set when LabelSelector isn't
+                            set. Keys that don't exist in the incoming pod labels
+                            will be ignored. A null or empty list means only match
+                            against labelSelector. \n This is a beta field and requires
+                            the MatchLabelKeysInPodTopologySpread feature gate to
+                            be enabled (enabled by default)."
                           items:
                             type: string
                           type: array
@@ -44262,19 +44284,19 @@ spec:
                             a pod if it doesn''t satisfy the spread constraint. -
                             DoNotSchedule (default) tells the scheduler not to schedule
                             it. - ScheduleAnyway tells the scheduler to schedule the
-                            pod in any location,   but giving higher precedence to
-                            topologies that would help reduce the   skew. A constraint
-                            is considered "Unsatisfiable" for an incoming pod if and
-                            only if every possible node assignment for that pod would
-                            violate "MaxSkew" on some topology. For example, in a
-                            3-zone cluster, MaxSkew is set to 1, and pods with the
-                            same labelSelector spread as 3/1/1: | zone1 | zone2 |
-                            zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable
-                            is set to DoNotSchedule, incoming pod can only be scheduled
-                            to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1)
-                            on zone2(zone3) satisfies MaxSkew(1). In other words,
-                            the cluster can still be imbalanced, but scheduler won''t
-                            make it *more* imbalanced. It''s a required field.'
+                            pod in any location, but giving higher precedence to topologies
+                            that would help reduce the skew. A constraint is considered
+                            "Unsatisfiable" for an incoming pod if and only if every
+                            possible node assignment for that pod would violate "MaxSkew"
+                            on some topology. For example, in a 3-zone cluster, MaxSkew
+                            is set to 1, and pods with the same labelSelector spread
+                            as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   |
+                            If WhenUnsatisfiable is set to DoNotSchedule, incoming
+                            pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2)
+                            as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1).
+                            In other words, the cluster can still be imbalanced, but
+                            scheduler won''t make it *more* imbalanced. It''s a required
+                            field.'
                           type: string
                       required:
                       - maxSkew
@@ -53377,6 +53399,7 @@ spec:
                                               type: object
                                             type: array
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       weight:
                                         description: Weight associated with matching
                                           the corresponding nodeSelectorTerm, in the
@@ -53487,10 +53510,12 @@ spec:
                                               type: object
                                             type: array
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       type: array
                                   required:
                                   - nodeSelectorTerms
                                   type: object
+                                  x-kubernetes-map-type: atomic
                               type: object
                             podAffinity:
                               description: Describes pod affinity scheduling rules
@@ -53577,6 +53602,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaceSelector:
                                             description: A label query over the set
                                               of namespaces that the term applies
@@ -53640,6 +53666,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaces:
                                             description: namespaces specifies a static
                                               list of namespace names that the term
@@ -53750,6 +53777,7 @@ spec:
                                               only "value". The requirements are ANDed.
                                             type: object
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       namespaceSelector:
                                         description: A label query over the set of
                                           namespaces that the term applies to. The
@@ -53808,6 +53836,7 @@ spec:
                                               only "value". The requirements are ANDed.
                                             type: object
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       namespaces:
                                         description: namespaces specifies a static
                                           list of namespace names that the term applies
@@ -53920,6 +53949,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaceSelector:
                                             description: A label query over the set
                                               of namespaces that the term applies
@@ -53983,6 +54013,7 @@ spec:
                                                   ANDed.
                                                 type: object
                                             type: object
+                                            x-kubernetes-map-type: atomic
                                           namespaces:
                                             description: namespaces specifies a static
                                               list of namespace names that the term
@@ -54094,6 +54125,7 @@ spec:
                                               only "value". The requirements are ANDed.
                                             type: object
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       namespaceSelector:
                                         description: A label query over the set of
                                           namespaces that the term applies to. The
@@ -54152,6 +54184,7 @@ spec:
                                               only "value". The requirements are ANDed.
                                             type: object
                                         type: object
+                                        x-kubernetes-map-type: atomic
                                       namespaces:
                                         description: namespaces specifies a static
                                           list of namespace names that the term applies
@@ -55565,6 +55598,7 @@ spec:
                                   uid?'
                                 type: string
                             type: object
+                            x-kubernetes-map-type: atomic
                           type: array
                         nodeSelector:
                           additionalProperties:
@@ -55668,7 +55702,8 @@ spec:
                                     The profile must be preconfigured on the node
                                     to work. Must be a descending path, relative to
                                     the kubelet's configured seccomp profile location.
-                                    Must only be set if type is "Localhost".
+                                    Must be set if type is "Localhost". Must NOT be
+                                    set for any other type.
                                   type: string
                                 type:
                                   description: "type indicates which kind of seccomp
@@ -55738,15 +55773,11 @@ spec:
                                   type: string
                                 hostProcess:
                                   description: HostProcess determines if a container
-                                    should be run as a 'Host Process' container. This
-                                    field is alpha-level and will only be honored
-                                    by components that enable the WindowsHostProcessContainers
-                                    feature flag. Setting this field without the feature
-                                    flag will result in errors when validating the
-                                    Pod. All of a Pod's containers must have the same
-                                    effective HostProcess value (it is not allowed
-                                    to have a mix of HostProcess containers and non-HostProcess
-                                    containers).  In addition, if HostProcess is true
+                                    should be run as a 'Host Process' container. All
+                                    of a Pod's containers must have the same effective
+                                    HostProcess value (it is not allowed to have a
+                                    mix of HostProcess containers and non-HostProcess
+                                    containers). In addition, if HostProcess is true
                                     then HostNetwork must also be set to true.
                                   type: boolean
                                 runAsUserName:
@@ -55861,16 +55892,22 @@ spec:
                                       The requirements are ANDed.
                                     type: object
                                 type: object
+                                x-kubernetes-map-type: atomic
                               matchLabelKeys:
-                                description: MatchLabelKeys is a set of pod label
+                                description: "MatchLabelKeys is a set of pod label
                                   keys to select the pods over which spreading will
                                   be calculated. The keys are used to lookup values
                                   from the incoming pod labels, those key-value labels
                                   are ANDed with labelSelector to select the group
                                   of existing pods over which spreading will be calculated
-                                  for the incoming pod. Keys that don't exist in the
-                                  incoming pod labels will be ignored. A null or empty
-                                  list means only match against labelSelector.
+                                  for the incoming pod. The same key is forbidden
+                                  to exist in both MatchLabelKeys and LabelSelector.
+                                  MatchLabelKeys cannot be set when LabelSelector
+                                  isn't set. Keys that don't exist in the incoming
+                                  pod labels will be ignored. A null or empty list
+                                  means only match against labelSelector. \n This
+                                  is a beta field and requires the MatchLabelKeysInPodTopologySpread
+                                  feature gate to be enabled (enabled by default)."
                                 items:
                                   type: string
                                 type: array
@@ -55970,9 +56007,9 @@ spec:
                                   with a pod if it doesn''t satisfy the spread constraint.
                                   - DoNotSchedule (default) tells the scheduler not
                                   to schedule it. - ScheduleAnyway tells the scheduler
-                                  to schedule the pod in any location,   but giving
+                                  to schedule the pod in any location, but giving
                                   higher precedence to topologies that would help
-                                  reduce the   skew. A constraint is considered "Unsatisfiable"
+                                  reduce the skew. A constraint is considered "Unsatisfiable"
                                   for an incoming pod if and only if every possible
                                   node assignment for that pod would violate "MaxSkew"
                                   on some topology. For example, in a 3-zone cluster,

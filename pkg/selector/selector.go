@@ -27,12 +27,9 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
-<<<<<<< HEAD
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcpaz"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gkenodepool"
-=======
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/k8schaos"
->>>>>>> 314a9ac8 (feat: Add k8schaos experiment type)
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/physicalmachine"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/pod"
