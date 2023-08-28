@@ -5165,7 +5165,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "az": {
-                    "description": "AZ indicates the Availability zone to be taken down",
+                    "description": "AvailabilityZone indicates the Availability zone to be taken down",
                     "type": "string"
                 },
                 "duration": {
