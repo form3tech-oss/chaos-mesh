@@ -7,12 +7,6 @@ on:
         description: "The the next semantic version tag based on commit messages."
         value: ${{ jobs.calculate-tag.outputs.tag }}
     inputs:
-      append_prerelease_suffix:
-        description: |
-          When set to true, a prerelease suffix will be added to the suffix of the tag.
-        required: false
-        type: boolean
-        default: "${{ github.event_name == 'pull_request' }}"
       head_ref:
         description: "Head ref to be used as pre-release suffix"
         type: string
@@ -41,10 +35,12 @@ jobs:
 
       - name: Calculate pre-release suffix
         id: tag-suffix
-        if: ${{ inputs.append_prerelease_suffix }}
         run: |
-          PRERELEASE="${{ inputs.head_ref }}"
-          underscores_and_slashes_to_dashes_suffix="${PRERELEASE//[\/_]/-}"
+          SUFFIX="${{ inputs.head_ref }}"
+          if [[ "${{ github.event_name }}" = "push" && "${{ github.ref_type }}" = "branch" && "${{ github.ref_name }}" = "builder" ]]; then
+            SUFFIX="test-$(date +%Y-%m-%d)"
+          fi
+          underscores_and_slashes_to_dashes_suffix="${SUFFIX//[\/_]/-}"
           echo "tag-suffix=-${underscores_and_slashes_to_dashes_suffix}" >> $GITHUB_OUTPUT
 
       - name: Compute next tag

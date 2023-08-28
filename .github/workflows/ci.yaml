@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - builder
+  push:
+    branches:
+      - builder
 
 jobs:
   calculate-tag:
