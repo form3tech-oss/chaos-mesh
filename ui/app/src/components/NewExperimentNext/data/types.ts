@@ -743,6 +743,7 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  NodeChaos: {},
   // Pod Fault
   PodChaos: {
     categories: [

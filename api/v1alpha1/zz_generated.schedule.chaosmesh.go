@@ -36,6 +36,7 @@ const (
 	ScheduleTypeK8SChaos ScheduleTemplateType = "K8SChaos"
 	ScheduleTypeKernelChaos ScheduleTemplateType = "KernelChaos"
 	ScheduleTypeNetworkChaos ScheduleTemplateType = "NetworkChaos"
+	ScheduleTypeNodeChaos ScheduleTemplateType = "NodeChaos"
 	ScheduleTypePhysicalMachineChaos ScheduleTemplateType = "PhysicalMachineChaos"
 	ScheduleTypePodChaos ScheduleTemplateType = "PodChaos"
 	ScheduleTypeResourceScaleChaos ScheduleTemplateType = "ResourceScaleChaos"
@@ -59,6 +60,7 @@ var allScheduleTemplateType = []ScheduleTemplateType{
 	ScheduleTypeK8SChaos,
 	ScheduleTypeKernelChaos,
 	ScheduleTypeNetworkChaos,
+	ScheduleTypeNodeChaos,
 	ScheduleTypePhysicalMachineChaos,
 	ScheduleTypePodChaos,
 	ScheduleTypeResourceScaleChaos,
@@ -118,6 +120,10 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 	case ScheduleTypeNetworkChaos:
 		result := NetworkChaos{}
 		result.Spec = *it.NetworkChaos
+		return &result, nil
+	case ScheduleTypeNodeChaos:
+		result := NodeChaos{}
+		result.Spec = *it.NodeChaos
 		return &result, nil
 	case ScheduleTypePhysicalMachineChaos:
 		result := PhysicalMachineChaos{}
@@ -190,6 +196,9 @@ func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 		return nil
 	case *NetworkChaos:
 		*it.NetworkChaos = chaos.Spec
+		return nil
+	case *NodeChaos:
+		*it.NodeChaos = chaos.Spec
 		return nil
 	case *PhysicalMachineChaos:
 		*it.PhysicalMachineChaos = chaos.Spec

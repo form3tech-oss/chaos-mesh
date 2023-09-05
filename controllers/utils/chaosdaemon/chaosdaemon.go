@@ -49,8 +49,7 @@ type ChaosDaemonClientBuilder struct {
 	client.Reader
 }
 
-func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod) (string, error) {
-	nodeName := pod.Spec.NodeName
+func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, nodeName string) (string, error) {
 	log.Info("Creating client to chaos-daemon", "node", nodeName)
 
 	ns := config.ControllerCfg.Namespace
@@ -82,7 +81,7 @@ func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *t
 		return nil, err.(error)
 	}
 
-	daemonIP, err := b.FindDaemonIP(ctx, pod)
+	daemonIP, err := b.FindDaemonIP(ctx, pod.Spec.NodeName)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +95,36 @@ func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *t
 	if id != nil {
 		builder = builder.WithNamespacedName(*id)
 	}
+
+	cc, err := builder.Build()
+	if err != nil {
+		return nil, err
+	}
+	return chaosdaemonclient.New(cc), nil
+}
+
+func (b *ChaosDaemonClientBuilder) BuildNodeClient(ctx context.Context, nodeName string) (chaosdaemonclient.ChaosDaemonClientInterface, error) {
+	if cli := mock.On("MockChaosDaemonClient"); cli != nil {
+		return cli.(chaosdaemonclient.ChaosDaemonClientInterface), nil
+	}
+	if err := mock.On("NewChaosDaemonClientError"); err != nil {
+		return nil, err.(error)
+	}
+
+	daemonIP, err := b.FindDaemonIP(ctx, nodeName)
+	if err != nil {
+		return nil, err
+	}
+	builder := grpcUtils.Builder(daemonIP, config.ControllerCfg.ChaosDaemonPort).WithDefaultTimeout()
+	if config.ControllerCfg.TLSConfig.ChaosMeshCACert != "" {
+		builder.TLSFromFile(config.ControllerCfg.TLSConfig.ChaosMeshCACert, config.ControllerCfg.TLSConfig.ChaosDaemonClientCert, config.ControllerCfg.TLSConfig.ChaosDaemonClientKey)
+	} else {
+		builder.Insecure()
+	}
+
+	// if id != nil {
+	// 	builder = builder.WithNamespacedName(*id)
+	// }
 
 	cc, err := builder.Build()
 	if err != nil {

@@ -30,6 +30,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/k8schaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/kernelchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/networkchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/nodechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/physicalmachinechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/podchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/resourcescalechaos"
@@ -48,6 +49,7 @@ var AllImpl = fx.Options(
 	iochaos.Module,
 	kernelchaos.Module,
 	networkchaos.Module,
+	nodechaos.Module,
 	podchaos.Module,
 	gcpchaos.Module,
 	stresschaos.Module,

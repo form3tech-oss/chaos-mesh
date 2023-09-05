@@ -1849,6 +1849,105 @@ spec:
                 - mode
                 - selector
                 type: object
+              nodeChaos:
+                description: NodeChaosSpec defines the attributes that a user creates
+                  on a chaos experiment about nodes.
+                properties:
+                  duration:
+                    description: Duration represents the duration of the chaos action.
+                      It is required when the action is `PodFailureAction`. A duration
+                      string is a possibly signed sequence of decimal numbers, each
+                      with optional fraction and a unit suffix, such as "300ms", "-1.5h"
+                      or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms",
+                      "s", "m", "h".
+                    type: string
+                  mode:
+                    description: 'Mode defines the mode to run chaos action. Supported
+                      mode: one / all / fixed / fixed-percent / random-max-percent'
+                    enum:
+                    - one
+                    - all
+                    - fixed
+                    - fixed-percent
+                    - random-max-percent
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                  selector:
+                    description: Selector is used to select nodes into which to inject
+                      chaos.
+                    properties:
+                      annotationSelectors:
+                        additionalProperties:
+                          type: string
+                        description: Map of string keys and values that can be used
+                          to select objects. A selector based on annotations.
+                        type: object
+                      expressionSelectors:
+                        description: a slice of label selector expressions that can
+                          be used to select objects. A list of selectors based on
+                          set-based label expressions.
+                        items:
+                          description: A label selector requirement is a selector
+                            that contains values, a key, and an operator that relates
+                            the key and values.
+                          properties:
+                            key:
+                              description: key is the label key that the selector
+                                applies to.
+                              type: string
+                            operator:
+                              description: operator represents a key's relationship
+                                to a set of values. Valid operators are In, NotIn,
+                                Exists and DoesNotExist.
+                              type: string
+                            values:
+                              description: values is an array of string values. If
+                                the operator is In or NotIn, the values array must
+                                be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced
+                                during a strategic merge patch.
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - key
+                          - operator
+                          type: object
+                        type: array
+                      fieldSelectors:
+                        additionalProperties:
+                          type: string
+                        description: Map of string keys and values that can be used
+                          to select objects. A selector based on fields.
+                        type: object
+                      labelSelectors:
+                        additionalProperties:
+                          type: string
+                        description: Map of string keys and values that can be used
+                          to select objects. A selector based on labels.
+                        type: object
+                      names:
+                        description: An array of node names.
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  value:
+                    description: Value is required when the mode is set to `FixedMode`
+                      / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
+                      provide an integer of pods to do chaos action. If `FixedPercentMode`,
+                      provide a number from 0-100 to specify the percent of pods the
+                      server can do chaos action. IF `RandomMaxPercentMode`,  provide
+                      a number from 0-100 to specify the max percent of pods to do
+                      chaos action
+                    type: string
+                required:
+                - mode
+                - selector
+                type: object
               physicalmachineChaos:
                 description: PhysicalMachineChaosSpec defines the desired state of
                   PhysicalMachineChaos
@@ -4873,6 +4972,106 @@ spec:
                         type: string
                     required:
                     - action
+                    - mode
+                    - selector
+                    type: object
+                  nodeChaos:
+                    description: NodeChaosSpec defines the attributes that a user
+                      creates on a chaos experiment about nodes.
+                    properties:
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action. It is required when the action is `PodFailureAction`.
+                          A duration string is a possibly signed sequence of decimal
+                          numbers, each with optional fraction and a unit suffix,
+                          such as "300ms", "-1.5h" or "2h45m". Valid time units are
+                          "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                        type: string
+                      mode:
+                        description: 'Mode defines the mode to run chaos action. Supported
+                          mode: one / all / fixed / fixed-percent / random-max-percent'
+                        enum:
+                        - one
+                        - all
+                        - fixed
+                        - fixed-percent
+                        - random-max-percent
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                      selector:
+                        description: Selector is used to select nodes into which to
+                          inject chaos.
+                        properties:
+                          annotationSelectors:
+                            additionalProperties:
+                              type: string
+                            description: Map of string keys and values that can be
+                              used to select objects. A selector based on annotations.
+                            type: object
+                          expressionSelectors:
+                            description: a slice of label selector expressions that
+                              can be used to select objects. A list of selectors based
+                              on set-based label expressions.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          fieldSelectors:
+                            additionalProperties:
+                              type: string
+                            description: Map of string keys and values that can be
+                              used to select objects. A selector based on fields.
+                            type: object
+                          labelSelectors:
+                            additionalProperties:
+                              type: string
+                            description: Map of string keys and values that can be
+                              used to select objects. A selector based on labels.
+                            type: object
+                          names:
+                            description: An array of node names.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      value:
+                        description: Value is required when the mode is set to `FixedMode`
+                          / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
+                          provide an integer of pods to do chaos action. If `FixedPercentMode`,
+                          provide a number from 0-100 to specify the percent of pods
+                          the server can do chaos action. IF `RandomMaxPercentMode`,  provide
+                          a number from 0-100 to specify the max percent of pods to
+                          do chaos action
+                        type: string
+                    required:
                     - mode
                     - selector
                     type: object
@@ -8447,6 +8646,115 @@ spec:
                               - mode
                               - selector
                               type: object
+                            nodeChaos:
+                              description: NodeChaosSpec defines the attributes that
+                                a user creates on a chaos experiment about nodes.
+                              properties:
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action. It is required when the action
+                                    is `PodFailureAction`. A duration string is a
+                                    possibly signed sequence of decimal numbers, each
+                                    with optional fraction and a unit suffix, such
+                                    as "300ms", "-1.5h" or "2h45m". Valid time units
+                                    are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                  type: string
+                                mode:
+                                  description: 'Mode defines the mode to run chaos
+                                    action. Supported mode: one / all / fixed / fixed-percent
+                                    / random-max-percent'
+                                  enum:
+                                  - one
+                                  - all
+                                  - fixed
+                                  - fixed-percent
+                                  - random-max-percent
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                                selector:
+                                  description: Selector is used to select nodes into
+                                    which to inject chaos.
+                                  properties:
+                                    annotationSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: Map of string keys and values that
+                                        can be used to select objects. A selector
+                                        based on annotations.
+                                      type: object
+                                    expressionSelectors:
+                                      description: a slice of label selector expressions
+                                        that can be used to select objects. A list
+                                        of selectors based on set-based label expressions.
+                                      items:
+                                        description: A label selector requirement
+                                          is a selector that contains values, a key,
+                                          and an operator that relates the key and
+                                          values.
+                                        properties:
+                                          key:
+                                            description: key is the label key that
+                                              the selector applies to.
+                                            type: string
+                                          operator:
+                                            description: operator represents a key's
+                                              relationship to a set of values. Valid
+                                              operators are In, NotIn, Exists and
+                                              DoesNotExist.
+                                            type: string
+                                          values:
+                                            description: values is an array of string
+                                              values. If the operator is In or NotIn,
+                                              the values array must be non-empty.
+                                              If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This
+                                              array is replaced during a strategic
+                                              merge patch.
+                                            items:
+                                              type: string
+                                            type: array
+                                        required:
+                                        - key
+                                        - operator
+                                        type: object
+                                      type: array
+                                    fieldSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: Map of string keys and values that
+                                        can be used to select objects. A selector
+                                        based on fields.
+                                      type: object
+                                    labelSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: Map of string keys and values that
+                                        can be used to select objects. A selector
+                                        based on labels.
+                                      type: object
+                                    names:
+                                      description: An array of node names.
+                                      items:
+                                        type: string
+                                      type: array
+                                  type: object
+                                value:
+                                  description: Value is required when the mode is
+                                    set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                    If `FixedMode`, provide an integer of pods to
+                                    do chaos action. If `FixedPercentMode`, provide
+                                    a number from 0-100 to specify the percent of
+                                    pods the server can do chaos action. IF `RandomMaxPercentMode`,  provide
+                                    a number from 0-100 to specify the max percent
+                                    of pods to do chaos action
+                                  type: string
+                              required:
+                              - mode
+                              - selector
+                              type: object
                             physicalmachineChaos:
                               description: PhysicalMachineChaosSpec defines the desired
                                 state of PhysicalMachineChaos
@@ -11783,6 +12091,120 @@ spec:
                                       type: string
                                   required:
                                   - action
+                                  - mode
+                                  - selector
+                                  type: object
+                                nodeChaos:
+                                  description: NodeChaosSpec defines the attributes
+                                    that a user creates on a chaos experiment about
+                                    nodes.
+                                  properties:
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action. It is required when the
+                                        action is `PodFailureAction`. A duration string
+                                        is a possibly signed sequence of decimal numbers,
+                                        each with optional fraction and a unit suffix,
+                                        such as "300ms", "-1.5h" or "2h45m". Valid
+                                        time units are "ns", "us" (or "µs"), "ms",
+                                        "s", "m", "h".
+                                      type: string
+                                    mode:
+                                      description: 'Mode defines the mode to run chaos
+                                        action. Supported mode: one / all / fixed
+                                        / fixed-percent / random-max-percent'
+                                      enum:
+                                      - one
+                                      - all
+                                      - fixed
+                                      - fixed-percent
+                                      - random-max-percent
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                    selector:
+                                      description: Selector is used to select nodes
+                                        into which to inject chaos.
+                                      properties:
+                                        annotationSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: Map of string keys and values
+                                            that can be used to select objects. A
+                                            selector based on annotations.
+                                          type: object
+                                        expressionSelectors:
+                                          description: a slice of label selector expressions
+                                            that can be used to select objects. A
+                                            list of selectors based on set-based label
+                                            expressions.
+                                          items:
+                                            description: A label selector requirement
+                                              is a selector that contains values,
+                                              a key, and an operator that relates
+                                              the key and values.
+                                            properties:
+                                              key:
+                                                description: key is the label key
+                                                  that the selector applies to.
+                                                type: string
+                                              operator:
+                                                description: operator represents a
+                                                  key's relationship to a set of values.
+                                                  Valid operators are In, NotIn, Exists
+                                                  and DoesNotExist.
+                                                type: string
+                                              values:
+                                                description: values is an array of
+                                                  string values. If the operator is
+                                                  In or NotIn, the values array must
+                                                  be non-empty. If the operator is
+                                                  Exists or DoesNotExist, the values
+                                                  array must be empty. This array
+                                                  is replaced during a strategic merge
+                                                  patch.
+                                                items:
+                                                  type: string
+                                                type: array
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                        fieldSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: Map of string keys and values
+                                            that can be used to select objects. A
+                                            selector based on fields.
+                                          type: object
+                                        labelSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: Map of string keys and values
+                                            that can be used to select objects. A
+                                            selector based on labels.
+                                          type: object
+                                        names:
+                                          description: An array of node names.
+                                          items:
+                                            type: string
+                                          type: array
+                                      type: object
+                                    value:
+                                      description: Value is required when the mode
+                                        is set to `FixedMode` / `FixedPercentMode`
+                                        / `RandomMaxPercentMode`. If `FixedMode`,
+                                        provide an integer of pods to do chaos action.
+                                        If `FixedPercentMode`, provide a number from
+                                        0-100 to specify the percent of pods the server
+                                        can do chaos action. IF `RandomMaxPercentMode`,  provide
+                                        a number from 0-100 to specify the max percent
+                                        of pods to do chaos action
+                                      type: string
+                                  required:
                                   - mode
                                   - selector
                                   type: object

@@ -3922,6 +3922,9 @@ definitions:
       networkChaos:
         $ref: '#/definitions/v1alpha1.NetworkChaosSpec'
         description: +optional
+      nodeChaos:
+        $ref: '#/definitions/v1alpha1.NodeChaosSpec'
+        description: +optional
       physicalmachineChaos:
         $ref: '#/definitions/v1alpha1.PhysicalMachineChaosSpec'
         description: +optional
@@ -5336,6 +5339,75 @@ definitions:
         description: only impact egress traffic to these IP addresses
         type: string
     type: object
+  v1alpha1.NodeChaosSpec:
+    properties:
+      duration:
+        description: |-
+          Duration represents the duration of the chaos action.
+          It is required when the action is `PodFailureAction`.
+          A duration string is a possibly signed sequence of
+          decimal numbers, each with optional fraction and a unit suffix,
+          such as "300ms", "-1.5h" or "2h45m".
+          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          +optional
+        type: string
+      mode:
+        description: |-
+          Mode defines the mode to run chaos action.
+          Supported mode: one / all / fixed / fixed-percent / random-max-percent
+          +kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent
+        type: string
+      remoteCluster:
+        description: |-
+          RemoteCluster represents the remote cluster where the chaos will be deployed
+          +optional
+        type: string
+      selector:
+        $ref: '#/definitions/v1alpha1.NodeSelectorSpec'
+        description: Selector is used to select nodes into which to inject chaos.
+      value:
+        description: |-
+          Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+          If `FixedMode`, provide an integer of pods to do chaos action.
+          If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+          IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+          +optional
+        type: string
+    type: object
+  v1alpha1.NodeSelectorSpec:
+    properties:
+      annotationSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on annotations.
+          +optional
+        type: object
+      fieldSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on fields.
+          +optional
+        type: object
+      labelSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on labels.
+          +optional
+        type: object
+      names:
+        description: |-
+          An array of node names.
+          +optional
+        items:
+          type: string
+        type: array
+    type: object
   v1alpha1.PMJVMMySQLSpec:
     properties:
       database:
@@ -6346,6 +6418,9 @@ definitions:
       networkChaos:
         $ref: '#/definitions/v1alpha1.NetworkChaosSpec'
         description: +optional
+      nodeChaos:
+        $ref: '#/definitions/v1alpha1.NodeChaosSpec'
+        description: +optional
       physicalmachineChaos:
         $ref: '#/definitions/v1alpha1.PhysicalMachineChaosSpec'
         description: +optional
@@ -6758,6 +6833,9 @@ definitions:
         type: string
       networkChaos:
         $ref: '#/definitions/v1alpha1.NetworkChaosSpec'
+        description: +optional
+      nodeChaos:
+        $ref: '#/definitions/v1alpha1.NodeChaosSpec'
         description: +optional
       physicalmachineChaos:
         $ref: '#/definitions/v1alpha1.PhysicalMachineChaosSpec'

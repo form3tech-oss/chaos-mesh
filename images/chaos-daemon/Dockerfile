@@ -40,6 +40,14 @@ FROM debian:bullseye-slim
 ARG HTTPS_PROXY
 ARG HTTP_PROXY
 
+ARG TARGET_PLATFORM=amd64
+
+ARG BYTEMAN_VERSION=v4.0.20-0.12
+ARG TODA_VERSION=v0.2.3-f3-rorootfs-pre1
+ARG NSEXEC_VERSION=v0.1.6
+ARG TPROXY_VERSION=v0.5.3
+ARG MEMSTRESS_VERSION=v0.3
+
 ENV http_proxy $HTTP_PROXY
 ENV https_proxy $HTTPS_PROXY
 
@@ -49,21 +57,42 @@ RUN apt-get update && \
     echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list && \
     echo "deb http://deb.debian.org/debian bullseye-proposed-updates main contrib non-free" >> /etc/apt/sources.list && \
     apt --allow-releaseinfo-change update && apt upgrade  -y && \
-    apt-get install -y tzdata iptables ebtables net-tools ipset stress-ng iproute2 fuse util-linux procps openjdk-11-jre && \
+    apt-get install -y tzdata iptables ebtables net-tools ipset stress-ng iproute2 fuse util-linux procps curl openjdk-11-jre && \
     rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ebtables /usr/sbin/ebtables-legacy
 
 ENV RUST_BACKTRACE 1
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+
+RUN curl -L https://mirrors.chaos-mesh.org/byteman-chaos-mesh-download-${BYTEMAN_VERSION}.tar.gz -o /usr/local/byteman.tar.gz && \
+    tar xvf /usr/local/byteman.tar.gz -C /usr/local && \
+    mv /usr/local/byteman-chaos-mesh-download-${BYTEMAN_VERSION} /usr/local/byteman && \
+    rm /usr/local/byteman.tar.gz
+
 ENV BYTEMAN_HOME /usr/local/byteman
 ENV PATH $PATH:/usr/local/byteman/bin
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH $PATH:/usr/local/bin
+
+# toda doesn't support arm64 yet
+RUN case "$TARGET_PLATFORM" in \
+    'amd64') \
+    export NSEXEC_ARCH='x86_64'; \
+    ;; \
+    'arm64') \
+    export NSEXEC_ARCH='aarch64'; \
+    ;; \
+    *) echo >&2 "error: unsupported architecture '$TARGET_PLATFORM'"; exit 1 ;; \
+    esac; \
+    curl -L https://github.com/form3tech-oss/toda/releases/download/${TODA_VERSION}/toda-linux-amd64.tar.gz | tar xz -C /urs/local/bin; \
+    curl -L https://github.com/chaos-mesh/nsexec/releases/download/${NSEXEC_VERSION}/nsexec-$NSEXEC_ARCH-unknown-linux-gnu.tar.gz | tar xz -C /usr/local/bin; \
+    curl -L https://github.com/chaos-mesh/chaos-tproxy/releases/download/${TPROXY_VERSION}/tproxy-$NSEXEC_ARCH.tar.gz | tar xz -C /usr/local/bin; \
+    curl -L https://github.com/chaos-mesh/memStress/releases/download/${MEMSTRESS_VERSION}/memStress_${MEMSTRESS_VERSION}-$NSEXEC_ARCH-linux-gnu.tar.gz | tar xz -C /usr/local/bin
 
 COPY bin/chaos-daemon /usr/local/bin/chaos-daemon
 COPY bin/pause /usr/local/bin/pause
 COPY bin/cdh /usr/local/bin/cdh
-COPY --from=binaryimage /tmp/byteman /usr/local/byteman
-COPY --from=binaryimage /tmp/bin/* /usr/local/bin/
+
+ENV PATH $PATH:/usr/local/bin
+
 RUN mv /usr/local/bin/libnsenter.so /usr/local/lib/libnsenter.so
