@@ -18,6 +18,8 @@ resources:
 - bases/chaos-mesh.org_azurechaos.yaml
 - bases/chaos-mesh.org_jvmchaos.yaml
 - bases/chaos-mesh.org_gcpchaos.yaml
+- bases/chaos-mesh.org_gcpazchaos.yaml
+- bases/chaos-mesh.org_gkenodepoolchaos.yaml
 - bases/chaos-mesh.org_workflows.yaml
 - bases/chaos-mesh.org_workflownodes.yaml
 - bases/chaos-mesh.org_schedules.yaml
@@ -26,6 +28,7 @@ resources:
 - bases/chaos-mesh.org_blockchaos.yaml
 - bases/chaos-mesh.org_statuschecks.yaml
 - bases/chaos-mesh.org_remoteclusters.yaml
+- bases/chaos-mesh.org_k8schaos.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

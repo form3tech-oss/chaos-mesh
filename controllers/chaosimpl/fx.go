@@ -18,14 +18,18 @@ package chaosimpl
 import (
 	"go.uber.org/fx"
 
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awsazchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awschaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/azurechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/blockchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/dnschaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/gcpazchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/gcpchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/gkenodepoolchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/httpchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/iochaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/jvmchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/k8schaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/kernelchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/networkchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/physicalmachinechaos"
@@ -45,10 +49,14 @@ var AllImpl = fx.Options(
 	networkchaos.Module,
 	podchaos.Module,
 	gcpchaos.Module,
+	gcpazchaos.Module,
+	gkenodepoolchaos.Module,
 	stresschaos.Module,
 	jvmchaos.Module,
 	timechaos.Module,
 	physicalmachinechaos.Module,
 	blockchaos.Module,
+	awsazchaos.Module,
+	k8schaos.Module,
 
 	utils.Module)

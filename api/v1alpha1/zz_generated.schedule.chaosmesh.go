@@ -24,14 +24,18 @@ import (
 
 
 const (
+	ScheduleTypeAWSAzChaos ScheduleTemplateType = "AWSAzChaos"
 	ScheduleTypeAWSChaos ScheduleTemplateType = "AWSChaos"
 	ScheduleTypeAzureChaos ScheduleTemplateType = "AzureChaos"
 	ScheduleTypeBlockChaos ScheduleTemplateType = "BlockChaos"
 	ScheduleTypeDNSChaos ScheduleTemplateType = "DNSChaos"
+	ScheduleTypeGCPAzChaos ScheduleTemplateType = "GCPAzChaos"
 	ScheduleTypeGCPChaos ScheduleTemplateType = "GCPChaos"
+	ScheduleTypeGKENodePoolChaos ScheduleTemplateType = "GKENodePoolChaos"
 	ScheduleTypeHTTPChaos ScheduleTemplateType = "HTTPChaos"
 	ScheduleTypeIOChaos ScheduleTemplateType = "IOChaos"
 	ScheduleTypeJVMChaos ScheduleTemplateType = "JVMChaos"
+	ScheduleTypeK8SChaos ScheduleTemplateType = "K8SChaos"
 	ScheduleTypeKernelChaos ScheduleTemplateType = "KernelChaos"
 	ScheduleTypeNetworkChaos ScheduleTemplateType = "NetworkChaos"
 	ScheduleTypePhysicalMachineChaos ScheduleTemplateType = "PhysicalMachineChaos"
@@ -43,14 +47,18 @@ const (
 )
 
 var allScheduleTemplateType = []ScheduleTemplateType{
+	ScheduleTypeAWSAzChaos,
 	ScheduleTypeAWSChaos,
 	ScheduleTypeAzureChaos,
 	ScheduleTypeBlockChaos,
 	ScheduleTypeDNSChaos,
+	ScheduleTypeGCPAzChaos,
 	ScheduleTypeGCPChaos,
+	ScheduleTypeGKENodePoolChaos,
 	ScheduleTypeHTTPChaos,
 	ScheduleTypeIOChaos,
 	ScheduleTypeJVMChaos,
+	ScheduleTypeK8SChaos,
 	ScheduleTypeKernelChaos,
 	ScheduleTypeNetworkChaos,
 	ScheduleTypePhysicalMachineChaos,
@@ -63,6 +71,10 @@ var allScheduleTemplateType = []ScheduleTemplateType{
 
 func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (GenericChaos, error) {
 	switch templateType {
+	case ScheduleTypeAWSAzChaos:
+		result := AWSAzChaos{}
+		result.Spec = *it.AWSAzChaos
+		return &result, nil
 	case ScheduleTypeAWSChaos:
 		result := AWSChaos{}
 		result.Spec = *it.AWSChaos
@@ -79,9 +91,17 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 		result := DNSChaos{}
 		result.Spec = *it.DNSChaos
 		return &result, nil
+	case ScheduleTypeGCPAzChaos:
+		result := GCPAzChaos{}
+		result.Spec = *it.GCPAzChaos
+		return &result, nil
 	case ScheduleTypeGCPChaos:
 		result := GCPChaos{}
 		result.Spec = *it.GCPChaos
+		return &result, nil
+	case ScheduleTypeGKENodePoolChaos:
+		result := GKENodePoolChaos{}
+		result.Spec = *it.GKENodePoolChaos
 		return &result, nil
 	case ScheduleTypeHTTPChaos:
 		result := HTTPChaos{}
@@ -94,6 +114,10 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 	case ScheduleTypeJVMChaos:
 		result := JVMChaos{}
 		result.Spec = *it.JVMChaos
+		return &result, nil
+	case ScheduleTypeK8SChaos:
+		result := K8SChaos{}
+		result.Spec = *it.K8SChaos
 		return &result, nil
 	case ScheduleTypeKernelChaos:
 		result := KernelChaos{}
@@ -131,6 +155,9 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 
 func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 	switch chaos := root.(type) {
+	case *AWSAzChaos:
+		*it.AWSAzChaos = chaos.Spec
+		return nil
 	case *AWSChaos:
 		*it.AWSChaos = chaos.Spec
 		return nil
@@ -143,8 +170,14 @@ func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 	case *DNSChaos:
 		*it.DNSChaos = chaos.Spec
 		return nil
+	case *GCPAzChaos:
+		*it.GCPAzChaos = chaos.Spec
+		return nil
 	case *GCPChaos:
 		*it.GCPChaos = chaos.Spec
+		return nil
+	case *GKENodePoolChaos:
+		*it.GKENodePoolChaos = chaos.Spec
 		return nil
 	case *HTTPChaos:
 		*it.HTTPChaos = chaos.Spec
@@ -154,6 +187,9 @@ func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 		return nil
 	case *JVMChaos:
 		*it.JVMChaos = chaos.Spec
+		return nil
+	case *K8SChaos:
+		*it.K8SChaos = chaos.Spec
 		return nil
 	case *KernelChaos:
 		*it.KernelChaos = chaos.Spec

@@ -23,6 +23,14 @@ import (
 	"testing"
 )
 
+func TestChaosKindMapShouldContainsAWSAzChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeAWSAzChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
 func TestChaosKindMapShouldContainsAWSChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 	var requiredType TemplateType
@@ -55,10 +63,26 @@ func TestChaosKindMapShouldContainsDNSChaos(t *testing.T) {
 	_, ok := all.kinds[string(requiredType)]
 	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
 }
+func TestChaosKindMapShouldContainsGCPAzChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeGCPAzChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
 func TestChaosKindMapShouldContainsGCPChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 	var requiredType TemplateType
 	requiredType = TypeGCPChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
+func TestChaosKindMapShouldContainsGKENodePoolChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeGKENodePoolChaos
 
 	_, ok := all.kinds[string(requiredType)]
 	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
@@ -83,6 +107,14 @@ func TestChaosKindMapShouldContainsJVMChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 	var requiredType TemplateType
 	requiredType = TypeJVMChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
+func TestChaosKindMapShouldContainsK8SChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeK8SChaos
 
 	_, ok := all.kinds[string(requiredType)]
 	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)

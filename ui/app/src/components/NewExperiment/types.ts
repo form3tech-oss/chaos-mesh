@@ -46,6 +46,11 @@ export interface AWS {
   deviceName?: string
 }
 
+export interface AWSAzChaos {
+  stack: string
+  availablityZone: string
+}
+
 export interface DNS {
   action: 'error' | 'random'
   patterns: string[]
@@ -59,6 +64,18 @@ export interface GCP {
   zone: string
   instance: string
   deviceNames?: string[]
+}
+
+export interface GCPAz {
+  project: string
+  zone: string
+  filter?: string
+}
+
+export interface GKENodePool {
+  project: string
+  cluster: string
+  location: string
 }
 
 export interface IO {
@@ -160,12 +177,16 @@ export interface Time {
 
 export interface ExperimentType {
   AWSChaos: AWS
+  AWSAzChaos: AWSAzChaos
   AzureChaos?: unknown
   DNSChaos: DNS
+  GCPAzChaos: GCPAz
   GCPChaos: GCP
+  GKENodePoolChaos: GKENodePool
   HTTPChaos?: unknown
   IOChaos: IO
   JVMChaos?: unknown
+  K8SChaos?: unknown
   KernelChaos: Kernel
   NetworkChaos: Network
   PodChaos: Pod

@@ -24,14 +24,18 @@ import (
 
 
 const (
+	TypeAWSAzChaos TemplateType = "AWSAzChaos"
 	TypeAWSChaos TemplateType = "AWSChaos"
 	TypeAzureChaos TemplateType = "AzureChaos"
 	TypeBlockChaos TemplateType = "BlockChaos"
 	TypeDNSChaos TemplateType = "DNSChaos"
+	TypeGCPAzChaos TemplateType = "GCPAzChaos"
 	TypeGCPChaos TemplateType = "GCPChaos"
+	TypeGKENodePoolChaos TemplateType = "GKENodePoolChaos"
 	TypeHTTPChaos TemplateType = "HTTPChaos"
 	TypeIOChaos TemplateType = "IOChaos"
 	TypeJVMChaos TemplateType = "JVMChaos"
+	TypeK8SChaos TemplateType = "K8SChaos"
 	TypeKernelChaos TemplateType = "KernelChaos"
 	TypeNetworkChaos TemplateType = "NetworkChaos"
 	TypePhysicalMachineChaos TemplateType = "PhysicalMachineChaos"
@@ -43,14 +47,18 @@ const (
 
 var allChaosTemplateType = []TemplateType{
 	TypeSchedule,
+	TypeAWSAzChaos,
 	TypeAWSChaos,
 	TypeAzureChaos,
 	TypeBlockChaos,
 	TypeDNSChaos,
+	TypeGCPAzChaos,
 	TypeGCPChaos,
+	TypeGKENodePoolChaos,
 	TypeHTTPChaos,
 	TypeIOChaos,
 	TypeJVMChaos,
+	TypeK8SChaos,
 	TypeKernelChaos,
 	TypeNetworkChaos,
 	TypePhysicalMachineChaos,
@@ -62,6 +70,8 @@ var allChaosTemplateType = []TemplateType{
 
 type EmbedChaos struct {
 	// +optional
+	AWSAzChaos *AWSAzChaosSpec `json:"awsazChaos,omitempty"`
+	// +optional
 	AWSChaos *AWSChaosSpec `json:"awsChaos,omitempty"`
 	// +optional
 	AzureChaos *AzureChaosSpec `json:"azureChaos,omitempty"`
@@ -70,13 +80,19 @@ type EmbedChaos struct {
 	// +optional
 	DNSChaos *DNSChaosSpec `json:"dnsChaos,omitempty"`
 	// +optional
+	GCPAzChaos *GCPAzChaosSpec `json:"gcpazChaos,omitempty"`
+	// +optional
 	GCPChaos *GCPChaosSpec `json:"gcpChaos,omitempty"`
+	// +optional
+	GKENodePoolChaos *GKENodePoolChaosSpec `json:"gkenodepoolChaos,omitempty"`
 	// +optional
 	HTTPChaos *HTTPChaosSpec `json:"httpChaos,omitempty"`
 	// +optional
 	IOChaos *IOChaosSpec `json:"ioChaos,omitempty"`
 	// +optional
 	JVMChaos *JVMChaosSpec `json:"jvmChaos,omitempty"`
+	// +optional
+	K8SChaos *K8SChaosSpec `json:"k8sChaos,omitempty"`
 	// +optional
 	KernelChaos *KernelChaosSpec `json:"kernelChaos,omitempty"`
 	// +optional
@@ -94,6 +110,10 @@ type EmbedChaos struct {
 
 func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, error) {
 	switch templateType {
+	case TypeAWSAzChaos:
+		result := AWSAzChaos{}
+		result.Spec = *it.AWSAzChaos
+		return &result, nil
 	case TypeAWSChaos:
 		result := AWSChaos{}
 		result.Spec = *it.AWSChaos
@@ -110,9 +130,17 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 		result := DNSChaos{}
 		result.Spec = *it.DNSChaos
 		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaos{}
+		result.Spec = *it.GCPAzChaos
+		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaos{}
 		result.Spec = *it.GCPChaos
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaos{}
+		result.Spec = *it.GKENodePoolChaos
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaos{}
@@ -125,6 +153,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeJVMChaos:
 		result := JVMChaos{}
 		result.Spec = *it.JVMChaos
+		return &result, nil
+	case TypeK8SChaos:
+		result := K8SChaos{}
+		result.Spec = *it.K8SChaos
 		return &result, nil
 	case TypeKernelChaos:
 		result := KernelChaos{}
@@ -158,6 +190,9 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 
 func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	switch chaos := root.(type) {
+	case *AWSAzChaos:
+		*it.AWSAzChaos = chaos.Spec
+		return nil
 	case *AWSChaos:
 		*it.AWSChaos = chaos.Spec
 		return nil
@@ -170,8 +205,14 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *DNSChaos:
 		*it.DNSChaos = chaos.Spec
 		return nil
+	case *GCPAzChaos:
+		*it.GCPAzChaos = chaos.Spec
+		return nil
 	case *GCPChaos:
 		*it.GCPChaos = chaos.Spec
+		return nil
+	case *GKENodePoolChaos:
+		*it.GKENodePoolChaos = chaos.Spec
 		return nil
 	case *HTTPChaos:
 		*it.HTTPChaos = chaos.Spec
@@ -181,6 +222,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 		return nil
 	case *JVMChaos:
 		*it.JVMChaos = chaos.Spec
+		return nil
+	case *K8SChaos:
+		*it.K8SChaos = chaos.Spec
 		return nil
 	case *KernelChaos:
 		*it.KernelChaos = chaos.Spec
@@ -208,6 +252,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 
 func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList, error) {
 	switch templateType {
+	case TypeAWSAzChaos:
+		result := AWSAzChaosList{}
+		return &result, nil
 	case TypeAWSChaos:
 		result := AWSChaosList{}
 		return &result, nil
@@ -220,8 +267,14 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 	case TypeDNSChaos:
 		result := DNSChaosList{}
 		return &result, nil
+	case TypeGCPAzChaos:
+		result := GCPAzChaosList{}
+		return &result, nil
 	case TypeGCPChaos:
 		result := GCPChaosList{}
+		return &result, nil
+	case TypeGKENodePoolChaos:
+		result := GKENodePoolChaosList{}
 		return &result, nil
 	case TypeHTTPChaos:
 		result := HTTPChaosList{}
@@ -231,6 +284,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeJVMChaos:
 		result := JVMChaosList{}
+		return &result, nil
+	case TypeK8SChaos:
+		result := K8SChaosList{}
 		return &result, nil
 	case TypeKernelChaos:
 		result := KernelChaosList{}
@@ -256,6 +312,14 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 	}
 }
 
+func (in *AWSAzChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
 func (in *AWSChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
@@ -288,7 +352,23 @@ func (in *DNSChaosList) GetItems() []GenericChaos {
 	}
 	return result
 }
+func (in *GCPAzChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
 func (in *GCPChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *GKENodePoolChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item
@@ -313,6 +393,14 @@ func (in *IOChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *JVMChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *K8SChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item
