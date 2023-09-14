@@ -36,6 +36,59 @@ See the following demo video for a quick view of Chaos Mesh:
 
 [![Watch the video](./static/demo.gif)](https://www.youtube.com/watch?v=ifZEwdJO868)
 
+##  Form3-specific instructions
+
+### Build CRDs
+
+After changing/adding a go struct that corresponds to a [CRD structure](https://github.com/form3tech/chaos-mesh/blob/nv-gk-az-loss/api/v1alpha1/awsazchaos_types.go)
+
+Run 
+```sh
+make generate  && make yaml
+```
+This will create new CRDS for the new custom Chaos,  and update existing schedules and workflows accordingly to accomodate the new custom chaos.
+
+### Build docker images and helm charts
+
+In order to build new docker images and helm charts containing your custom CRD (and its controller code) 
+
+Run
+
+```sh
+make all
+# AWS_ACCOUNT_ID and region which hosts the ECR where you want to push the docker image to
+AWS_ACCOUNT_ID="AWS_ACCOUNT_ID_HERE"
+AWS_REGION="AWS_REGION_HERE"
+TAG="YOUR_BUILD_TAG_HERE"
+
+# `make all` creates docker images with the latest tag and point to ghcr repo. We need to tag them properly to prepare the push to AMAZON ECR
+docker tag ghcr.io/chaos-mesh/chaos-daemon:latest  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-daemon:$TAG
+docker tag ghcr.io/chaos-mesh/chaos-dashboard:latest  $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-dashboard:$TAG
+docker tag ghcr.io/chaos-mesh/chaos-mesh:latest   $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-mesh:$TAG
+
+## Authenticate to the ECR docker repo using https://github.com/form3tech/docker-build-scripts/blob/master/scripts/docker-ecr-login.sh
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-daemon:$TAG
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-dashboard:$TAG
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-mesh:$TAG
+
+
+# package the helm charts
+cd helm
+helm package chaos-mesh --version $TAG --app-version $TAG 
+
+## Authenticate to the ECR helm repo 
+ECR_URL= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
+export HELM_EXPERIMENTAL_OCI=1;aws ecr get-login-password --region $(AWS_REGION) | \
+helm registry login --username AWS --password-stdin $(ECR_URL)
+
+# Push the chart
+helm push chaos-mesh-$TAG.tgz oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/charts.tech.form3/
+```
+
+
+
+
+
 ## Chaos Operator
 
 Chaos Operator injects chaos into the applications and Kubernetes infrastructure in a manageable way, which provides easy, custom definitions for chaos experiments and automatic orchestration. There are three components at play:
