@@ -61,6 +61,12 @@ export interface GCP {
   deviceNames?: string[]
 }
 
+export interface GKENodePool {
+  project: string
+  cluster: string
+  location: string
+}
+
 export interface IO {
   action: 'latency' | 'fault' | 'attrOverride'
   delay?: string
@@ -163,6 +169,7 @@ export interface ExperimentType {
   AzureChaos?: unknown
   DNSChaos: DNS
   GCPChaos: GCP
+  GKENodePoolChaos: GKENodePool
   HTTPChaos?: unknown
   IOChaos: IO
   JVMChaos?: unknown
