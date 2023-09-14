@@ -206,5 +206,4 @@ var Module = fx.Provide(
 		Group:  "impl",
 		Target: NewImpl,
 	},
-	NewImpl,
 )
