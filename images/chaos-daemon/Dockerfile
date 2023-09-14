@@ -17,7 +17,7 @@ RUN mkdir -p /tmp/bin && \
     rm /usr/local/byteman.tar.gz
 
 # toda doesn't support arm64 yet
-RUN curl -k -L https://github.com/chaos-mesh/toda/releases/download/v0.2.3/toda-linux-amd64.tar.gz | tar xz -C /tmp/bin
+#RUN curl -k -L https://github.com/chaos-mesh/toda/releases/download/v0.2.3/toda-linux-amd64.tar.gz | tar xz -C /tmp/bin
 RUN case "$TARGET_PLATFORM" in \
     'amd64') \
     export NSEXEC_ARCH='x86_64'; \
@@ -64,6 +64,7 @@ ENV PATH $PATH:/usr/local/bin
 COPY bin/chaos-daemon /usr/local/bin/chaos-daemon
 COPY bin/pause /usr/local/bin/pause
 COPY bin/cdh /usr/local/bin/cdh
+COPY bin/toda /usr/local/bin/toda
 COPY --from=binaryimage /tmp/byteman /usr/local/byteman
 COPY --from=binaryimage /tmp/bin/* /usr/local/bin/
 RUN mv /usr/local/bin/libnsenter.so /usr/local/lib/libnsenter.so

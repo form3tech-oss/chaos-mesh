@@ -47,10 +47,11 @@ func findIPOnEndpoints(e *v1.Endpoints, nodeName string) string {
 
 type ChaosDaemonClientBuilder struct {
 	client.Reader
+	pod      *v1.Pod
+	nodeName *string
 }
 
-func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod) (string, error) {
-	nodeName := pod.Spec.NodeName
+func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, nodeName string) (string, error) {
 	log.Info("Creating client to chaos-daemon", "node", nodeName)
 
 	ns := config.ControllerCfg.Namespace
@@ -71,10 +72,20 @@ func (b *ChaosDaemonClientBuilder) FindDaemonIP(ctx context.Context, pod *v1.Pod
 	return daemonIP, nil
 }
 
+func (b *ChaosDaemonClientBuilder) Pod(pod *v1.Pod) *ChaosDaemonClientBuilder {
+	b.pod = pod
+	return b
+}
+
+func (b *ChaosDaemonClientBuilder) NodeName(node string) *ChaosDaemonClientBuilder {
+	b.nodeName = &node
+	return b
+}
+
 // Build will construct a ChaosDaemonClient
 // The `id` parameter is the namespacedName of current handling resource,
 // which will be printed in the log of the chaos-daemon
-func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *types.NamespacedName) (chaosdaemonclient.ChaosDaemonClientInterface, error) {
+func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, id *types.NamespacedName) (chaosdaemonclient.ChaosDaemonClientInterface, error) {
 	if cli := mock.On("MockChaosDaemonClient"); cli != nil {
 		return cli.(chaosdaemonclient.ChaosDaemonClientInterface), nil
 	}
@@ -82,10 +93,21 @@ func (b *ChaosDaemonClientBuilder) Build(ctx context.Context, pod *v1.Pod, id *t
 		return nil, err.(error)
 	}
 
-	daemonIP, err := b.FindDaemonIP(ctx, pod)
+	var daemonIP string
+	var err error
+
+	switch {
+	case b.nodeName != nil:
+		daemonIP, err = b.FindDaemonIP(ctx, *b.nodeName)
+	case b.pod != nil:
+		daemonIP, err = b.FindDaemonIP(ctx, b.pod.Spec.NodeName)
+	default:
+		return nil, errors.New("node or pod must be set")
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	builder := grpcUtils.Builder(daemonIP, config.ControllerCfg.ChaosDaemonPort).WithDefaultTimeout()
 	if config.ControllerCfg.TLSConfig.ChaosMeshCACert != "" {
 		builder.TLSFromFile(config.ControllerCfg.TLSConfig.ChaosMeshCACert, config.ControllerCfg.TLSConfig.ChaosDaemonClientCert, config.ControllerCfg.TLSConfig.ChaosDaemonClientKey)

@@ -113,9 +113,15 @@ func (s *DaemonServer) SetTcs(ctx context.Context, in *pb.TcsRequest) (*empty.Em
 	log := s.getLoggerFromContext(ctx)
 	log.Info("handling tc request", "tcs", in)
 
-	pid, err := s.crClient.GetPidFromContainerID(ctx, in.ContainerId)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "get pid from containerID error: %v", err)
+	var pid uint32
+	if in.ContainerId == "host" {
+		pid = 1
+	} else {
+		var err error
+		pid, err = s.crClient.GetPidFromContainerID(ctx, in.ContainerId)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "get pid from containerID error: %v", err)
+		}
 	}
 
 	tcCli := buildTcClient(ctx, log, in.EnterNS, pid)

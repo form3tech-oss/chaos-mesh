@@ -32,7 +32,7 @@ type DaemonHelper struct {
 
 // GetPidFromPod returns pid given containerd ID in pod
 func (h *DaemonHelper) GetPidFromPod(ctx context.Context, pod *v1.Pod) (uint32, error) {
-	daemonClient, err := h.Builder.Build(ctx, pod, nil)
+	daemonClient, err := h.Builder.Pod(pod).Build(ctx, nil)
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to craete new chaos daemon client of pod(%s/%s)", pod.Namespace, pod.Name)
 	}

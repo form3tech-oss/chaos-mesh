@@ -116,7 +116,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 func (impl *Impl) recoverPod(ctx context.Context, pod *v1.Pod, chaos *v1alpha1.KernelChaos, containerID string) error {
 	impl.Log.Info("try to recover pod", "namespace", pod.Namespace, "name", pod.Name)
 
-	pbClient, err := impl.chaosDaemonClientBuilder.Build(ctx, pod, &types.NamespacedName{
+	pbClient, err := impl.chaosDaemonClientBuilder.Pod(pod).Build(ctx, &types.NamespacedName{
 		Namespace: chaos.Namespace,
 		Name:      chaos.Name,
 	})
@@ -170,7 +170,7 @@ func (impl *Impl) recoverPod(ctx context.Context, pod *v1.Pod, chaos *v1alpha1.K
 func (impl *Impl) applyPod(ctx context.Context, pod *v1.Pod, chaos *v1alpha1.KernelChaos, containerID string) error {
 	impl.Log.Info("Try to inject kernel on pod", "namespace", pod.Namespace, "name", pod.Name)
 
-	pbClient, err := impl.chaosDaemonClientBuilder.Build(ctx, pod, &types.NamespacedName{
+	pbClient, err := impl.chaosDaemonClientBuilder.Pod(pod).Build(ctx, &types.NamespacedName{
 		Namespace: chaos.Namespace,
 		Name:      chaos.Name,
 	})
@@ -226,7 +226,7 @@ func (impl *Impl) applyPod(ctx context.Context, pod *v1.Pod, chaos *v1alpha1.Ker
 
 // CreateBPFKIConnection create a grpc connection with bpfki
 func (impl *Impl) CreateBPFKIConnection(ctx context.Context, c client.Client, pod *v1.Pod) (*grpc.ClientConn, error) {
-	daemonIP, err := impl.chaosDaemonClientBuilder.FindDaemonIP(ctx, pod)
+	daemonIP, err := impl.chaosDaemonClientBuilder.FindDaemonIP(ctx, pod.Spec.NodeName)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
   name: workflows.chaos-mesh.org
 spec:
@@ -1880,6 +1880,139 @@ spec:
                       - action
                       - mode
                       - selector
+                      type: object
+                    nodeChaos:
+                      properties:
+                        action:
+                          enum:
+                          - network-loss
+                          type: string
+                        duration:
+                          description: Duration represents the duration of the chaos
+                            action
+                          type: string
+                        mode:
+                          description: 'Mode defines the mode to run chaos action.
+                            Supported mode: one / all / fixed / fixed-percent / random-max-percent'
+                          enum:
+                          - one
+                          - all
+                          - fixed
+                          - fixed-percent
+                          - random-max-percent
+                          type: string
+                        network-loss:
+                          properties:
+                            correlation:
+                              description: correlation is percentage (10 is 10%)
+                              type: string
+                            device:
+                              description: the network interface to impact
+                              type: string
+                            egress-port:
+                              description: only impact egress traffic to these destination
+                                ports, use a ',' to separate or to indicate the range,
+                                such as 80, 8001:8010. it can only be used in conjunction
+                                with -p tcp or -p udp
+                              type: string
+                            hostname:
+                              description: only impact traffic to these hostnames
+                              type: string
+                            ip-address:
+                              description: only impact egress traffic to these IP
+                                addresses
+                              type: string
+                            ip-protocol:
+                              description: 'only impact traffic using this IP protocol,
+                                supported: tcp, udp, icmp, all'
+                              type: string
+                            percent:
+                              description: percentage of packets to loss (10 is 10%)
+                              type: string
+                            source-port:
+                              description: only impact egress traffic from these source
+                                ports, use a ',' to separate or to indicate the range,
+                                such as 80, 8001:8010. it can only be used in conjunction
+                                with -p tcp or -p udp
+                              type: string
+                          type: object
+                        remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
+                          type: string
+                        selector:
+                          properties:
+                            annotationSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on annotations.
+                              type: object
+                            expressionSelectors:
+                              description: a slice of label selector expressions that
+                                can be used to select objects. A list of selectors
+                                based on set-based label expressions.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            fieldSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on fields.
+                              type: object
+                            labelSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on labels.
+                              type: object
+                            namespaces:
+                              description: Namespaces is a set of namespace to which
+                                objects belong.
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                        value:
+                          description: Value is required when the mode is set to `FixedMode`
+                            / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
+                            provide an integer of physical machines to do chaos action.
+                            If `FixedPercentMode`, provide a number from 0-100 to
+                            specify the percent of physical machines the server can
+                            do chaos action. IF `RandomMaxPercentMode`,  provide a
+                            number from 0-100 to specify the max percent of pods to
+                            do chaos action
+                          type: string
+                      required:
+                      - action
+                      - mode
                       type: object
                     physicalmachineChaos:
                       description: PhysicalMachineChaosSpec defines the desired state
@@ -4923,6 +5056,145 @@ spec:
                           - action
                           - mode
                           - selector
+                          type: object
+                        nodeChaos:
+                          properties:
+                            action:
+                              enum:
+                              - network-loss
+                              type: string
+                            duration:
+                              description: Duration represents the duration of the
+                                chaos action
+                              type: string
+                            mode:
+                              description: 'Mode defines the mode to run chaos action.
+                                Supported mode: one / all / fixed / fixed-percent
+                                / random-max-percent'
+                              enum:
+                              - one
+                              - all
+                              - fixed
+                              - fixed-percent
+                              - random-max-percent
+                              type: string
+                            network-loss:
+                              properties:
+                                correlation:
+                                  description: correlation is percentage (10 is 10%)
+                                  type: string
+                                device:
+                                  description: the network interface to impact
+                                  type: string
+                                egress-port:
+                                  description: only impact egress traffic to these
+                                    destination ports, use a ',' to separate or to
+                                    indicate the range, such as 80, 8001:8010. it
+                                    can only be used in conjunction with -p tcp or
+                                    -p udp
+                                  type: string
+                                hostname:
+                                  description: only impact traffic to these hostnames
+                                  type: string
+                                ip-address:
+                                  description: only impact egress traffic to these
+                                    IP addresses
+                                  type: string
+                                ip-protocol:
+                                  description: 'only impact traffic using this IP
+                                    protocol, supported: tcp, udp, icmp, all'
+                                  type: string
+                                percent:
+                                  description: percentage of packets to loss (10 is
+                                    10%)
+                                  type: string
+                                source-port:
+                                  description: only impact egress traffic from these
+                                    source ports, use a ',' to separate or to indicate
+                                    the range, such as 80, 8001:8010. it can only
+                                    be used in conjunction with -p tcp or -p udp
+                                  type: string
+                              type: object
+                            remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
+                              type: string
+                            selector:
+                              properties:
+                                annotationSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on annotations.
+                                  type: object
+                                expressionSelectors:
+                                  description: a slice of label selector expressions
+                                    that can be used to select objects. A list of
+                                    selectors based on set-based label expressions.
+                                  items:
+                                    description: A label selector requirement is a
+                                      selector that contains values, a key, and an
+                                      operator that relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: operator represents a key's relationship
+                                          to a set of values. Valid operators are
+                                          In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: values is an array of string
+                                          values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the
+                                          operator is Exists or DoesNotExist, the
+                                          values array must be empty. This array is
+                                          replaced during a strategic merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                fieldSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on fields.
+                                  type: object
+                                labelSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on labels.
+                                  type: object
+                                namespaces:
+                                  description: Namespaces is a set of namespace to
+                                    which objects belong.
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                            value:
+                              description: Value is required when the mode is set
+                                to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                If `FixedMode`, provide an integer of physical machines
+                                to do chaos action. If `FixedPercentMode`, provide
+                                a number from 0-100 to specify the percent of physical
+                                machines the server can do chaos action. IF `RandomMaxPercentMode`,  provide
+                                a number from 0-100 to specify the max percent of
+                                pods to do chaos action
+                              type: string
+                          required:
+                          - action
+                          - mode
                           type: object
                         physicalmachineChaos:
                           description: PhysicalMachineChaosSpec defines the desired

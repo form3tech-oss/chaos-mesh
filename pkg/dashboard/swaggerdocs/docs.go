@@ -5153,6 +5153,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
                 },
+                "nodeChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeChaosSpec"
+                },
                 "physicalmachineChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PhysicalMachineChaosSpec"
@@ -6534,6 +6538,71 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.NodeChaosSpec": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "+kubebuilder:validation:Enum=network-loss",
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "mode": {
+                    "description": "Mode defines the mode to run chaos action.\nSupported mode: one / all / fixed / fixed-percent / random-max-percent\n+kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent",
+                    "type": "string"
+                },
+                "network-loss": {
+                    "description": "+ui:form:when=action=='network-loss'\n+optional",
+                    "$ref": "#/definitions/v1alpha1.NetworkLossSpec"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "selector": {
+                    "$ref": "#/definitions/v1alpha1.NodeSelectorSpec"
+                },
+                "value": {
+                    "description": "Value is required when the mode is set to ` + "`" + `FixedMode` + "`" + ` / ` + "`" + `FixedPercentMode` + "`" + ` / ` + "`" + `RandomMaxPercentMode` + "`" + `.\nIf ` + "`" + `FixedMode` + "`" + `, provide an integer of physical machines to do chaos action.\nIf ` + "`" + `FixedPercentMode` + "`" + `, provide a number from 0-100 to specify the percent of physical machines the server can do chaos action.\nIF ` + "`" + `RandomMaxPercentMode` + "`" + `,  provide a number from 0-100 to specify the max percent of pods to do chaos action\n+optional",
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.NodeSelectorSpec": {
+            "type": "object",
+            "properties": {
+                "annotationSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on annotations.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "fieldSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on fields.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "labelSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on labels.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "namespaces": {
+                    "description": "Namespaces is a set of namespace to which objects belong.\n+optional",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "v1alpha1.PMJVMMySQLSpec": {
             "type": "object",
             "properties": {
@@ -7340,6 +7409,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
                 },
+                "nodeChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeChaosSpec"
+                },
                 "physicalmachineChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PhysicalMachineChaosSpec"
@@ -7643,6 +7716,10 @@ const docTemplate = `{
                 "networkChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
+                },
+                "nodeChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeChaosSpec"
                 },
                 "physicalmachineChaos": {
                     "description": "+optional",

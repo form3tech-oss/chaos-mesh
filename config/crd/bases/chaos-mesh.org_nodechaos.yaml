@@ -6,24 +6,26 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
-  name: timechaos.chaos-mesh.org
+  name: nodechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
   names:
-    kind: TimeChaos
-    listKind: TimeChaosList
-    plural: timechaos
-    singular: timechaos
+    kind: NodeChaos
+    listKind: NodeChaosList
+    plural: nodechaos
+    singular: nodechaos
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.action
+      name: action
+      type: string
     - jsonPath: .spec.duration
       name: duration
       type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: TimeChaos is the Schema for the timechaos API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -38,22 +40,11 @@ spec:
           metadata:
             type: object
           spec:
-            description: Spec defines the behavior of a time chaos experiment
             properties:
-              clockIds:
-                description: ClockIds defines all affected clock id All available
-                  options are ["CLOCK_REALTIME","CLOCK_MONOTONIC","CLOCK_PROCESS_CPUTIME_ID","CLOCK_THREAD_CPUTIME_ID",
-                  "CLOCK_MONOTONIC_RAW","CLOCK_REALTIME_COARSE","CLOCK_MONOTONIC_COARSE","CLOCK_BOOTTIME","CLOCK_REALTIME_ALARM",
-                  "CLOCK_BOOTTIME_ALARM"] Default value is ["CLOCK_REALTIME"]
-                items:
-                  type: string
-                type: array
-              containerNames:
-                description: ContainerNames indicates list of the name of affected
-                  container. If not set, the first container will be injected
-                items:
-                  type: string
-                type: array
+              action:
+                enum:
+                - network-loss
+                type: string
               duration:
                 description: Duration represents the duration of the chaos action
                 type: string
@@ -67,13 +58,45 @@ spec:
                 - fixed-percent
                 - random-max-percent
                 type: string
+              network-loss:
+                properties:
+                  correlation:
+                    description: correlation is percentage (10 is 10%)
+                    type: string
+                  device:
+                    description: the network interface to impact
+                    type: string
+                  egress-port:
+                    description: only impact egress traffic to these destination ports,
+                      use a ',' to separate or to indicate the range, such as 80,
+                      8001:8010. it can only be used in conjunction with -p tcp or
+                      -p udp
+                    type: string
+                  hostname:
+                    description: only impact traffic to these hostnames
+                    type: string
+                  ip-address:
+                    description: only impact egress traffic to these IP addresses
+                    type: string
+                  ip-protocol:
+                    description: 'only impact traffic using this IP protocol, supported:
+                      tcp, udp, icmp, all'
+                    type: string
+                  percent:
+                    description: percentage of packets to loss (10 is 10%)
+                    type: string
+                  source-port:
+                    description: only impact egress traffic from these source ports,
+                      use a ',' to separate or to indicate the range, such as 80,
+                      8001:8010. it can only be used in conjunction with -p tcp or
+                      -p udp
+                    type: string
+                type: object
               remoteCluster:
                 description: RemoteCluster represents the remote cluster where the
                   chaos will be deployed
                 type: string
               selector:
-                description: Selector is used to select pods that are used to inject
-                  chaos action.
                 properties:
                   annotationSelectors:
                     additionalProperties:
@@ -131,57 +154,21 @@ spec:
                     items:
                       type: string
                     type: array
-                  nodeSelectors:
-                    additionalProperties:
-                      type: string
-                    description: Map of string keys and values that can be used to
-                      select nodes. Selector which must match a node's labels, and
-                      objects must belong to these selected nodes.
-                    type: object
-                  nodes:
-                    description: Nodes is a set of node name and objects must belong
-                      to these nodes.
-                    items:
-                      type: string
-                    type: array
-                  podPhaseSelectors:
-                    description: 'PodPhaseSelectors is a set of condition of a pod
-                      at the current time. supported value: Pending / Running / Succeeded
-                      / Failed / Unknown'
-                    items:
-                      type: string
-                    type: array
-                  pods:
-                    additionalProperties:
-                      items:
-                        type: string
-                      type: array
-                    description: Pods is a map of string keys and a set values that
-                      used to select pods. The key defines the namespace which pods
-                      belong, and the each values is a set of pod names.
-                    type: object
                 type: object
-              timeOffset:
-                description: TimeOffset defines the delta time of injected program.
-                  It's a possibly signed sequence of decimal numbers, such as "300ms",
-                  "-1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms",
-                  "s", "m", "h".
-                type: string
               value:
                 description: Value is required when the mode is set to `FixedMode`
                   / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`, provide
-                  an integer of pods to do chaos action. If `FixedPercentMode`, provide
-                  a number from 0-100 to specify the percent of pods the server can
-                  do chaos action. IF `RandomMaxPercentMode`,  provide a number from
-                  0-100 to specify the max percent of pods to do chaos action
+                  an integer of physical machines to do chaos action. If `FixedPercentMode`,
+                  provide a number from 0-100 to specify the percent of physical machines
+                  the server can do chaos action. IF `RandomMaxPercentMode`,  provide
+                  a number from 0-100 to specify the max percent of pods to do chaos
+                  action
                 type: string
             required:
+            - action
             - mode
-            - selector
-            - timeOffset
             type: object
           status:
-            description: Most recently observed status of the time chaos experiment
             properties:
               conditions:
                 description: Conditions represents the current global condition of

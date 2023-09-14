@@ -130,7 +130,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		}
 	}
 
-	pbClient, err := r.ChaosDaemonClientBuilder.Build(ctx, pod, &types.NamespacedName{
+	pbClient, err := r.ChaosDaemonClientBuilder.Pod(pod).Build(ctx, &types.NamespacedName{
 		Name:      obj.Name,
 		Namespace: obj.Namespace,
 	})

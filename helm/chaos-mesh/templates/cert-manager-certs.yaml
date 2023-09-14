@@ -164,3 +164,32 @@ spec:
   privateKey:
     rotationPolicy: Never
 {{- end }}
+---
+{{- if .Values.controllerManager.chaosdSecurityMode }}
+{{- if .Capabilities.APIVersions.Has "cert-manager.io/v1" }}
+apiVersion: cert-manager.io/v1
+{{- else if .Capabilities.APIVersions.Has "cert-manager.io/v1beta1" }}
+apiVersion: cert-manager.io/v1beta1
+{{- else if .Capabilities.APIVersions.Has "cert-manager.io/v1alpha3" }}
+apiVersion: cert-manager.io/v1alpha3
+{{- else }}
+apiVersion: cert-manager.io/v1alpha2
+{{- end }}
+kind: Certificate
+metadata:
+  name: chaosd-client-cert
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "chaos-mesh.labels" . | nindent 4 }}
+    app.kubernetes.io/component: chaos-daemontcert
+spec:
+  duration: 43800h0m0s #5year
+  dnsNames:
+    - controller-manager.chaos-mesh.org
+  isCA: false
+  secretName: {{ template "chaos-mesh.chaosd-client.certs" . }}
+  issuerRef:
+    name: chaos-mesh-ca
+  privateKey:
+    rotationPolicy: Never
+{{- end }}
