@@ -156,6 +156,7 @@ var ChaosObjects = fx.Supply(
 			Object: &v1alpha1.BlockChaos{},
 		},
 	},
+
 	fx.Annotated{
 		Group: "objs",
 		Target: Object{
@@ -163,11 +164,20 @@ var ChaosObjects = fx.Supply(
 			Object: &v1alpha1.AWSAzChaos{},
 		},
 	},
+
 	fx.Annotated{
 		Group: "objs",
 		Target: Object{
 			Name:   "gcpazchaos",
 			Object: &v1alpha1.GCPAzChaos{},
+		},
+	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "deploymentchaos",
+			Object: &v1alpha1.DeploymentChaos{},
 		},
 	},
 )
