@@ -25,6 +25,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/deployment"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/physicalmachine"
@@ -75,6 +76,12 @@ type SelectorParams struct {
 	GCPSelector             *gcp.SelectImpl
 	PhysicalMachineSelector *physicalmachine.SelectImpl
 	NodeVolumePath          *nodevolumepath.SelectImpl
+<<<<<<< HEAD
+=======
+	K8SChaosSelector        *k8schaos.SelectImpl
+	AWSAZSelector           *awsaz.SelectImpl
+	DeploymentSelector      *deployment.SelectImpl
+>>>>>>> 7e56ecdc (feat: Adds new chaos experiment type DeploymentChaos)
 }
 
 func New(p SelectorParams) *Selector {
@@ -104,4 +111,9 @@ var Module = fx.Provide(
 	gcp.New,
 	physicalmachine.New,
 	nodevolumepath.New,
+<<<<<<< HEAD
+=======
+	k8schaos.New,
+	deployment.New,
+>>>>>>> 7e56ecdc (feat: Adds new chaos experiment type DeploymentChaos)
 )
