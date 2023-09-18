@@ -70,7 +70,7 @@ jobs:
         id: release
         with:
           generate_release_notes: true
-          target_commitish: "${{ github.base_ref }}"
+          target_commitish: "${{ github.ref }}"
           tag_name: ${{ needs.calculate-tag.outputs.tag }}
           prerelease: "${{ github.event_name == 'pull_request' }}"
           files: |
@@ -78,6 +78,7 @@ jobs:
             ./output/${{ needs.build-targets.outputs.chart-artifact-name }}/*
 
       - uses: actions/github-script@v6
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           script: |
             github.rest.issues.createComment({
