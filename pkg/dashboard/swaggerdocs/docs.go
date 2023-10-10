@@ -5185,6 +5185,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PodChaosSpec"
                 },
+                "rollingrestartChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.RollingRestartChaosSpec"
+                },
                 "schedule": {
                     "type": "string"
                 },
@@ -7217,6 +7221,31 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.RollingRestartChaosSpec": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action\n+optional",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name defines the name of the deployment.",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "Namespace defines the namespace of the deployment.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "resourceType": {
+                    "description": "ResourceType defines the specific resource type to restart\nSupported resource types: daemonset / deployment / statefulset\n+kubebuilder:validation:Enum=daemonset;deployment;statefulset",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.Schedule": {
             "type": "object",
             "properties": {
@@ -7370,6 +7399,10 @@ const docTemplate = `{
                 "podChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PodChaosSpec"
+                },
+                "rollingrestartChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.RollingRestartChaosSpec"
                 },
                 "schedule": {
                     "type": "string"
@@ -7673,6 +7706,10 @@ const docTemplate = `{
                 "podChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PodChaosSpec"
+                },
+                "rollingrestartChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.RollingRestartChaosSpec"
                 },
                 "schedule": {
                     "description": "Schedule describe the Schedule(describing scheduled chaos) to be injected with chaos nodes. Only used when Type is TypeSchedule.\n+optional",
