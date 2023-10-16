@@ -6,24 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: deploymentchaos.chaos-mesh.org
+  name: rollingrestartchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
   names:
-    kind: DeploymentChaos
-    listKind: DeploymentChaosList
-    plural: deploymentchaos
-    singular: deploymentchaos
+    kind: RollingRestartChaos
+    listKind: RollingRestartChaosList
+    plural: rollingrestartchaos
+    singular: rollingrestartchaos
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .spec.duration
-      name: duration
-      type: string
-    name: v1alpha1
+  - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: DeploymentChaos is the Schema for the Kubernetes Chaos API
+        description: RollingRestartChaos is the Schema for the rolling restart API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -53,8 +49,15 @@ spec:
                 description: RemoteCluster represents the remote cluster where the
                   chaos will be deployed
                 type: string
+              resourceType:
+                description: 'ResourceType defines the specific resource type to restart
+                  Supported resource types: daemonset / deployment / statefulset'
+                enum:
+                - daemonset
+                - deployment
+                - statefulset
+                type: string
             required:
-            - duration
             - name
             - namespace
             type: object
@@ -148,7 +151,6 @@ spec:
         type: object
     served: true
     storage: true
-    subresources: {}
 status:
   acceptedNames:
     kind: ""

@@ -10,7 +10,7 @@
 # Set DEBUGGER=1 to build debug symbols
 export LDFLAGS := $(if $(LDFLAGS),$(LDFLAGS),$(if $(DEBUGGER),,-s -w) $(shell ./hack/version.sh))
 
-export IMAGE_TAG ?= latest
+export IMAGE_TAG ?= release-2.6
 export IMAGE_BUILD ?= 1
 
 ROOT=$(shell pwd)
@@ -302,7 +302,7 @@ e2e-build: e2e-test/image/e2e/bin/ginkgo e2e-test/image/e2e/bin/e2e.test ## Buil
 
 bin/chaos-builder: SHELL:=$(RUN_IN_DEV_SHELL)
 bin/chaos-builder: images/dev-env/.dockerbuilt
-	$(CGOENV) go build -ldflags '$(LDFLAGS)' -o bin/chaos-builder ./cmd/chaos-builder/...
+	$(CGOENV) go build -buildvcs=false -ldflags '$(LDFLAGS)' -o bin/chaos-builder ./cmd/chaos-builder/...
 
 failpoint-enable: SHELL:=$(RUN_IN_DEV_SHELL)
 failpoint-enable: images/dev-env/.dockerbuilt ## Enable failpoint stub for testing

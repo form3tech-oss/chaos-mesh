@@ -21,9 +21,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// SelectorResourceType is the type of resource that is valid for rolling restart
+type SelectorResourceType string
+
+const (
+	// DaemonSetResourceType represents the resource type daemonset
+	DaemonSetResourceType SelectorResourceType = "daemonset"
+	// DeploymentResource represents the resource type deployment
+	DeploymentResourceType SelectorResourceType = "deployment"
+	// StatefulSetResourceType represents the resource type statefulset
+	StatefulSetResourceType SelectorResourceType = "statefulset"
+)
+
 // +kubebuilder:object:root=true
 // +chaos-mesh:experiment
-// +chaos-mesh:oneshot=
+// +chaos-mesh:oneshot=true
 
 // RollingRestartChaos is the Schema for the rolling restart API
 type RollingRestartChaos struct {
@@ -42,13 +54,26 @@ type RollingRestartChaos struct {
 type RollingRestartChaosSpec struct {
 	RollingRestartSelector `json:",inline"`
 
+	// Duration represents the duration of the chaos action
+	// +optional
+	Duration *string `json:"duration,omitempty"`
+
 	// RemoteCluster represents the remote cluster where the chaos will be deployed
 	// +optional
 	RemoteCluster string `json:"remoteCluster,omitempty"`
 }
 
 type RollingRestartSelector struct {
-	GenericSelectorSpec `json:",inline"`
+	// Namespace defines the namespace of the deployment.
+	Namespace string `json:"namespace"`
+
+	// Name defines the name of the deployment.
+	Name string `json:"name"`
+
+	// ResourceType defines the specific resource type to restart
+	// Supported resource types: daemonset / deployment / statefulset
+	// +kubebuilder:validation:Enum=daemonset;deployment;statefulset
+	ResourceType SelectorResourceType `json:"resourceType,omitempty"`
 }
 
 // RollingRestartChaosStatus defines the observed state of RollingRestartChaos
@@ -57,9 +82,13 @@ type RollingRestartChaosStatus struct {
 }
 
 func (obj *RollingRestartChaos) GetSelectorSpecs() map[string]interface{} {
-	return map[string]interface{}{
-		".": &obj.Spec.RollingRestartSelector,
+	switch obj.Spec.ResourceType {
+	case DaemonSetResourceType, DeploymentResourceType, StatefulSetResourceType:
+		return map[string]interface{}{
+			".": &obj.Spec.RollingRestartSelector,
+		}
 	}
+	return nil
 }
 
 func (selector *RollingRestartSelector) Id() string {
