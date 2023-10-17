@@ -2681,6 +2681,10 @@ func (in *RollingRestartChaos) DurationExceeded(now time.Time) (bool, time.Durat
 }
 
 func (in *RollingRestartChaos) IsOneShot() bool {
+	if true {
+		return true
+	}
+
 	return false
 }
 

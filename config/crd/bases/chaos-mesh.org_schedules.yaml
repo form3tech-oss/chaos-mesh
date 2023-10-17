@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.1
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: schedules.chaos-mesh.org
 spec:
@@ -3091,9 +3091,6 @@ spec:
                     - deployment
                     - statefulset
                     type: string
-                required:
-                - name
-                - namespace
                 type: object
               schedule:
                 type: string
@@ -6747,9 +6744,6 @@ spec:
                               - deployment
                               - statefulset
                               type: string
-                          required:
-                          - name
-                          - namespace
                           type: object
                         schedule:
                           description: Schedule describe the Schedule(describing scheduled
@@ -10112,9 +10106,6 @@ spec:
                                   - deployment
                                   - statefulset
                                   type: string
-                              required:
-                              - name
-                              - namespace
                               type: object
                             schedule:
                               type: string
