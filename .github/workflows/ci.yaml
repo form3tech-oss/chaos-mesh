@@ -5,10 +5,12 @@ on:
     branches:
       - builder
       - develop
+      - master
   push:
     branches:
       - builder
       - develop
+      - master
 
 jobs:
   calculate-tag:
