@@ -65,10 +65,10 @@ type RollingRestartChaosSpec struct {
 
 type RollingRestartSelector struct {
 	// Namespace defines the namespace of the deployment.
-	Namespace string `json:"namespace"`
+	Namespace string `json:"namespace,omitempty"`
 
 	// Name defines the name of the deployment.
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 
 	// ResourceType defines the specific resource type to restart
 	// Supported resource types: daemonset / deployment / statefulset
