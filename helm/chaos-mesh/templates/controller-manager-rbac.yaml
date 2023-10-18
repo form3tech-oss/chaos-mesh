@@ -39,6 +39,9 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "pods", "configmaps", "secrets"]
     verbs: [ "get", "list", "watch", "delete", "update", "patch" ]
+  - apiGroups: [ "apps" ]
+    resources: [ "deployments", "daemonsets", "statefulsets"]
+    verbs: [ "get", "list", "watch", "update", "patch" ]
   - apiGroups:
       - ""
     resources:
