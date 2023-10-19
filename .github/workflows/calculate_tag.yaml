@@ -48,5 +48,5 @@ jobs:
         run: |
           latest_tag="${{ steps.latest_tag.outputs.latest_tag }}"
           sha5=$(echo "${{ inputs.f3_tag }}" | cut -c1-5)
-          tag="${latest_tag}-f3-${sha5}${{steps.tag-suffix.outputs.tag-suffix}}"
+          tag="$(${latest_tag}-f3-${sha5}${{steps.tag-suffix.outputs.tag-suffix}}" | sed 's/^v//')
           echo "tag=$tag" >> $GITHUB_OUTPUT
