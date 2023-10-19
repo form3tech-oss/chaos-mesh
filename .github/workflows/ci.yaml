@@ -70,7 +70,7 @@ jobs:
         id: release
         with:
           generate_release_notes: true
-          target_commitish: "${{ github.ref_name }}"
+          target_commitish: "${{ github.ref }}"
           tag_name: ${{ needs.calculate-tag.outputs.tag }}
           prerelease: "${{ github.event_name == 'pull_request' }}"
           files: |
