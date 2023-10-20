@@ -1366,7 +1366,6 @@ spec:
                     type: string
                 required:
                 - apiObjects
-                - duration
                 type: object
               kernelChaos:
                 description: KernelChaosSpec defines the desired state of KernelChaos
@@ -4900,7 +4899,6 @@ spec:
                               type: string
                           required:
                           - apiObjects
-                          - duration
                           type: object
                         kernelChaos:
                           description: KernelChaosSpec defines the desired state of
@@ -8203,7 +8201,6 @@ spec:
                                   type: string
                               required:
                               - apiObjects
-                              - duration
                               type: object
                             kernelChaos:
                               description: KernelChaosSpec defines the desired state
