@@ -15,6 +15,7 @@ header:
     - '**/*.log'
     - 'vendor/**'
     - 'api/vendor/**'
+    - 'e2e-test/vendor/**'
     - '**/go.mod'
     - '**/go.sum'
     - '**/go.work'

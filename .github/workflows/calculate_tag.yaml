@@ -35,11 +35,9 @@ jobs:
 
       - name: Calculate pre-release suffix
         id: tag-suffix
+        if: github.ref_name != 'master'
         run: |
-          SUFFIX="${{ inputs.head_ref }}"
-          if [[ "${{ github.event_name }}" = "push" && "${{ github.ref_type }}" = "branch" && ("${{ github.ref_name }}" = "builder" || "${{ github.ref_name }}" = "develop") ]]; then
-            SUFFIX="release-$(date +%Y-%m-%d)"
-          fi
+          SUFFIX="release-$(date +%Y-%m-%d)"
           underscores_and_slashes_to_dashes_suffix="${SUFFIX//[\/_]/-}"
           echo "tag-suffix=-${underscores_and_slashes_to_dashes_suffix}" >> $GITHUB_OUTPUT
 

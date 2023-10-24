@@ -40,9 +40,9 @@ See the following demo video for a quick view of Chaos Mesh:
 
 ### Build CRDs
 
-After changing/adding a go struct that corresponds to a [CRD structure](https://github.com/form3tech/chaos-mesh/blob/nv-gk-az-loss/api/v1alpha1/awsazchaos_types.go)
+After changing/adding a go struct that corresponds to a [CRD structure](./api/v1alpha1/awsazchaos_types.go)
 
-Run 
+Run
 ```sh
 make generate  && make yaml
 ```
@@ -50,7 +50,7 @@ This will create new CRDS for the new custom Chaos,  and update existing schedul
 
 ### Build docker images and helm charts
 
-In order to build new docker images and helm charts containing your custom CRD (and its controller code) 
+In order to build new docker images and helm charts containing your custom CRD (and its controller code)
 
 Run
 
@@ -74,9 +74,9 @@ docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chaos-mesh/chaos-m
 
 # package the helm charts
 cd helm
-helm package chaos-mesh --version $TAG --app-version $TAG 
+helm package chaos-mesh --version $TAG --app-version $TAG
 
-## Authenticate to the ECR helm repo 
+## Authenticate to the ECR helm repo
 ECR_URL= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 export HELM_EXPERIMENTAL_OCI=1;aws ecr get-login-password --region $(AWS_REGION) | \
 helm registry login --username AWS --password-stdin $(ECR_URL)
