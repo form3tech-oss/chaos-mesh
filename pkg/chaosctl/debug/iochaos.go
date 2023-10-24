@@ -46,6 +46,7 @@ func (d *ioDebugger) Collect(ctx context.Context, namespace, chaosName string) (
 		name = &n
 	}
 
+	// FOO BAR
 	var query struct {
 		Namespace []struct {
 			IOChaos []struct {
