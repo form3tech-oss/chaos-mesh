@@ -74,6 +74,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		_, err = client.AppsV1().Deployments(res.Namespace).Patch(ctx, res.Name, k8stypes.StrategicMergePatchType, data, v1.PatchOptions{})
 	case v1alpha1.StatefulSetResourceType:
 		_, err = client.AppsV1().StatefulSets(res.Namespace).Patch(ctx, res.Name, k8stypes.StrategicMergePatchType, data, v1.PatchOptions{})
+	default:
+		err = fmt.Errorf("invalid resource type: %s", res.Type)
 	}
 
 	if err != nil {
