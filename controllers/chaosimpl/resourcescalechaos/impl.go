@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/resourcescalechaos/daemonset"
 	impltypes "github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
 )
 
@@ -65,7 +66,10 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("failed to create kubernetes client: %w", err)
 	}
 
+	// TODO: default values scaling up and down?
+
 	switch spec.ResourceType {
+	case v1alpha1.ResourceTypeDaemonSet:
 	case v1alpha1.ResourceTypeDeployment:
 	case v1alpha1.ResourceTypeReplicaSet:
 	case v1alpha1.ResourceTypeStatefulSet:
@@ -75,10 +79,10 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		}
 
 		if err = impl.scaleResource(ctx, res, spec.Name, spec.ApplyReplicas); err != nil {
-			return v1alpha1.NotInjected, fmt.Errorf("failed to scale resource %s: %w", spec.ResourceType, err)
+			return v1alpha1.NotInjected, fmt.Errorf("failed to set replicas = %d on resource %s/%s: %w", spec.ApplyReplicas, spec.ResourceType, spec.Name, err)
 		}
-	case v1alpha1.ResourceTypeDaemonSet:
-		return v1alpha1.NotInjected, fmt.Errorf("not yet implemented")
+	default:
+		return v1alpha1.NotInjected, fmt.Errorf("invalid resource type: %s", spec.ResourceType)
 	}
 
 	return v1alpha1.Injected, nil
@@ -121,10 +125,14 @@ func (i *Impl) scaleResource(ctx context.Context, res ScalableResource, resource
 	if err != nil {
 		return fmt.Errorf("failed to update scale %s: %w", resourceName, err)
 	}
+
+	return nil
 }
 
 func (i *Impl) getScalingResource(client *kubernetes.Clientset, spec ResourceSpecs) (ScalableResource, error) {
 	switch spec.ResourceType {
+	case v1alpha1.ResourceTypeDaemonSet:
+		return daemonset.New(client.AppsV1().DaemonSets(spec.Namespace)), nil
 	case v1alpha1.ResourceTypeDeployment:
 		return client.AppsV1().Deployments(spec.Namespace), nil
 	case v1alpha1.ResourceTypeReplicaSet:

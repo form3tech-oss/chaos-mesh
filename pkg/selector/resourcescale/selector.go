@@ -30,9 +30,8 @@ import (
 type SelectImpl struct{}
 
 type ResourceSpec struct {
-	Namespace string `json:"namespace,omitempty"`
-	Name      string `json:"name,omitempty"`
-	Replicas  int32  `json:"replicas,omitempty"`
+	Selector *v1alpha1.ResourceScaleSelector `json:"selector,omitempty"`
+	Replicas int32                           `json:"replicas,omitempty"`
 }
 
 func (dep *ResourceSpec) Id() string {
@@ -46,19 +45,46 @@ func (impl *SelectImpl) Select(ctx context.Context, selector *v1alpha1.ResourceS
 		return nil, fmt.Errorf("failed to create kubernetes client: %w", err)
 	}
 
-	// TODO: support different scalable resources
-	scale, err := client.AppsV1().Deployments(selector.Namespace).GetScale(ctx, selector.Name, v1.GetOptions{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get deployment scale for %q: %w", selector.Namespace+"/"+selector.Name, err)
+	specs := &ResourceSpec{
+		Replicas: 0,
+		Selector: selector,
 	}
 
-	dep := &ResourceSpec{
-		Namespace: selector.Namespace,
-		Name:      selector.Name,
-		Replicas:  scale.Spec.Replicas,
+	// Get current number of replicas
+	switch selector.ResourceType {
+	case v1alpha1.ResourceTypeDaemonSet:
+		ds, err := client.AppsV1().DaemonSets(selector.Namespace).Get(ctx, selector.Name, v1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to select daemonset %q: %w", selector.Namespace+"/"+selector.Name, err)
+		}
+
+		// Daemonsets can only scale to 0 or 1 pod per node
+		if ds.Status.DesiredNumberScheduled > 0 {
+			specs.Replicas = 1
+		}
+	case v1alpha1.ResourceTypeDeployment:
+		dep, err := client.AppsV1().Deployments(selector.Namespace).GetScale(ctx, selector.Name, v1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to select deployment %q: %w", selector.Namespace+"/"+selector.Name, err)
+		}
+		specs.Replicas = dep.Status.Replicas
+	case v1alpha1.ResourceTypeReplicaSet:
+		rs, err := client.AppsV1().ReplicaSets(selector.Namespace).GetScale(ctx, selector.Name, v1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to select replicaset %q: %w", selector.Namespace+"/"+selector.Name, err)
+		}
+		specs.Replicas = rs.Status.Replicas
+	case v1alpha1.ResourceTypeStatefulSet:
+		sts, err := client.AppsV1().StatefulSets(selector.Namespace).GetScale(ctx, selector.Name, v1.GetOptions{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to select statefulset %q: %w", selector.Namespace+"/"+selector.Name, err)
+		}
+		specs.Replicas = sts.Status.Replicas
+	default:
+		return nil, fmt.Errorf("failed to get select to get resource %q: invalid resource type %s", selector.Namespace+"/"+selector.Name, selector.ResourceType)
 	}
 
-	return []*ResourceSpec{dep}, nil
+	return []*ResourceSpec{specs}, nil
 }
 
 func New() *SelectImpl {
