@@ -85,29 +85,12 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("get rest mapping: %w", err)
 	}
 
-	if k8schaos.Spec.Update {
+	if k8schaos.Spec.AllowPatching {
 		impl.initialValue, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Get(ctx, resource.GetName(), v1.GetOptions{})
 		if err != nil && !apiErrors.IsNotFound(err) {
 			return v1alpha1.NotInjected, err
 		}
-
-		if impl.initialValue != nil {
-			var resourceVersion string
-			var found bool
-			resourceVersion, found, err = unstructured.NestedString(impl.initialValue.Object, "metadata", "resourceVersion")
-			if err != nil {
-				return v1alpha1.NotInjected, err
-			}
-			if found {
-				resource.SetResourceVersion(resourceVersion)
-			}
-
-			unstructured.RemoveNestedField(impl.initialValue.Object, "metadata", "creationTimestamp")
-			unstructured.RemoveNestedField(impl.initialValue.Object, "metadata", "resourceVersion")
-			unstructured.RemoveNestedField(impl.initialValue.Object, "metadata", "uid")
-		}
-
-		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Update(ctx, resource, v1.UpdateOptions{})
+		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Apply(ctx, resource.GetName(), resource, v1.ApplyOptions{})
 	} else {
 		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Create(ctx, resource, v1.CreateOptions{})
 	}
@@ -161,7 +144,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	if impl.initialValue != nil {
-		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Update(ctx, impl.initialValue, v1.UpdateOptions{})
+		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Apply(ctx, resource.GetName(), impl.initialValue, v1.ApplyOptions{})
 	} else {
 		err = resourceClient.Delete(ctx, resource.GetName(), v1.DeleteOptions{})
 	}
