@@ -140,18 +140,18 @@ export interface Pod {
   containerNames?: string[]
 }
 
-export interface RollingRestart {
-  namespace: string
-  name: string
-  type: 'daemonset' | 'deployment' | 'statefulset'
-}
-
 export interface ResourceScale {
   namespace: string
   name: string
   resourceType: 'daemonset' | 'deployment' | 'replicaset' | 'statefulset'
   applyReplicas: number
   recoverReplicas: number
+}
+
+export interface RollingRestart {
+  namespace: string
+  name: string
+  type: 'daemonset' | 'deployment' | 'statefulset'
 }
 
 export interface Stress {

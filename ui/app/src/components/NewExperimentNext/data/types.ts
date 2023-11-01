@@ -779,37 +779,14 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
-  // RollingRestart
-  RollingRestartChaos: {
+  // ResourceScaleChaos
+  ResourceScaleChaos: {
     spec: {
       namespace: {
         field: 'text',
         label: 'Namespace',
         value: '',
-        helperText: 'The namespace of the deployment',
-      },
-      name: {
-        field: 'text',
-        label: 'Name',
-        value: '',
-        helperText: 'The name of the deployment',
-      },
-      method: {
-        field: 'select',
-        items: ['', 'daemonset', 'deployment', 'statefulset'],
-        label: 'Type',
-        value: '',
-        helperText: 'Required. The type of the resource to restart',
-      },
-    } as any,
-  },
-  // ResourceScaleChaos
-  ResourceScaleChaos: {
-        spec: {
-          namespace: {
-            field: 'text',
-            label: 'Namespace',
-            value: '',        helperText: 'The namespace of the resource',
+        helperText: 'The namespace of the resource',
       },
       name: {
         field: 'text',
@@ -835,6 +812,30 @@ const data: Record<Kind, Definition> = {
         label: 'Recover # replicas Count',
         value: null,
         helperText: 'Specify the CPU count',
+      },
+    } as any,
+  },
+  // RollingRestart
+  RollingRestartChaos: {
+    spec: {
+      namespace: {
+        field: 'text',
+        label: 'Namespace',
+        value: '',
+        helperText: 'The namespace of the deployment',
+      },
+      name: {
+        field: 'text',
+        label: 'Name',
+        value: '',
+        helperText: 'The name of the deployment',
+      },
+      method: {
+        field: 'select',
+        items: ['', 'daemonset', 'deployment', 'statefulset'],
+        label: 'Type',
+        value: '',
+        helperText: 'Required. The type of the resource to restart',
       },
     } as any,
   },
