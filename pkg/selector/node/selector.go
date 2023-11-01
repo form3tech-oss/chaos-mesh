@@ -25,8 +25,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	"github.com/go-logr/logr"
+
+	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 )
 
 // const nodeSelectorName = "node"
