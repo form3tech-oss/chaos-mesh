@@ -46,12 +46,12 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	ciliumContainerID, err := impl.ciliumContainerID(ctx, record.Id)
 	if err != nil {
-		return v1alpha1.Injected, fmt.Errorf("determing cilium-agent container ID: %w", err)
+		return v1alpha1.NotInjected, fmt.Errorf("determing cilium-agent container ID: %w", err)
 	}
 
 	client, err := impl.Builder.BuildNodeClient(ctx, record.Id)
 	if err != nil {
-		return v1alpha1.Injected, fmt.Errorf("building chaos-daemon client: %w", err)
+		return v1alpha1.NotInjected, fmt.Errorf("building chaos-daemon client: %w", err)
 	}
 
 	resp, err := client.ApplyNodeChaos(ctx, &pb.ApplyNodeChaosRequest{ContainerId: ciliumContainerID})
@@ -93,7 +93,7 @@ func (impl *Impl) ciliumContainerID(ctx context.Context, nodeName string) (strin
 	podList := &v1.PodList{}
 	err := impl.List(ctx, podList, &client.ListOptions{
 		LabelSelector: labels.SelectorFromSet(labels.Set{
-			"app.kubernetes.io/name": "cilium-agent",
+			"k8s-app": "cilium",
 		}),
 	})
 	if err != nil {
