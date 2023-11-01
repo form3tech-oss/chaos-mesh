@@ -18,7 +18,6 @@
 package v1alpha1
 
 import (
-	"context"
 	"encoding/json"
 	"reflect"
 	"time"
@@ -143,59 +142,39 @@ func (in *AWSChaos) IsOneShot() bool {
 
 var AWSChaosWebhookLog = logf.Log.WithName("AWSChaos-resource")
 
-func (in *AWSChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*AWSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AWSChaos, got %T", obj)
-	}
-	AWSChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *AWSChaos) ValidateCreate() (admission.Warnings, error) {
+	AWSChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *AWSChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*AWSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AWSChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*AWSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AWSChaos, got %T", newObj)
-	}
-
-	AWSChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *AWSChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	AWSChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*AWSChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *AWSChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*AWSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AWSChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *AWSChaos) ValidateDelete() (admission.Warnings, error) {
+	AWSChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	AWSChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &AWSChaos{}
+var _ webhook.Validator = &AWSChaos{}
 
 func (in *AWSChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &AWSChaos{}
+var _ webhook.Defaulter = &AWSChaos{}
 
-func (in *AWSChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *AWSChaos) Default() {
+	gw.Default(in)
 }
 
 const KindAzureChaos = "AzureChaos"
@@ -305,59 +284,39 @@ func (in *AzureChaos) IsOneShot() bool {
 
 var AzureChaosWebhookLog = logf.Log.WithName("AzureChaos-resource")
 
-func (in *AzureChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*AzureChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AzureChaos, got %T", obj)
-	}
-	AzureChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *AzureChaos) ValidateCreate() (admission.Warnings, error) {
+	AzureChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *AzureChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*AzureChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AzureChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*AzureChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AzureChaos, got %T", newObj)
-	}
-
-	AzureChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *AzureChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	AzureChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*AzureChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *AzureChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*AzureChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *AzureChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *AzureChaos) ValidateDelete() (admission.Warnings, error) {
+	AzureChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	AzureChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &AzureChaos{}
+var _ webhook.Validator = &AzureChaos{}
 
 func (in *AzureChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &AzureChaos{}
+var _ webhook.Defaulter = &AzureChaos{}
 
-func (in *AzureChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *AzureChaos) Default() {
+	gw.Default(in)
 }
 
 const KindBlockChaos = "BlockChaos"
@@ -463,59 +422,319 @@ func (in *BlockChaos) IsOneShot() bool {
 
 var BlockChaosWebhookLog = logf.Log.WithName("BlockChaos-resource")
 
-func (in *BlockChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*BlockChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *BlockChaos, got %T", obj)
-	}
-	BlockChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *BlockChaos) ValidateCreate() (admission.Warnings, error) {
+	BlockChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *BlockChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*BlockChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *BlockChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*BlockChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *BlockChaos, got %T", newObj)
-	}
-
-	BlockChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *BlockChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	BlockChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*BlockChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *BlockChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*BlockChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *BlockChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *BlockChaos) ValidateDelete() (admission.Warnings, error) {
+	BlockChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	BlockChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &BlockChaos{}
+var _ webhook.Validator = &BlockChaos{}
 
 func (in *BlockChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &BlockChaos{}
+var _ webhook.Defaulter = &BlockChaos{}
 
-func (in *BlockChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *BlockChaos) Default() {
+	gw.Default(in)
+}
+
+const KindCiliumChaos = "CiliumChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CiliumChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CiliumChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CiliumChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CiliumChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CiliumChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CiliumChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CiliumChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CiliumChaosList contains a list of CiliumChaos
+type CiliumChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CiliumChaos `json:"items"`
+}
+
+func (in *CiliumChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CiliumChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CiliumChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CiliumChaos) IsOneShot() bool {
+	return false
+}
+
+var CiliumChaosWebhookLog = logf.Log.WithName("CiliumChaos-resource")
+
+func (in *CiliumChaos) ValidateCreate() (admission.Warnings, error) {
+	CiliumChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *CiliumChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	CiliumChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*CiliumChaos).Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *CiliumChaos) ValidateDelete() (admission.Warnings, error) {
+	CiliumChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil, nil
+}
+
+var _ webhook.Validator = &CiliumChaos{}
+
+func (in *CiliumChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &CiliumChaos{}
+
+func (in *CiliumChaos) Default() {
+	gw.Default(in)
+}
+
+const KindCloudStackVMChaos = "CloudStackVMChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CloudStackVMChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CloudStackVMChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CloudStackVMChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CloudStackVMChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CloudStackVMChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CloudStackVMChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CloudStackVMChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CloudStackVMChaosList contains a list of CloudStackVMChaos
+type CloudStackVMChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CloudStackVMChaos `json:"items"`
+}
+
+func (in *CloudStackVMChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CloudStackVMChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CloudStackVMChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CloudStackVMChaos) IsOneShot() bool {
+	if in.Spec.Action==VMRestart {
+		return true
+	}
+
+	return false
+}
+
+var CloudStackVMChaosWebhookLog = logf.Log.WithName("CloudStackVMChaos-resource")
+
+func (in *CloudStackVMChaos) ValidateCreate() (admission.Warnings, error) {
+	CloudStackVMChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *CloudStackVMChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	CloudStackVMChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*CloudStackVMChaos).Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *CloudStackVMChaos) ValidateDelete() (admission.Warnings, error) {
+	CloudStackVMChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil, nil
+}
+
+var _ webhook.Validator = &CloudStackVMChaos{}
+
+func (in *CloudStackVMChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &CloudStackVMChaos{}
+
+func (in *CloudStackVMChaos) Default() {
+	gw.Default(in)
 }
 
 const KindDNSChaos = "DNSChaos"
@@ -621,59 +840,39 @@ func (in *DNSChaos) IsOneShot() bool {
 
 var DNSChaosWebhookLog = logf.Log.WithName("DNSChaos-resource")
 
-func (in *DNSChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*DNSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *DNSChaos, got %T", obj)
-	}
-	DNSChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *DNSChaos) ValidateCreate() (admission.Warnings, error) {
+	DNSChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *DNSChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*DNSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *DNSChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*DNSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *DNSChaos, got %T", newObj)
-	}
-
-	DNSChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *DNSChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	DNSChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*DNSChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *DNSChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*DNSChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *DNSChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *DNSChaos) ValidateDelete() (admission.Warnings, error) {
+	DNSChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	DNSChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &DNSChaos{}
+var _ webhook.Validator = &DNSChaos{}
 
 func (in *DNSChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &DNSChaos{}
+var _ webhook.Defaulter = &DNSChaos{}
 
-func (in *DNSChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *DNSChaos) Default() {
+	gw.Default(in)
 }
 
 const KindGCPChaos = "GCPChaos"
@@ -783,59 +982,39 @@ func (in *GCPChaos) IsOneShot() bool {
 
 var GCPChaosWebhookLog = logf.Log.WithName("GCPChaos-resource")
 
-func (in *GCPChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*GCPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *GCPChaos, got %T", obj)
-	}
-	GCPChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *GCPChaos) ValidateCreate() (admission.Warnings, error) {
+	GCPChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *GCPChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*GCPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *GCPChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*GCPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *GCPChaos, got %T", newObj)
-	}
-
-	GCPChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *GCPChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	GCPChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*GCPChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *GCPChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*GCPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *GCPChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *GCPChaos) ValidateDelete() (admission.Warnings, error) {
+	GCPChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	GCPChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &GCPChaos{}
+var _ webhook.Validator = &GCPChaos{}
 
 func (in *GCPChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &GCPChaos{}
+var _ webhook.Defaulter = &GCPChaos{}
 
-func (in *GCPChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *GCPChaos) Default() {
+	gw.Default(in)
 }
 
 const KindHTTPChaos = "HTTPChaos"
@@ -941,59 +1120,39 @@ func (in *HTTPChaos) IsOneShot() bool {
 
 var HTTPChaosWebhookLog = logf.Log.WithName("HTTPChaos-resource")
 
-func (in *HTTPChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*HTTPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *HTTPChaos, got %T", obj)
-	}
-	HTTPChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *HTTPChaos) ValidateCreate() (admission.Warnings, error) {
+	HTTPChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *HTTPChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*HTTPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *HTTPChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*HTTPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *HTTPChaos, got %T", newObj)
-	}
-
-	HTTPChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *HTTPChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	HTTPChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*HTTPChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *HTTPChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*HTTPChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *HTTPChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *HTTPChaos) ValidateDelete() (admission.Warnings, error) {
+	HTTPChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	HTTPChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &HTTPChaos{}
+var _ webhook.Validator = &HTTPChaos{}
 
 func (in *HTTPChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &HTTPChaos{}
+var _ webhook.Defaulter = &HTTPChaos{}
 
-func (in *HTTPChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *HTTPChaos) Default() {
+	gw.Default(in)
 }
 
 const KindIOChaos = "IOChaos"
@@ -1099,59 +1258,39 @@ func (in *IOChaos) IsOneShot() bool {
 
 var IOChaosWebhookLog = logf.Log.WithName("IOChaos-resource")
 
-func (in *IOChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*IOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *IOChaos, got %T", obj)
-	}
-	IOChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *IOChaos) ValidateCreate() (admission.Warnings, error) {
+	IOChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *IOChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*IOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *IOChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*IOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *IOChaos, got %T", newObj)
-	}
-
-	IOChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *IOChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	IOChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*IOChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *IOChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*IOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *IOChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *IOChaos) ValidateDelete() (admission.Warnings, error) {
+	IOChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	IOChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &IOChaos{}
+var _ webhook.Validator = &IOChaos{}
 
 func (in *IOChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &IOChaos{}
+var _ webhook.Defaulter = &IOChaos{}
 
-func (in *IOChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *IOChaos) Default() {
+	gw.Default(in)
 }
 
 const KindJVMChaos = "JVMChaos"
@@ -1257,59 +1396,39 @@ func (in *JVMChaos) IsOneShot() bool {
 
 var JVMChaosWebhookLog = logf.Log.WithName("JVMChaos-resource")
 
-func (in *JVMChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*JVMChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *JVMChaos, got %T", obj)
-	}
-	JVMChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *JVMChaos) ValidateCreate() (admission.Warnings, error) {
+	JVMChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *JVMChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*JVMChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *JVMChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*JVMChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *JVMChaos, got %T", newObj)
-	}
-
-	JVMChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *JVMChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	JVMChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*JVMChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *JVMChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*JVMChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *JVMChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *JVMChaos) ValidateDelete() (admission.Warnings, error) {
+	JVMChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	JVMChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &JVMChaos{}
+var _ webhook.Validator = &JVMChaos{}
 
 func (in *JVMChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &JVMChaos{}
+var _ webhook.Defaulter = &JVMChaos{}
 
-func (in *JVMChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *JVMChaos) Default() {
+	gw.Default(in)
 }
 
 const KindK8SChaos = "K8SChaos"
@@ -1416,13 +1535,13 @@ func (in *K8SChaos) IsOneShot() bool {
 var K8SChaosWebhookLog = logf.Log.WithName("K8SChaos-resource")
 
 func (in *K8SChaos) ValidateCreate() (admission.Warnings, error) {
-	K8SChaosWebhookLog.Info("validate create", "name", in.Name)
+	K8SChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
 	return in.Validate()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (in *K8SChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
-	K8SChaosWebhookLog.Info("validate update", "name", in.Name)
+	K8SChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
 	if !reflect.DeepEqual(in.Spec, old.(*K8SChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
@@ -1431,7 +1550,7 @@ func (in *K8SChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (in *K8SChaos) ValidateDelete() (admission.Warnings, error) {
-	K8SChaosWebhookLog.Info("validate delete", "name", in.Name)
+	K8SChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
 	// Nothing to do?
 	return nil, nil
@@ -1553,59 +1672,39 @@ func (in *KernelChaos) IsOneShot() bool {
 
 var KernelChaosWebhookLog = logf.Log.WithName("KernelChaos-resource")
 
-func (in *KernelChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*KernelChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *KernelChaos, got %T", obj)
-	}
-	KernelChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *KernelChaos) ValidateCreate() (admission.Warnings, error) {
+	KernelChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *KernelChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*KernelChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *KernelChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*KernelChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *KernelChaos, got %T", newObj)
-	}
-
-	KernelChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *KernelChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	KernelChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*KernelChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *KernelChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*KernelChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *KernelChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *KernelChaos) ValidateDelete() (admission.Warnings, error) {
+	KernelChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	KernelChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &KernelChaos{}
+var _ webhook.Validator = &KernelChaos{}
 
 func (in *KernelChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &KernelChaos{}
+var _ webhook.Defaulter = &KernelChaos{}
 
-func (in *KernelChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *KernelChaos) Default() {
+	gw.Default(in)
 }
 
 const KindNetworkChaos = "NetworkChaos"
@@ -1711,59 +1810,39 @@ func (in *NetworkChaos) IsOneShot() bool {
 
 var NetworkChaosWebhookLog = logf.Log.WithName("NetworkChaos-resource")
 
-func (in *NetworkChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*NetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *NetworkChaos, got %T", obj)
-	}
-	NetworkChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *NetworkChaos) ValidateCreate() (admission.Warnings, error) {
+	NetworkChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *NetworkChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*NetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *NetworkChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*NetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *NetworkChaos, got %T", newObj)
-	}
-
-	NetworkChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *NetworkChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	NetworkChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*NetworkChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *NetworkChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*NetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *NetworkChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *NetworkChaos) ValidateDelete() (admission.Warnings, error) {
+	NetworkChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	NetworkChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &NetworkChaos{}
+var _ webhook.Validator = &NetworkChaos{}
 
 func (in *NetworkChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &NetworkChaos{}
+var _ webhook.Defaulter = &NetworkChaos{}
 
-func (in *NetworkChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *NetworkChaos) Default() {
+	gw.Default(in)
 }
 
 const KindPhysicalMachineChaos = "PhysicalMachineChaos"
@@ -1869,118 +1948,78 @@ func (in *PhysicalMachineChaos) IsOneShot() bool {
 
 var PhysicalMachineChaosWebhookLog = logf.Log.WithName("PhysicalMachineChaos-resource")
 
-func (in *PhysicalMachineChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PhysicalMachineChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachineChaos, got %T", obj)
-	}
-	PhysicalMachineChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PhysicalMachineChaos) ValidateCreate() (admission.Warnings, error) {
+	PhysicalMachineChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PhysicalMachineChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PhysicalMachineChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachineChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PhysicalMachineChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachineChaos, got %T", newObj)
-	}
-
-	PhysicalMachineChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PhysicalMachineChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PhysicalMachineChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*PhysicalMachineChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PhysicalMachineChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PhysicalMachineChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachineChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PhysicalMachineChaos) ValidateDelete() (admission.Warnings, error) {
+	PhysicalMachineChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PhysicalMachineChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PhysicalMachineChaos{}
+var _ webhook.Validator = &PhysicalMachineChaos{}
 
 func (in *PhysicalMachineChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PhysicalMachineChaos{}
+var _ webhook.Defaulter = &PhysicalMachineChaos{}
 
-func (in *PhysicalMachineChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PhysicalMachineChaos) Default() {
+	gw.Default(in)
 }
 
 const KindPhysicalMachine = "PhysicalMachine"
 
 var PhysicalMachineWebhookLog = logf.Log.WithName("PhysicalMachine-resource")
 
-func (in *PhysicalMachine) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PhysicalMachine)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachine, got %T", obj)
-	}
-	PhysicalMachineWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PhysicalMachine) ValidateCreate() (admission.Warnings, error) {
+	PhysicalMachineWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PhysicalMachine) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PhysicalMachine)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachine, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PhysicalMachine)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachine, got %T", newObj)
-	}
-
-	PhysicalMachineWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PhysicalMachine) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PhysicalMachineWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*PhysicalMachine).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PhysicalMachine) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PhysicalMachine)
-	if !ok {
-		return nil, errors.Errorf("expected type *PhysicalMachine, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PhysicalMachine) ValidateDelete() (admission.Warnings, error) {
+	PhysicalMachineWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PhysicalMachineWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PhysicalMachine{}
+var _ webhook.Validator = &PhysicalMachine{}
 
 func (in *PhysicalMachine) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PhysicalMachine{}
+var _ webhook.Defaulter = &PhysicalMachine{}
 
-func (in *PhysicalMachine) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PhysicalMachine) Default() {
+	gw.Default(in)
 }
 
 const KindPodChaos = "PodChaos"
@@ -2090,345 +2129,363 @@ func (in *PodChaos) IsOneShot() bool {
 
 var PodChaosWebhookLog = logf.Log.WithName("PodChaos-resource")
 
-func (in *PodChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodChaos, got %T", obj)
-	}
-	PodChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PodChaos) ValidateCreate() (admission.Warnings, error) {
+	PodChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PodChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PodChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodChaos, got %T", newObj)
-	}
-
-	PodChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PodChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PodChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*PodChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PodChaos) ValidateDelete() (admission.Warnings, error) {
+	PodChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PodChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PodChaos{}
+var _ webhook.Validator = &PodChaos{}
 
 func (in *PodChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PodChaos{}
+var _ webhook.Defaulter = &PodChaos{}
 
-func (in *PodChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PodChaos) Default() {
+	gw.Default(in)
 }
 
 const KindPodHttpChaos = "PodHttpChaos"
 
 var PodHttpChaosWebhookLog = logf.Log.WithName("PodHttpChaos-resource")
 
-func (in *PodHttpChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodHttpChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodHttpChaos, got %T", obj)
-	}
-	PodHttpChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PodHttpChaos) ValidateCreate() (admission.Warnings, error) {
+	PodHttpChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodHttpChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PodHttpChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodHttpChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PodHttpChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodHttpChaos, got %T", newObj)
-	}
-
-	PodHttpChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	return typedNewObj.Validate()
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PodHttpChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PodHttpChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodHttpChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodHttpChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodHttpChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PodHttpChaos) ValidateDelete() (admission.Warnings, error) {
+	PodHttpChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PodHttpChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PodHttpChaos{}
+var _ webhook.Validator = &PodHttpChaos{}
 
 func (in *PodHttpChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PodHttpChaos{}
+var _ webhook.Defaulter = &PodHttpChaos{}
 
-func (in *PodHttpChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PodHttpChaos) Default() {
+	gw.Default(in)
 }
 
 const KindPodIOChaos = "PodIOChaos"
 
 var PodIOChaosWebhookLog = logf.Log.WithName("PodIOChaos-resource")
 
-func (in *PodIOChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodIOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodIOChaos, got %T", obj)
-	}
-	PodIOChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PodIOChaos) ValidateCreate() (admission.Warnings, error) {
+	PodIOChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodIOChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PodIOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodIOChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PodIOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodIOChaos, got %T", newObj)
-	}
-
-	PodIOChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	return typedNewObj.Validate()
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PodIOChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PodIOChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodIOChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodIOChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodIOChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PodIOChaos) ValidateDelete() (admission.Warnings, error) {
+	PodIOChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PodIOChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PodIOChaos{}
+var _ webhook.Validator = &PodIOChaos{}
 
 func (in *PodIOChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PodIOChaos{}
+var _ webhook.Defaulter = &PodIOChaos{}
 
-func (in *PodIOChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PodIOChaos) Default() {
+	gw.Default(in)
 }
 
 const KindPodNetworkChaos = "PodNetworkChaos"
 
 var PodNetworkChaosWebhookLog = logf.Log.WithName("PodNetworkChaos-resource")
 
-func (in *PodNetworkChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodNetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodNetworkChaos, got %T", obj)
-	}
-	PodNetworkChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *PodNetworkChaos) ValidateCreate() (admission.Warnings, error) {
+	PodNetworkChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodNetworkChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*PodNetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodNetworkChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*PodNetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodNetworkChaos, got %T", newObj)
-	}
-
-	PodNetworkChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	return typedNewObj.Validate()
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *PodNetworkChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	PodNetworkChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *PodNetworkChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*PodNetworkChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *PodNetworkChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *PodNetworkChaos) ValidateDelete() (admission.Warnings, error) {
+	PodNetworkChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	PodNetworkChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &PodNetworkChaos{}
+var _ webhook.Validator = &PodNetworkChaos{}
 
 func (in *PodNetworkChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &PodNetworkChaos{}
+var _ webhook.Defaulter = &PodNetworkChaos{}
 
-func (in *PodNetworkChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *PodNetworkChaos) Default() {
+	gw.Default(in)
 }
 
 const KindRemoteCluster = "RemoteCluster"
 
 var RemoteClusterWebhookLog = logf.Log.WithName("RemoteCluster-resource")
 
-func (in *RemoteCluster) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*RemoteCluster)
-	if !ok {
-		return nil, errors.Errorf("expected type *RemoteCluster, got %T", obj)
-	}
-	RemoteClusterWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *RemoteCluster) ValidateCreate() (admission.Warnings, error) {
+	RemoteClusterWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *RemoteCluster) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*RemoteCluster)
-	if !ok {
-		return nil, errors.Errorf("expected type *RemoteCluster, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*RemoteCluster)
-	if !ok {
-		return nil, errors.Errorf("expected type *RemoteCluster, got %T", newObj)
-	}
-
-	RemoteClusterWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *RemoteCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	RemoteClusterWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*RemoteCluster).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *RemoteCluster) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*RemoteCluster)
-	if !ok {
-		return nil, errors.Errorf("expected type *RemoteCluster, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *RemoteCluster) ValidateDelete() (admission.Warnings, error) {
+	RemoteClusterWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	RemoteClusterWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &RemoteCluster{}
+var _ webhook.Validator = &RemoteCluster{}
 
 func (in *RemoteCluster) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &RemoteCluster{}
+var _ webhook.Defaulter = &RemoteCluster{}
 
-func (in *RemoteCluster) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *RemoteCluster) Default() {
+	gw.Default(in)
+}
+
+const KindResourceScaleChaos = "ResourceScaleChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *ResourceScaleChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *ResourceScaleChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *ResourceScaleChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *ResourceScaleChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *ResourceScaleChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *ResourceScaleChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *ResourceScaleChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// ResourceScaleChaosList contains a list of ResourceScaleChaos
+type ResourceScaleChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ResourceScaleChaos `json:"items"`
+}
+
+func (in *ResourceScaleChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *ResourceScaleChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *ResourceScaleChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *ResourceScaleChaos) IsOneShot() bool {
+	return false
+}
+
+var ResourceScaleChaosWebhookLog = logf.Log.WithName("ResourceScaleChaos-resource")
+
+func (in *ResourceScaleChaos) ValidateCreate() (admission.Warnings, error) {
+	ResourceScaleChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *ResourceScaleChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	ResourceScaleChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*ResourceScaleChaos).Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return in.Validate()
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *ResourceScaleChaos) ValidateDelete() (admission.Warnings, error) {
+	ResourceScaleChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
+
+	// Nothing to do?
+	return nil, nil
+}
+
+var _ webhook.Validator = &ResourceScaleChaos{}
+
+func (in *ResourceScaleChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.Defaulter = &ResourceScaleChaos{}
+
+func (in *ResourceScaleChaos) Default() {
+	gw.Default(in)
 }
 
 const KindStatusCheck = "StatusCheck"
 
 var StatusCheckWebhookLog = logf.Log.WithName("StatusCheck-resource")
 
-func (in *StatusCheck) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*StatusCheck)
-	if !ok {
-		return nil, errors.Errorf("expected type *StatusCheck, got %T", obj)
-	}
-	StatusCheckWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *StatusCheck) ValidateCreate() (admission.Warnings, error) {
+	StatusCheckWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *StatusCheck) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*StatusCheck)
-	if !ok {
-		return nil, errors.Errorf("expected type *StatusCheck, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*StatusCheck)
-	if !ok {
-		return nil, errors.Errorf("expected type *StatusCheck, got %T", newObj)
-	}
-
-	StatusCheckWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *StatusCheck) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	StatusCheckWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*StatusCheck).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *StatusCheck) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*StatusCheck)
-	if !ok {
-		return nil, errors.Errorf("expected type *StatusCheck, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *StatusCheck) ValidateDelete() (admission.Warnings, error) {
+	StatusCheckWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	StatusCheckWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &StatusCheck{}
+var _ webhook.Validator = &StatusCheck{}
 
 func (in *StatusCheck) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &StatusCheck{}
+var _ webhook.Defaulter = &StatusCheck{}
 
-func (in *StatusCheck) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *StatusCheck) Default() {
+	gw.Default(in)
 }
 
 const KindStressChaos = "StressChaos"
@@ -2534,59 +2591,39 @@ func (in *StressChaos) IsOneShot() bool {
 
 var StressChaosWebhookLog = logf.Log.WithName("StressChaos-resource")
 
-func (in *StressChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*StressChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *StressChaos, got %T", obj)
-	}
-	StressChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *StressChaos) ValidateCreate() (admission.Warnings, error) {
+	StressChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *StressChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*StressChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *StressChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*StressChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *StressChaos, got %T", newObj)
-	}
-
-	StressChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *StressChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	StressChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*StressChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *StressChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*StressChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *StressChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *StressChaos) ValidateDelete() (admission.Warnings, error) {
+	StressChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	StressChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &StressChaos{}
+var _ webhook.Validator = &StressChaos{}
 
 func (in *StressChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &StressChaos{}
+var _ webhook.Defaulter = &StressChaos{}
 
-func (in *StressChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *StressChaos) Default() {
+	gw.Default(in)
 }
 
 const KindTimeChaos = "TimeChaos"
@@ -2692,59 +2729,39 @@ func (in *TimeChaos) IsOneShot() bool {
 
 var TimeChaosWebhookLog = logf.Log.WithName("TimeChaos-resource")
 
-func (in *TimeChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*TimeChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *TimeChaos, got %T", obj)
-	}
-	TimeChaosWebhookLog.Info("validate create", "name", typedObj.GetName())
-
-	return typedObj.Validate()
+func (in *TimeChaos) ValidateCreate() (admission.Warnings, error) {
+	TimeChaosWebhookLog.V(1).Info("validate create", "name", in.Name)
+	return in.Validate()
 }
 
-// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *TimeChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	typedOldObj, ok := oldObj.(*TimeChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *TimeChaos, got %T", oldObj)
-	}
-
-	typedNewObj, ok := newObj.(*TimeChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *TimeChaos, got %T", newObj)
-	}
-
-	TimeChaosWebhookLog.Info("validate update", "name", typedOldObj.GetName())
-	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (in *TimeChaos) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	TimeChaosWebhookLog.V(1).Info("validate update", "name", in.Name)
+	if !reflect.DeepEqual(in.Spec, old.(*TimeChaos).Spec) {
 		return nil, ErrCanNotUpdateChaos
 	}
-	return typedNewObj.Validate()
+	return in.Validate()
 }
 
-// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (in *TimeChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	typedObj, ok := obj.(*TimeChaos)
-	if !ok {
-		return nil, errors.Errorf("expected type *TimeChaos, got %T", obj)
-	}
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (in *TimeChaos) ValidateDelete() (admission.Warnings, error) {
+	TimeChaosWebhookLog.V(1).Info("validate delete", "name", in.Name)
 
-	TimeChaosWebhookLog.Info("validate delete", "name", typedObj.GetName())
-
+	// Nothing to do?
 	return nil, nil
 }
 
-var _ webhook.CustomValidator = &TimeChaos{}
+var _ webhook.Validator = &TimeChaos{}
 
 func (in *TimeChaos) Validate() ([]string, error) {
 	errs := gw.Validate(in)
 	return nil, gw.Aggregate(errs)
 }
 
-var _ webhook.CustomDefaulter = &TimeChaos{}
+var _ webhook.Defaulter = &TimeChaos{}
 
-func (in *TimeChaos) Default(_ context.Context, obj runtime.Object) error {
-	gw.Default(obj)
-	return nil
+func (in *TimeChaos) Default() {
+	gw.Default(in)
 }
 
 func init() {
@@ -2765,6 +2782,18 @@ func init() {
 	all.register(KindBlockChaos, &ChaosKind{
 		chaos: &BlockChaos{},
 		list:  &BlockChaosList{},
+	})
+
+	SchemeBuilder.Register(&CiliumChaos{}, &CiliumChaosList{})
+	all.register(KindCiliumChaos, &ChaosKind{
+		chaos: &CiliumChaos{},
+		list:  &CiliumChaosList{},
+	})
+
+	SchemeBuilder.Register(&CloudStackVMChaos{}, &CloudStackVMChaosList{})
+	all.register(KindCloudStackVMChaos, &ChaosKind{
+		chaos: &CloudStackVMChaos{},
+		list:  &CloudStackVMChaosList{},
 	})
 
 	SchemeBuilder.Register(&DNSChaos{}, &DNSChaosList{})
@@ -2837,6 +2866,12 @@ func init() {
 
 	SchemeBuilder.Register(&RemoteCluster{}, &RemoteClusterList{})
 
+	SchemeBuilder.Register(&ResourceScaleChaos{}, &ResourceScaleChaosList{})
+	all.register(KindResourceScaleChaos, &ChaosKind{
+		chaos: &ResourceScaleChaos{},
+		list:  &ResourceScaleChaosList{},
+	})
+
 	SchemeBuilder.Register(&StatusCheck{}, &StatusCheckList{})
 
 	SchemeBuilder.Register(&StressChaos{}, &StressChaosList{})
@@ -2865,6 +2900,16 @@ func init() {
 	allScheduleItem.register(KindBlockChaos, &ChaosKind{
 		chaos: &BlockChaos{},
 		list:  &BlockChaosList{},
+	})
+
+	allScheduleItem.register(KindCiliumChaos, &ChaosKind{
+		chaos: &CiliumChaos{},
+		list:  &CiliumChaosList{},
+	})
+
+	allScheduleItem.register(KindCloudStackVMChaos, &ChaosKind{
+		chaos: &CloudStackVMChaos{},
+		list:  &CloudStackVMChaosList{},
 	})
 
 	allScheduleItem.register(KindDNSChaos, &ChaosKind{
@@ -2915,6 +2960,11 @@ func init() {
 	allScheduleItem.register(KindPodChaos, &ChaosKind{
 		chaos: &PodChaos{},
 		list:  &PodChaosList{},
+	})
+
+	allScheduleItem.register(KindResourceScaleChaos, &ChaosKind{
+		chaos: &ResourceScaleChaos{},
+		list:  &ResourceScaleChaosList{},
 	})
 
 	allScheduleItem.register(KindStressChaos, &ChaosKind{
