@@ -146,6 +146,14 @@ export interface RollingRestart {
   type: 'daemonset' | 'deployment' | 'statefulset'
 }
 
+export interface ResourceScale {
+  namespace: string
+  name: string
+  resourceType: 'daemonset' | 'deployment' | 'replicaset' | 'statefulset'
+  applyReplicas: number
+  recoverReplicas: number
+}
+
 export interface Stress {
   stressors: {
     cpu?: {
@@ -183,6 +191,7 @@ export interface ExperimentType {
   NetworkChaos: Network
   PodChaos: Pod
   RollingRestartChaos: RollingRestart
+  ResourceScaleChaos: ResourceScale
   StressChaos: Stress
   TimeChaos: Time
   PhysicalMachineChaos?: unknown
