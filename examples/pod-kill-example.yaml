@@ -20,5 +20,7 @@ spec:
   action: pod-kill
   mode: one
   selector:
-    labelSelectors:
-      "app.kubernetes.io/component": "tikv"
+    namespaces:
+      - "cert-manager"
+    fieldSelectors:
+      "metadata.name": "cert-manager-57f8ccc899-gwtvd"

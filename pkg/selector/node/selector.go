@@ -108,7 +108,6 @@ func filterNodesByMode(nodes []*Node, mode v1alpha1.SelectorMode, value string) 
 type Params struct {
 	fx.In
 
-	// Client client.Client
 	Reader client.Reader `name:"no-cache"`
 }
 

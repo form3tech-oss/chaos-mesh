@@ -1121,6 +1121,10 @@ rules:
       - namespaces
       - services
     verbs: [ "get", "list", "watch" ]
+  - apiGroups: [ "apps" ]
+    resources:
+      - daemonsets
+    verbs: [ "get" ]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews

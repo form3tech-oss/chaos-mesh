@@ -21,8 +21,10 @@ import (
 
 	"github.com/go-logr/logr"
 	"go.uber.org/fx"
-	v1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
@@ -34,14 +36,12 @@ import (
 var _ impltypes.ChaosImpl = (*Impl)(nil)
 
 type Impl struct {
-	client.Client
+	client.Reader
 	Log     logr.Logger
 	Builder *chaosdaemon.ChaosDaemonClientBuilder
 }
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	impl.Log.Info("paramas received", "index", index, "records", records, "obj", obj)
-
 	record := records[index]
 
 	ciliumContainerID, err := impl.ciliumContainerID(ctx, record.Id)
@@ -54,19 +54,15 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("building chaos-daemon client: %w", err)
 	}
 
-	resp, err := client.ApplyNodeChaos(ctx, &pb.ApplyNodeChaosRequest{ContainerId: ciliumContainerID})
+	_, err = client.ApplyNodeChaos(ctx, &pb.ApplyNodeChaosRequest{ContainerId: ciliumContainerID})
 	if err != nil {
 		return v1alpha1.NotInjected, fmt.Errorf("applying node chaos: %w", err)
 	}
-
-	impl.Log.Info("response from chaos-daemon", "response", resp)
 
 	return v1alpha1.Injected, nil
 }
 
 func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	impl.Log.Info("paramas received", "index", index, "records", records, "obj", obj)
-
 	record := records[index]
 
 	ciliumContainerID, err := impl.ciliumContainerID(ctx, record.Id)
@@ -79,28 +75,30 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("building chaos-daemon client: %w", err)
 	}
 
-	resp, err := client.RecoverNodeChaos(ctx, &pb.RecoverNodeChaosRequest{ContainerId: ciliumContainerID})
+	_, err = client.RecoverNodeChaos(ctx, &pb.RecoverNodeChaosRequest{ContainerId: ciliumContainerID})
 	if err != nil {
 		return v1alpha1.Injected, fmt.Errorf("applying node chaos: %w", err)
 	}
-
-	impl.Log.Info("response from chaos-daemon", "response", resp)
 
 	return v1alpha1.NotInjected, nil
 }
 
 func (impl *Impl) ciliumContainerID(ctx context.Context, nodeName string) (string, error) {
-	podList := &v1.PodList{}
-	err := impl.List(ctx, podList, &client.ListOptions{
-		LabelSelector: labels.SelectorFromSet(labels.Set{
-			"k8s-app": "cilium",
-		}),
-	})
+	ciliumDS := &appsv1.DaemonSet{}
+	err := impl.Get(ctx, types.NamespacedName{Name: "cilium", Namespace: "kube-system"}, ciliumDS)
 	if err != nil {
-		return "", fmt.Errorf("listing pods: %w", err)
+		return "", fmt.Errorf("getting cilium daemonset: %w", err)
 	}
 
-	pods := []v1.Pod{}
+	labelSelector := labels.SelectorFromSet(labels.Set(ciliumDS.Spec.Selector.MatchLabels))
+
+	podList := &corev1.PodList{}
+	err = impl.List(ctx, podList, &client.ListOptions{LabelSelector: labelSelector})
+	if err != nil {
+		return "", fmt.Errorf("listing cilium pods: %w", err)
+	}
+
+	pods := []corev1.Pod{}
 	for _, pod := range podList.Items {
 		if pod.Spec.NodeName == nodeName {
 			pods = append(pods, pod)
@@ -112,8 +110,6 @@ func (impl *Impl) ciliumContainerID(ctx context.Context, nodeName string) (strin
 	}
 
 	ciliumPod := pods[0]
-
-	impl.Log.Info("cilium pod", "pod", ciliumPod.GetName())
 
 	var ciliumContainerID string
 	for _, status := range ciliumPod.Status.ContainerStatuses {
@@ -133,7 +129,7 @@ func (impl *Impl) ciliumContainerID(ctx context.Context, nodeName string) (strin
 type ImplParams struct {
 	fx.In
 
-	Client  client.Client
+	Reader  client.Reader `name:"no-cache"`
 	Builder *chaosdaemon.ChaosDaemonClientBuilder
 	Logger  logr.Logger
 }
@@ -143,7 +139,7 @@ func NewImpl(params ImplParams) *impltypes.ChaosImplPair {
 		Name:   "nodechaos",
 		Object: &v1alpha1.NodeChaos{},
 		Impl: &Impl{
-			Client:  params.Client,
+			Reader:  params.Reader,
 			Log:     params.Logger.WithName("nodechaos"),
 			Builder: params.Builder,
 		},
