@@ -28,30 +28,35 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Environment variable to control log format, if set to JSON, structured logging will be used. Default is "console", and to use zap.NewDevelopmentConfig.
-const LogFormat = "LOG_FORMAT"
+const (
+	// Environment variable to control log format, if set to JSON, structured logging will be used. Default is "console", and to use zap.NewDevelopmentConfig.
+	LogFormat = "LOG_FORMAT"
+	// Log format environment variable value indicating JSON
+	LogFormatJSON = "json"
+	// Log format environment variable value indicating console / human-readable form
+	LogFormatConsole = "console"
 
-// Environment variable to control logging level, should parse to zapcore.Level. Default is "info".
-const LogLevel = "LOG_LEVEL"
+	// Environment variable to control logging level, should parse to zapcore.Level. Default is "info".
+	LogLevel = "LOG_LEVEL"
 
-// Environment variable to control logging key used for log message in structured logging. Default is defined by zap.NewProductionEncoderConfig.
-const LogKeyMessage = "LOG_KEY_MESSAGE"
+	// Environment variable to control logging key used for log message in structured logging. Default is defined by zap.NewProductionEncoderConfig.
+	LogKeyMessage = "LOG_KEY_MESSAGE"
 
-// Environment variable to control logging key used for log timestamp in structured logging. Default is defined by zap.NewProductionEncoderConfig.
-const LogKeyTimestamp = "LOG_KEY_TIMESTAMP"
+	// Environment variable to control logging key used for log timestamp in structured logging. Default is defined by zap.NewProductionEncoderConfig.
+	LogKeyTimestamp = "LOG_KEY_TIMESTAMP"
 
-// Environment variable to control the maximum field size in structured logging before truncating the field value.
-const LogMaxFieldSize = "LOG_MAX_FIELD_SIZE"
+	// Environment variable to control the maximum field size in structured logging before truncating the field value.
+	LogMaxFieldSize = "LOG_MAX_FIELD_SIZE"
 
-// Environment variable to control the logging timestamp format used in structured logging. Valid values are "rfc3339", "rfc3339nano" and "epoch".
-const LogTimestampFormat = "LOG_TIMESTAMP_FORMAT"
+	// Environment variable to control the logging timestamp format used in structured logging. Valid values are "rfc3339", "rfc3339nano" and "epoch".
+	LogTimestampFormat = "LOG_TIMESTAMP_FORMAT"
+)
 
 // NewDefaultZapLogger is the recommended way to create a new logger, you could call this function to initialize the root
 // logger of your application, and provide it to your components, by fx or manually.
 func NewDefaultZapLogger() (logr.Logger, error) {
-	envLevel := os.Getenv(LogLevel)
 	logLevel := zap.InfoLevel
-	if envLevel != "" {
+	if envLevel := os.Getenv(LogLevel); envLevel != "" {
 		var err error
 		logLevel, err = zapcore.ParseLevel(envLevel)
 		if err != nil {
@@ -59,15 +64,16 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 		}
 	}
 
-	envFormat := os.Getenv(LogFormat)
-	logFormat := "console"
-	if envFormat == "json" {
-		logFormat = "json"
+	logFormat := LogFormatConsole
+	if envFormat := os.Getenv(LogFormat); envFormat == LogFormatJSON {
+		logFormat = LogFormatJSON
 	}
 
 	var config zap.Config
 
-	if logFormat == "json" {
+	if logFormat == LogFormatConsole {
+		config = zap.NewDevelopmentConfig()
+	} else {
 		encoderConfig := zap.NewProductionEncoderConfig()
 
 		if v := os.Getenv(LogKeyMessage); v != "" {
@@ -78,13 +84,13 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 		}
 
 		if v := os.Getenv(LogTimestampFormat); v != "" {
-			if v == "rfc3339" {
-				encoderConfig.EncodeTime = zapcore.RFC3339TimeEncoder
-			} else if v == "rfc3339nano" {
-				encoderConfig.EncodeTime = zapcore.RFC3339NanoTimeEncoder
-			} else if v == "epoch" {
-				encoderConfig.EncodeTime = zapcore.EpochTimeEncoder
+			var timeEncoder zapcore.TimeEncoder
+
+			if err := timeEncoder.UnmarshalText([]byte(v)); err != nil {
+				return logr.Discard(), err
 			}
+
+			encoderConfig.EncodeTime = timeEncoder
 		}
 
 		// If configured, truncate the fields to the configured size. This allows for reasonable configuration to prevent extremely
@@ -104,8 +110,6 @@ func NewDefaultZapLogger() (logr.Logger, error) {
 
 		config = zap.NewProductionConfig()
 		config.EncoderConfig = encoderConfig
-	} else {
-		config = zap.NewDevelopmentConfig()
 	}
 
 	zapLogger, err := config.Build(zap.IncreaseLevel(logLevel))
