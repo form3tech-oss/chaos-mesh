@@ -24,6 +24,7 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstack"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
@@ -75,6 +76,7 @@ type SelectorParams struct {
 	GCPSelector             *gcp.SelectImpl
 	PhysicalMachineSelector *physicalmachine.SelectImpl
 	NodeVolumePath          *nodevolumepath.SelectImpl
+	CloudStack              *cloudstack.SelectImpl
 }
 
 func New(p SelectorParams) *Selector {
@@ -104,4 +106,5 @@ var Module = fx.Provide(
 	gcp.New,
 	physicalmachine.New,
 	nodevolumepath.New,
+	cloudstack.New,
 )
