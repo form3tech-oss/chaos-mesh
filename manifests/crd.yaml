@@ -2243,10 +2243,6 @@ spec:
           spec:
             description: Spec defines the behavior of a pod chaos experiment
             properties:
-              allowPatching:
-                description: AllowPatching specifies that the chaos should patch &
-                  restore the modified object, rather than create & delete.
-                type: boolean
               apiObjects:
                 description: K8SChaosAPIObjects defines ways to specify Kubernetes
                   API resources to be applied by K8SChaos
@@ -2264,6 +2260,10 @@ spec:
                 description: RemoteCluster represents the remote cluster where the
                   chaos will be deployed
                 type: string
+              update:
+                description: Patch specifies that the chaos should update an existing
+                  resource rather than create a new one.
+                type: boolean
             required:
             - apiObjects
             - duration
@@ -6617,10 +6617,6 @@ spec:
               k8sChaos:
                 description: K8SChaosSpec defines the desired state of K8SChaos
                 properties:
-                  allowPatching:
-                    description: AllowPatching specifies that the chaos should patch
-                      & restore the modified object, rather than create & delete.
-                    type: boolean
                   apiObjects:
                     description: K8SChaosAPIObjects defines ways to specify Kubernetes
                       API resources to be applied by K8SChaos
@@ -6638,6 +6634,10 @@ spec:
                     description: RemoteCluster represents the remote cluster where
                       the chaos will be deployed
                     type: string
+                  update:
+                    description: Patch specifies that the chaos should update an existing
+                      resource rather than create a new one.
+                    type: boolean
                 required:
                 - apiObjects
                 - duration
@@ -9982,11 +9982,6 @@ spec:
                         k8sChaos:
                           description: K8SChaosSpec defines the desired state of K8SChaos
                           properties:
-                            allowPatching:
-                              description: AllowPatching specifies that the chaos
-                                should patch & restore the modified object, rather
-                                than create & delete.
-                              type: boolean
                             apiObjects:
                               description: K8SChaosAPIObjects defines ways to specify
                                 Kubernetes API resources to be applied by K8SChaos
@@ -10006,6 +10001,10 @@ spec:
                               description: RemoteCluster represents the remote cluster
                                 where the chaos will be deployed
                               type: string
+                            update:
+                              description: Patch specifies that the chaos should update
+                                an existing resource rather than create a new one.
+                              type: boolean
                           required:
                           - apiObjects
                           - duration
@@ -13116,11 +13115,6 @@ spec:
                               description: K8SChaosSpec defines the desired state
                                 of K8SChaos
                               properties:
-                                allowPatching:
-                                  description: AllowPatching specifies that the chaos
-                                    should patch & restore the modified object, rather
-                                    than create & delete.
-                                  type: boolean
                                 apiObjects:
                                   description: K8SChaosAPIObjects defines ways to
                                     specify Kubernetes API resources to be applied
@@ -13141,6 +13135,11 @@ spec:
                                   description: RemoteCluster represents the remote
                                     cluster where the chaos will be deployed
                                   type: string
+                                update:
+                                  description: Patch specifies that the chaos should
+                                    update an existing resource rather than create
+                                    a new one.
+                                  type: boolean
                               required:
                               - apiObjects
                               - duration
@@ -21282,10 +21281,6 @@ spec:
               k8sChaos:
                 description: K8SChaosSpec defines the desired state of K8SChaos
                 properties:
-                  allowPatching:
-                    description: AllowPatching specifies that the chaos should patch
-                      & restore the modified object, rather than create & delete.
-                    type: boolean
                   apiObjects:
                     description: K8SChaosAPIObjects defines ways to specify Kubernetes
                       API resources to be applied by K8SChaos
@@ -21303,6 +21298,10 @@ spec:
                     description: RemoteCluster represents the remote cluster where
                       the chaos will be deployed
                     type: string
+                  update:
+                    description: Patch specifies that the chaos should update an existing
+                      resource rather than create a new one.
+                    type: boolean
                 required:
                 - apiObjects
                 - duration
@@ -24217,11 +24216,6 @@ spec:
                   k8sChaos:
                     description: K8SChaosSpec defines the desired state of K8SChaos
                     properties:
-                      allowPatching:
-                        description: AllowPatching specifies that the chaos should
-                          patch & restore the modified object, rather than create
-                          & delete.
-                        type: boolean
                       apiObjects:
                         description: K8SChaosAPIObjects defines ways to specify Kubernetes
                           API resources to be applied by K8SChaos
@@ -24241,6 +24235,10 @@ spec:
                         description: RemoteCluster represents the remote cluster where
                           the chaos will be deployed
                         type: string
+                      update:
+                        description: Patch specifies that the chaos should update
+                          an existing resource rather than create a new one.
+                        type: boolean
                     required:
                     - apiObjects
                     - duration
@@ -27657,11 +27655,6 @@ spec:
                               description: K8SChaosSpec defines the desired state
                                 of K8SChaos
                               properties:
-                                allowPatching:
-                                  description: AllowPatching specifies that the chaos
-                                    should patch & restore the modified object, rather
-                                    than create & delete.
-                                  type: boolean
                                 apiObjects:
                                   description: K8SChaosAPIObjects defines ways to
                                     specify Kubernetes API resources to be applied
@@ -27682,6 +27675,11 @@ spec:
                                   description: RemoteCluster represents the remote
                                     cluster where the chaos will be deployed
                                   type: string
+                                update:
+                                  description: Patch specifies that the chaos should
+                                    update an existing resource rather than create
+                                    a new one.
+                                  type: boolean
                               required:
                               - apiObjects
                               - duration
@@ -30896,11 +30894,6 @@ spec:
                                   description: K8SChaosSpec defines the desired state
                                     of K8SChaos
                                   properties:
-                                    allowPatching:
-                                      description: AllowPatching specifies that the
-                                        chaos should patch & restore the modified
-                                        object, rather than create & delete.
-                                      type: boolean
                                     apiObjects:
                                       description: K8SChaosAPIObjects defines ways
                                         to specify Kubernetes API resources to be
@@ -30921,6 +30914,11 @@ spec:
                                       description: RemoteCluster represents the remote
                                         cluster where the chaos will be deployed
                                       type: string
+                                    update:
+                                      description: Patch specifies that the chaos
+                                        should update an existing resource rather
+                                        than create a new one.
+                                      type: boolean
                                   required:
                                   - apiObjects
                                   - duration
@@ -41993,11 +41991,6 @@ spec:
                     k8sChaos:
                       description: K8SChaosSpec defines the desired state of K8SChaos
                       properties:
-                        allowPatching:
-                          description: AllowPatching specifies that the chaos should
-                            patch & restore the modified object, rather than create
-                            & delete.
-                          type: boolean
                         apiObjects:
                           description: K8SChaosAPIObjects defines ways to specify
                             Kubernetes API resources to be applied by K8SChaos
@@ -42017,6 +42010,10 @@ spec:
                           description: RemoteCluster represents the remote cluster
                             where the chaos will be deployed
                           type: string
+                        update:
+                          description: Patch specifies that the chaos should update
+                            an existing resource rather than create a new one.
+                          type: boolean
                       required:
                       - apiObjects
                       - duration
@@ -45045,11 +45042,6 @@ spec:
                         k8sChaos:
                           description: K8SChaosSpec defines the desired state of K8SChaos
                           properties:
-                            allowPatching:
-                              description: AllowPatching specifies that the chaos
-                                should patch & restore the modified object, rather
-                                than create & delete.
-                              type: boolean
                             apiObjects:
                               description: K8SChaosAPIObjects defines ways to specify
                                 Kubernetes API resources to be applied by K8SChaos
@@ -45069,6 +45061,10 @@ spec:
                               description: RemoteCluster represents the remote cluster
                                 where the chaos will be deployed
                               type: string
+                            update:
+                              description: Patch specifies that the chaos should update
+                                an existing resource rather than create a new one.
+                              type: boolean
                           required:
                           - apiObjects
                           - duration
