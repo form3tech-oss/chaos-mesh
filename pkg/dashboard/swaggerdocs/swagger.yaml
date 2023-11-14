@@ -5593,22 +5593,6 @@ definitions:
     type: object
   v1alpha1.NodeSelectorSpec:
     properties:
-      annotationSelectors:
-        additionalProperties:
-          type: string
-        description: |-
-          Map of string keys and values that can be used to select objects.
-          A selector based on annotations.
-          +optional
-        type: object
-      fieldSelectors:
-        additionalProperties:
-          type: string
-        description: |-
-          Map of string keys and values that can be used to select objects.
-          A selector based on fields.
-          +optional
-        type: object
       labelSelectors:
         additionalProperties:
           type: string
@@ -5617,13 +5601,6 @@ definitions:
           A selector based on labels.
           +optional
         type: object
-      names:
-        description: |-
-          An array of node names.
-          +optional
-        items:
-          type: string
-        type: array
     type: object
   v1alpha1.PMJVMMySQLSpec:
     properties:

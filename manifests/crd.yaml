@@ -6473,12 +6473,6 @@ spec:
                     description: Selector is used to select nodes into which to inject
                       chaos.
                     properties:
-                      annotationSelectors:
-                        additionalProperties:
-                          type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on annotations.
-                        type: object
                       expressionSelectors:
                         description: a slice of label selector expressions that can
                           be used to select objects. A list of selectors based on
@@ -6511,23 +6505,12 @@ spec:
                           - operator
                           type: object
                         type: array
-                      fieldSelectors:
-                        additionalProperties:
-                          type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on fields.
-                        type: object
                       labelSelectors:
                         additionalProperties:
                           type: string
                         description: Map of string keys and values that can be used
                           to select objects. A selector based on labels.
                         type: object
-                      names:
-                        description: An array of node names.
-                        items:
-                          type: string
-                        type: array
                     type: object
                   value:
                     description: Value is required when the mode is set to `FixedMode`
@@ -10124,13 +10107,6 @@ spec:
                               description: Selector is used to select nodes into which
                                 to inject chaos.
                               properties:
-                                annotationSelectors:
-                                  additionalProperties:
-                                    type: string
-                                  description: Map of string keys and values that
-                                    can be used to select objects. A selector based
-                                    on annotations.
-                                  type: object
                                 expressionSelectors:
                                   description: a slice of label selector expressions
                                     that can be used to select objects. A list of
@@ -10164,13 +10140,6 @@ spec:
                                     - operator
                                     type: object
                                   type: array
-                                fieldSelectors:
-                                  additionalProperties:
-                                    type: string
-                                  description: Map of string keys and values that
-                                    can be used to select objects. A selector based
-                                    on fields.
-                                  type: object
                                 labelSelectors:
                                   additionalProperties:
                                     type: string
@@ -10178,11 +10147,6 @@ spec:
                                     can be used to select objects. A selector based
                                     on labels.
                                   type: object
-                                names:
-                                  description: An array of node names.
-                                  items:
-                                    type: string
-                                  type: array
                               type: object
                             value:
                               description: Value is required when the mode is set
@@ -13628,13 +13592,6 @@ spec:
                                   description: Selector is used to select nodes into
                                     which to inject chaos.
                                   properties:
-                                    annotationSelectors:
-                                      additionalProperties:
-                                        type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on annotations.
-                                      type: object
                                     expressionSelectors:
                                       description: a slice of label selector expressions
                                         that can be used to select objects. A list
@@ -13671,13 +13628,6 @@ spec:
                                         - operator
                                         type: object
                                       type: array
-                                    fieldSelectors:
-                                      additionalProperties:
-                                        type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on fields.
-                                      type: object
                                     labelSelectors:
                                       additionalProperties:
                                         type: string
@@ -13685,11 +13635,6 @@ spec:
                                         can be used to select objects. A selector
                                         based on labels.
                                       type: object
-                                    names:
-                                      description: An array of node names.
-                                      items:
-                                        type: string
-                                      type: array
                                   type: object
                                 value:
                                   description: Value is required when the mode is
@@ -23716,12 +23661,6 @@ spec:
                     description: Selector is used to select nodes into which to inject
                       chaos.
                     properties:
-                      annotationSelectors:
-                        additionalProperties:
-                          type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on annotations.
-                        type: object
                       expressionSelectors:
                         description: a slice of label selector expressions that can
                           be used to select objects. A list of selectors based on
@@ -23754,23 +23693,12 @@ spec:
                           - operator
                           type: object
                         type: array
-                      fieldSelectors:
-                        additionalProperties:
-                          type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on fields.
-                        type: object
                       labelSelectors:
                         additionalProperties:
                           type: string
                         description: Map of string keys and values that can be used
                           to select objects. A selector based on labels.
                         type: object
-                      names:
-                        description: An array of node names.
-                        items:
-                          type: string
-                        type: array
                     type: object
                   value:
                     description: Value is required when the mode is set to `FixedMode`
@@ -26996,12 +26924,6 @@ spec:
                         description: Selector is used to select nodes into which to
                           inject chaos.
                         properties:
-                          annotationSelectors:
-                            additionalProperties:
-                              type: string
-                            description: Map of string keys and values that can be
-                              used to select objects. A selector based on annotations.
-                            type: object
                           expressionSelectors:
                             description: a slice of label selector expressions that
                               can be used to select objects. A list of selectors based
@@ -27035,23 +26957,12 @@ spec:
                               - operator
                               type: object
                             type: array
-                          fieldSelectors:
-                            additionalProperties:
-                              type: string
-                            description: Map of string keys and values that can be
-                              used to select objects. A selector based on fields.
-                            type: object
                           labelSelectors:
                             additionalProperties:
                               type: string
                             description: Map of string keys and values that can be
                               used to select objects. A selector based on labels.
                             type: object
-                          names:
-                            description: An array of node names.
-                            items:
-                              type: string
-                            type: array
                         type: object
                       value:
                         description: Value is required when the mode is set to `FixedMode`
@@ -30731,13 +30642,6 @@ spec:
                                   description: Selector is used to select nodes into
                                     which to inject chaos.
                                   properties:
-                                    annotationSelectors:
-                                      additionalProperties:
-                                        type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on annotations.
-                                      type: object
                                     expressionSelectors:
                                       description: a slice of label selector expressions
                                         that can be used to select objects. A list
@@ -30774,13 +30678,6 @@ spec:
                                         - operator
                                         type: object
                                       type: array
-                                    fieldSelectors:
-                                      additionalProperties:
-                                        type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on fields.
-                                      type: object
                                     labelSelectors:
                                       additionalProperties:
                                         type: string
@@ -30788,11 +30685,6 @@ spec:
                                         can be used to select objects. A selector
                                         based on labels.
                                       type: object
-                                    names:
-                                      description: An array of node names.
-                                      items:
-                                        type: string
-                                      type: array
                                   type: object
                                 value:
                                   description: Value is required when the mode is
@@ -34339,13 +34231,6 @@ spec:
                                       description: Selector is used to select nodes
                                         into which to inject chaos.
                                       properties:
-                                        annotationSelectors:
-                                          additionalProperties:
-                                            type: string
-                                          description: Map of string keys and values
-                                            that can be used to select objects. A
-                                            selector based on annotations.
-                                          type: object
                                         expressionSelectors:
                                           description: a slice of label selector expressions
                                             that can be used to select objects. A
@@ -34384,13 +34269,6 @@ spec:
                                             - operator
                                             type: object
                                           type: array
-                                        fieldSelectors:
-                                          additionalProperties:
-                                            type: string
-                                          description: Map of string keys and values
-                                            that can be used to select objects. A
-                                            selector based on fields.
-                                          type: object
                                         labelSelectors:
                                           additionalProperties:
                                             type: string
@@ -34398,11 +34276,6 @@ spec:
                                             that can be used to select objects. A
                                             selector based on labels.
                                           type: object
-                                        names:
-                                          description: An array of node names.
-                                          items:
-                                            type: string
-                                          type: array
                                       type: object
                                     value:
                                       description: Value is required when the mode
@@ -48792,12 +48665,6 @@ spec:
                           description: Selector is used to select nodes into which
                             to inject chaos.
                           properties:
-                            annotationSelectors:
-                              additionalProperties:
-                                type: string
-                              description: Map of string keys and values that can
-                                be used to select objects. A selector based on annotations.
-                              type: object
                             expressionSelectors:
                               description: a slice of label selector expressions that
                                 can be used to select objects. A list of selectors
@@ -48831,23 +48698,12 @@ spec:
                                 - operator
                                 type: object
                               type: array
-                            fieldSelectors:
-                              additionalProperties:
-                                type: string
-                              description: Map of string keys and values that can
-                                be used to select objects. A selector based on fields.
-                              type: object
                             labelSelectors:
                               additionalProperties:
                                 type: string
                               description: Map of string keys and values that can
                                 be used to select objects. A selector based on labels.
                               type: object
-                            names:
-                              description: An array of node names.
-                              items:
-                                type: string
-                              type: array
                           type: object
                         value:
                           description: Value is required when the mode is set to `FixedMode`
@@ -52198,13 +52054,6 @@ spec:
                               description: Selector is used to select nodes into which
                                 to inject chaos.
                               properties:
-                                annotationSelectors:
-                                  additionalProperties:
-                                    type: string
-                                  description: Map of string keys and values that
-                                    can be used to select objects. A selector based
-                                    on annotations.
-                                  type: object
                                 expressionSelectors:
                                   description: a slice of label selector expressions
                                     that can be used to select objects. A list of
@@ -52238,13 +52087,6 @@ spec:
                                     - operator
                                     type: object
                                   type: array
-                                fieldSelectors:
-                                  additionalProperties:
-                                    type: string
-                                  description: Map of string keys and values that
-                                    can be used to select objects. A selector based
-                                    on fields.
-                                  type: object
                                 labelSelectors:
                                   additionalProperties:
                                     type: string
@@ -52252,11 +52094,6 @@ spec:
                                     can be used to select objects. A selector based
                                     on labels.
                                   type: object
-                                names:
-                                  description: An array of node names.
-                                  items:
-                                    type: string
-                                  type: array
                               type: object
                             value:
                               description: Value is required when the mode is set

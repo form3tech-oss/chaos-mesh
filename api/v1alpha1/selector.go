@@ -154,15 +154,6 @@ type NodeSelector struct {
 }
 
 type NodeSelectorSpec struct {
-	// An array of node names.
-	// +optional
-	Names []string `json:"names,omitempty"`
-
-	// Map of string keys and values that can be used to select objects.
-	// A selector based on fields.
-	// +optional
-	FieldSelectors map[string]string `json:"fieldSelectors,omitempty"`
-
 	// Map of string keys and values that can be used to select objects.
 	// A selector based on labels.
 	// +optional
@@ -172,9 +163,4 @@ type NodeSelectorSpec struct {
 	// A list of selectors based on set-based label expressions.
 	// +optional
 	ExpressionSelectors LabelSelectorRequirements `json:"expressionSelectors,omitempty" swaggerignore:"true"`
-
-	// Map of string keys and values that can be used to select objects.
-	// A selector based on annotations.
-	// +optional
-	AnnotationSelectors map[string]string `json:"annotationSelectors,omitempty"`
 }

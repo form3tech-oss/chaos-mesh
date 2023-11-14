@@ -7140,31 +7140,10 @@
         "v1alpha1.NodeSelectorSpec": {
             "type": "object",
             "properties": {
-                "annotationSelectors": {
-                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on annotations.\n+optional",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "fieldSelectors": {
-                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on fields.\n+optional",
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
                 "labelSelectors": {
                     "description": "Map of string keys and values that can be used to select objects.\nA selector based on labels.\n+optional",
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "names": {
-                    "description": "An array of node names.\n+optional",
-                    "type": "array",
-                    "items": {
                         "type": "string"
                     }
                 }
