@@ -145,6 +145,8 @@ spec:
                     - Stop
                     type: string
                 type: object
+              originalObjectValue:
+                type: object
             required:
             - experiment
             type: object
