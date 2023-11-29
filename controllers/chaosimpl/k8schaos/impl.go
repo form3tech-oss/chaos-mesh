@@ -170,18 +170,12 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	existingResource, err := resourceClient.Get(ctx, resource.GetName(), v1.GetOptions{})
 	if err != nil {
 		if apiErrors.IsNotFound(err) {
-			impl.Log.Error(err, "k8schaos: resource not found", "namespace", obj.GetNamespace(), "name", obj.GetName(),
-				"target-namespace", resource.GetNamespace(), "target-name", resource.GetName())
 			return v1alpha1.NotInjected, nil
 		}
-		impl.Log.Error(err, "k8schaos: failed to load resource", "namespace", obj.GetNamespace(), "name", obj.GetName(),
-			"target-namespace", resource.GetNamespace(), "target-name", resource.GetName())
 		return v1alpha1.Injected, err
 	}
 
 	if resMgr := getResourceManager(existingResource); resMgr != managedBy {
-		impl.Log.Error(nil, "k8schaos: resource not managed by chaos mesh", "namespace", obj.GetNamespace(), "name", obj.GetName(),
-			"target-namespace", resource.GetNamespace(), "target-name", resource.GetName(), "managed-by", resMgr)
 		return v1alpha1.Injected, fmt.Errorf("resource is not managed by %s: %s: \"%s\"", managedBy, managedByLabel, resMgr)
 	}
 
