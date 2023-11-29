@@ -76,11 +76,16 @@ type K8SChaosAPIObjects struct {
 
 // K8SChaosStatus defines the observed state of K8SChaos
 type K8SChaosStatus struct {
-	ChaosStatus `json:",inline"`
+	ChaosStatus         `json:",inline"`
+	OriginalObjectValue string `json:"originalObjectValue,omitempty"`
 }
 
 func (obj *K8SChaos) GetSelectorSpecs() map[string]interface{} {
 	return map[string]interface{}{
 		".": obj.Spec.APIObjects,
 	}
+}
+
+func (obj *K8SChaos) GetCustomStatus() interface{} {
+	return &obj.Status.OriginalObjectValue
 }
