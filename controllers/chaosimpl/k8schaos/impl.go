@@ -117,17 +117,17 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		}
 
 		return v1alpha1.Injected, nil
-	} else {
-		if k8schaos.Spec.Update {
-			impl.Log.Info("k8schaos: warning: chaos has update=true but resource not found - creating a new resource instead", "namespace",
-				obj.GetNamespace(), "name", obj.GetName(),
-				"target-namespace", resource.GetNamespace(), "target-name", resource.GetName())
-		}
-
-		impl.Log.Info("k8schaos: creating new resources", "namespace", obj.GetNamespace(), "name", obj.GetName(),
-			"target-namespace", resource.GetNamespace(), "target-name", resource.GetName(), "method", "POST")
-		_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Create(ctx, resource, v1.CreateOptions{})
 	}
+
+	if k8schaos.Spec.Update {
+		impl.Log.Info("k8schaos: warning: chaos has update=true but resource not found - creating a new resource instead", "namespace",
+			obj.GetNamespace(), "name", obj.GetName(),
+			"target-namespace", resource.GetNamespace(), "target-name", resource.GetName())
+	}
+
+	impl.Log.Info("k8schaos: creating new resources", "namespace", obj.GetNamespace(), "name", obj.GetName(),
+		"target-namespace", resource.GetNamespace(), "target-name", resource.GetName(), "method", "POST")
+	_, err = client.Resource(mapping.Resource).Namespace(resource.GetNamespace()).Create(ctx, resource, v1.CreateOptions{})
 
 	if err != nil {
 		impl.Log.Error(err, "k8schaos: failed to create resource", "namespace", obj.GetNamespace(), "name", obj.GetName(),
