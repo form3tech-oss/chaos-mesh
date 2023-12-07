@@ -60,6 +60,7 @@ type InitReconciler struct {
 func (r *InitReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	obj := r.Object.DeepCopyObject().(v1alpha1.InnerObject)
 
+	r.Log.Info("init reconciler -> Reconcile")
 	if err := r.Client.Get(context.TODO(), req.NamespacedName, obj); err != nil {
 		if apierrors.IsNotFound(err) {
 			r.Log.Info("chaos not found")
@@ -89,6 +90,8 @@ type CleanReconciler struct {
 // Reconcile the common chaos to clean the finalizer
 func (r *CleanReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	obj := r.Object.DeepCopyObject().(v1alpha1.InnerObject)
+
+	r.Log.Info("clean reconciler -> Reconcile")
 
 	if err := r.Client.Get(context.TODO(), req.NamespacedName, obj); err != nil {
 		if apierrors.IsNotFound(err) {
