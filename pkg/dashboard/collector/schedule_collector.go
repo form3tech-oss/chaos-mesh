@@ -112,6 +112,8 @@ func (r *ScheduleCollector) setUnarchivedSchedule(req ctrl.Request, schedule v1a
 		archive.Action = ""
 	case v1alpha1.ScheduleTypeDeploymentChaos:
 		archive.Action = ""
+	case v1alpha1.ScheduleTypeRollingRestartChaos:
+		archive.Action = ""
 	default:
 		return errors.New("unsupported chaos type " + string(schedule.Spec.Type))
 	}
