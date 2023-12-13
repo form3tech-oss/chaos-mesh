@@ -17,6 +17,7 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -51,8 +52,13 @@ func (e *httpExecutor) Type() string {
 }
 
 func (e *httpExecutor) Do() (bool, string, error) {
+	transport := http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	client := &http.Client{
-		Timeout: time.Duration(e.timeoutSeconds) * time.Second,
+		Timeout:   time.Duration(e.timeoutSeconds) * time.Second,
+		Transport: &transport,
 	}
 
 	httpStatusCheck := e.httpStatusCheck
