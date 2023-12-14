@@ -10,7 +10,7 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 
 ### Added
 
-- Nothing
+- Support configuration of logging through helm chart / environment (Form3 overlay)
 
 ### Changed
 
@@ -188,7 +188,6 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 - Add [`GreptimeDB`](https://greptime.com) to ADOPTERS.md [#4245](https://github.com/chaos-mesh/chaos-mesh/pull/4245)
 - Support configurable chaos-dns-server pod affinities [#4260](https://github.com/chaos-mesh/chaos-mesh/pull/4260)
 - Add experiment `name`, `namespace` and `kind` to "apply chaos" and "recover chaos" log messages [4278](https://github.com/chaos-mesh/chaos-mesh/pull/4278)
-<<<<<<< HEAD
 - Support for watching remote status of chaos experiments to local [#4188](https://github.com/chaos-mesh/chaos-mesh/pull/4188)
 - Add netem/rate support for NetworkChaos [#4017](https://github.com/chaos-mesh/chaos-mesh/pull/4017)
 - Support for setting `loadBalancerSourceRanges` in chaos-dashboard service in helm chart [#4172](https://github.com/chaos-mesh/chaos-mesh/pull/4172)
@@ -197,10 +196,6 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 - Allow if condition for creating chaos-controller-manager ServiceAccount and allow setting securityContext for chaos-daemon pods [#4390](https://github.com/chaos-mesh/chaos-mesh/pull/4390)
 - Integrate helm-values-schema-json to generate schema for values.yaml [#4435](https://github.com/chaos-mesh/chaos-mesh/pull/4435)
 - Add an option to toggle metric scraping of Chaos Daemon [#4488](https://github.com/chaos-mesh/chaos-mesh/pull/4488)
-=======
-- Support for watch remote chaos experiments to locally chaos  [#4188](https://github.com/chaos-mesh/chaos-mesh/pull/4188)
-- Support configuration of logging through helm chart / environment [#4249](https://github.com/chaos-mesh/chaos-mesh/pull/4249)
->>>>>>> 603e1a0a (feat: allow logger configuration)
 
 ### Changed
 
