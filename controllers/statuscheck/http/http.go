@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -35,14 +33,15 @@ import (
 )
 
 type httpExecutor struct {
-	logger logr.Logger
+	logger   logr.Logger
+	certPool *x509.CertPool
 
 	timeoutSeconds  int
 	httpStatusCheck v1alpha1.HTTPStatusCheck
 }
 
-func NewExecutor(logger logr.Logger, timeoutSeconds int, httpStatusCheck v1alpha1.HTTPStatusCheck) *httpExecutor {
-	return &httpExecutor{logger: logger, timeoutSeconds: timeoutSeconds, httpStatusCheck: httpStatusCheck}
+func NewExecutor(logger logr.Logger, certPool *x509.CertPool, timeoutSeconds int, httpStatusCheck v1alpha1.HTTPStatusCheck) *httpExecutor {
+	return &httpExecutor{logger: logger, certPool: certPool, timeoutSeconds: timeoutSeconds, httpStatusCheck: httpStatusCheck}
 }
 
 type response struct {
@@ -54,68 +53,17 @@ func (e *httpExecutor) Type() string {
 	return "HTTP"
 }
 
-func loadExtraCACerts(caCerts *x509.CertPool) error {
-	extraCAPath, ok := os.LookupEnv("EXTRA_CA_TRUST_PATH")
-	if !ok {
-		return nil
-	}
-
-	secrets, err := os.ReadDir(extraCAPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return errors.Wrap(err, "load extra CA trust certificates")
-	}
-
-	for _, secret := range secrets {
-		certs, err := os.ReadDir(path.Join(extraCAPath, secret.Name()))
-		if err != nil {
-			return errors.Wrapf(err, "read secret %q", secret.Name())
-		}
-
-		for _, cert := range certs {
-			if cert.IsDir() {
-				continue
-			}
-
-			if strings.HasPrefix(cert.Name(), "..") {
-				continue
-			}
-
-			bytes, err := os.ReadFile(path.Join(extraCAPath, secret.Name(), cert.Name()))
-			if err != nil {
-				return errors.Wrapf(err, "read cert %q", cert.Name())
-			}
-
-			ok := caCerts.AppendCertsFromPEM(bytes)
-			if !ok {
-				return errors.Errorf("parse PEM file %q", cert.Name())
-			}
-		}
-	}
-
-	return nil
-}
-
 func (e *httpExecutor) Do() (bool, string, error) {
-	caCerts, _ := x509.SystemCertPool()
-	if caCerts == nil {
-		caCerts = x509.NewCertPool()
-	}
-
-	err := loadExtraCACerts(caCerts)
-	if err != nil {
-		return false, "", errors.Wrap(err, "load extra CA certs")
-	}
-
 	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCerts,
-			},
-		},
 		Timeout: time.Duration(e.timeoutSeconds) * time.Second,
+	}
+
+	if e.certPool != nil {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: e.certPool,
+			},
+		}
 	}
 
 	httpStatusCheck := e.httpStatusCheck
