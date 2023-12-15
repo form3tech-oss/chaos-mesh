@@ -158,7 +158,7 @@ func (in *{{.Type}}) ValidateCreate(ctx context.Context, obj runtime.Object) (ad
 	if !ok {
 		return nil, errors.Errorf("expected type *{{.Type}}, got %T", obj)
 	}
-	{{.Type}}WebhookLog.Info("validate create", "name", typedObj.GetName())
+	{{.Type}}WebhookLog.V(1).Info("validate create", "name", typedObj.GetName())
 
 	return typedObj.Validate()
 }
@@ -175,7 +175,7 @@ func (in *{{.Type}}) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.
 		return nil, errors.Errorf("expected type *{{.Type}}, got %T", newObj)
 	}
 
-	{{.Type}}WebhookLog.Info("validate update", "name", typedOldObj.GetName())
+	{{.Type}}WebhookLog.V(1).Info("validate update", "name", typedOldObj.GetName())
 
 	{{- if not .EnableUpdate}}
 	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
@@ -192,7 +192,7 @@ func (in *{{.Type}}) ValidateDelete(_ context.Context, obj runtime.Object) (admi
 		return nil, errors.Errorf("expected type *{{.Type}}, got %T", obj)
 	}
 
-	{{.Type}}WebhookLog.Info("validate delete", "name", typedObj.GetName())
+	{{.Type}}WebhookLog.V(1).Info("validate delete", "name", typedObj.GetName())
 
 	return nil, nil
 }
