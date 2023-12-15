@@ -34,7 +34,7 @@ var _ webhook.CustomDefaulter = &Schedule{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (in *Schedule) Default(_ context.Context, _ runtime.Object) error {
-	schedulelog.Info("default", "name", in.Name)
+	schedulelog.V(1).Info("default", "name", in.Name)
 	in.Spec.ConcurrencyPolicy.Default()
 	return nil
 }
@@ -54,7 +54,7 @@ func (in *Schedule) ValidateCreate(_ context.Context, obj runtime.Object) (admis
 		return nil, errors.Errorf("expected type *Schedule, got %T", obj)
 	}
 
-	schedulelog.Info("validate create", "name", schedule.Name)
+	schedulelog.V(1).Info("validate create", "name", schedule.Name)
 
 	return in.Validate(schedule)
 }
@@ -66,7 +66,7 @@ func (in *Schedule) ValidateUpdate(_ context.Context, _, newObj runtime.Object) 
 		return nil, errors.Errorf("expected type *Schedule, got %T", newObj)
 	}
 
-	schedulelog.Info("validate update", "name", newSchedule.Name)
+	schedulelog.V(1).Info("validate update", "name", newSchedule.Name)
 
 	return in.Validate(newSchedule)
 }
@@ -78,7 +78,7 @@ func (in *Schedule) ValidateDelete(_ context.Context, obj runtime.Object) (admis
 		return nil, errors.Errorf("expected type *Schedule, got %T", obj)
 	}
 
-	schedulelog.Info("validate delete", "name", schedule.Name)
+	schedulelog.V(1).Info("validate delete", "name", schedule.Name)
 
 	return nil, nil
 }
