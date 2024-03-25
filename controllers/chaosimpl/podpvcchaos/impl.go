@@ -21,12 +21,12 @@ import (
 	"github.com/go-logr/logr"
 	"go.uber.org/fx"
 	v1 "k8s.io/api/core/v1"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	impltypes "github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/podpvc"
-	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 var _ impltypes.ChaosImpl = (*Impl)(nil)
