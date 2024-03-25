@@ -41,15 +41,12 @@ type SelectImpl struct {
 	generic.Option
 }
 
-type PodPVCSpec struct {
+type PodPVCTarget struct {
 	Pod types.NamespacedName
 	PVC types.NamespacedName
-	// Namespace                 string `json:"namespace,omitempty"`
-	// PodName                   string `json:"podName,omitempty"`
-	// PersistentVolumeClaimName string `json:"pvcName,omitempty"`
 }
 
-func (dep *PodPVCSpec) Id() string {
+func (dep *PodPVCTarget) Id() string {
 	b, _ := json.Marshal(dep)
 	return string(b)
 }
@@ -65,9 +62,9 @@ func (pod *Pod) Id() string {
 	}).String()
 }
 
-func (impl *SelectImpl) Select(ctx context.Context, ps *v1alpha1.PodPVCSelector) ([]*PodPVCSpec, error) {
+func (impl *SelectImpl) Select(ctx context.Context, ps *v1alpha1.PodPVCSelector) ([]*PodPVCTarget, error) {
 	if ps == nil {
-		return []*PodPVCSpec{}, nil
+		return []*PodPVCTarget{}, nil
 	}
 
 	pods, err := pod.SelectAndFilterPods(ctx, impl.c, impl.r, &ps.PodSelector, impl.ClusterScoped, impl.TargetNamespace, impl.EnableFilterNamespace)
@@ -75,7 +72,7 @@ func (impl *SelectImpl) Select(ctx context.Context, ps *v1alpha1.PodPVCSelector)
 		return nil, err
 	}
 
-	var result []*PodPVCSpec
+	var result []*PodPVCTarget
 	for _, pod := range pods {
 		spec, err := SelectVolume(ctx, impl.c, impl.r, ps, &pod)
 		if err != nil {
@@ -108,9 +105,9 @@ func New(params Params) *SelectImpl {
 
 // SelectAndFilterPods returns the list of pods that filtered by selector and SelectorMode
 // Deprecated: use pod.SelectImpl as instead
-func SelectVolume(ctx context.Context, c client.Client, r client.Reader, selector *v1alpha1.PodPVCSelector, pod *v1.Pod) (*PodPVCSpec, error) {
+func SelectVolume(ctx context.Context, c client.Client, r client.Reader, selector *v1alpha1.PodPVCSelector, pod *v1.Pod) (*PodPVCTarget, error) {
 
-	spec := &PodPVCSpec{Pod: types.NamespacedName{Namespace: pod.Namespace, Name: pod.Name}}
+	spec := &PodPVCTarget{Pod: types.NamespacedName{Namespace: pod.Namespace, Name: pod.Name}}
 	for _, v := range pod.Spec.Volumes {
 		if v.Name == selector.VolumeName {
 			spec.PVC = types.NamespacedName{Namespace: pod.Namespace, Name: v.PersistentVolumeClaim.ClaimName}

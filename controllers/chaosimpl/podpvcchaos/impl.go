@@ -26,6 +26,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	impltypes "github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/podpvc"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
 var _ impltypes.ChaosImpl = (*Impl)(nil)
@@ -40,28 +41,31 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	chaos := obj.(*v1alpha1.PodPVCChaos)
 
-	var spec podpvc.PodPVCSpec
-	if err := json.Unmarshal([]byte(records[index].Id), &spec); err != nil {
+	var target podpvc.PodPVCTarget
+	if err := json.Unmarshal([]byte(records[index].Id), &target); err != nil {
 		return v1alpha1.NotInjected, err
 	}
 
 	var pvc v1.PersistentVolumeClaim
-	err := impl.Get(ctx, spec.PVC, &pvc)
+	err := impl.Get(ctx, target.PVC, &pvc)
 	if err != nil {
-		// TODO: handle this error
+		if apiErrors.IsNotFound(err) {
+			return v1alpha1.Injected, nil
+		}
 		return v1alpha1.NotInjected, err
 	}
 
 	err = impl.Delete(ctx, &pvc, &client.DeleteOptions{})
 	if err != nil {
-		// TODO: handle this error
 		return v1alpha1.NotInjected, err
 	}
 
 	var pod v1.Pod
-	err = impl.Get(ctx, spec.Pod, &pod)
+	err = impl.Get(ctx, target.Pod, &pod)
 	if err != nil {
-		// TODO: handle this error
+		if apiErrors.IsNotFound(err) {
+			return v1alpha1.Injected, nil
+		}
 		return v1alpha1.NotInjected, err
 	}
 
@@ -69,7 +73,6 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		GracePeriodSeconds: &chaos.Spec.GracePeriod, // PeriodSeconds has to be set specifically
 	})
 	if err != nil {
-		// TODO: handle this error
 		return v1alpha1.NotInjected, err
 	}
 
