@@ -762,6 +762,7 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  PodPVCChaos: {},
   // ResourceScaleChaos
   ResourceScaleChaos: {
     spec: {
