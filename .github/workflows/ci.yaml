@@ -24,7 +24,7 @@ jobs:
 
   build-targets:
     needs: [changed-files, calculate-tag]
-    if: needs.changed-files.outputs.only_changed == 'false'
+    #if: needs.changed-files.outputs.only_changed == 'false'
     uses: ./.github/workflows/build_targets.yaml
     with:
       tag: ${{needs.calculate-tag.outputs.tag }}
