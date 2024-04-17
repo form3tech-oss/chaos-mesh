@@ -139,7 +139,6 @@ def main():
             pass_env_to_build_arg(cmd, env_key)
 
         target_platform = utils.get_target_platform()
-        cmd += ["--build-arg", f"TARGET_PLATFORM={target_platform}"]
         cmd += ["-t", image_full_name, args.path[0]]
     else:
         cmd = ["docker", "pull", image_full_name]
