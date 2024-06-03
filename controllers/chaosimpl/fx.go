@@ -23,6 +23,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/blockchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/certificatechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/ciliumchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackhost"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/dnschaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/gcpchaos"
@@ -59,6 +60,7 @@ var AllImpl = fx.Options(
 	physicalmachinechaos.Module,
 	blockchaos.Module,
 	cloudstackvm.Module,
+	cloudstackhost.Module,
 	k8schaos.Module,
 	resourcescalechaos.Module,
 	rollingrestartchaos.Module,

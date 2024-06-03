@@ -63,6 +63,14 @@ func TestChaosKindMapShouldContainsCiliumChaos(t *testing.T) {
 	_, ok := all.kinds[string(requiredType)]
 	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
 }
+func TestChaosKindMapShouldContainsCloudStackHostChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+	var requiredType TemplateType
+	requiredType = TypeCloudStackHostChaos
+
+	_, ok := all.kinds[string(requiredType)]
+	g.Expect(ok).To(Equal(true), "all kinds map should contains this type", requiredType)
+}
 func TestChaosKindMapShouldContainsCloudStackVMChaos(t *testing.T) {
 	g := NewGomegaWithT(t)
 	var requiredType TemplateType

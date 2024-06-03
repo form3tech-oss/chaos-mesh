@@ -1093,7 +1093,7 @@ rules:
       - ""
     resources:
       - persistentvolumeclaims
-    verbs:
+    verbs: 
       - get
       - list
       - delete
@@ -2662,6 +2662,27 @@ webhooks:
       service:
         name: chaos-mesh-controller-manager
         namespace: "chaos-mesh"
+        path: /mutate-chaos-mesh-org-v1alpha1-cloudstackhostchaos
+    failurePolicy: Fail
+    name: mcloudstackhostchaos.kb.io
+    timeoutSeconds: 5
+    sideEffects: None
+    admissionReviewVersions: ["v1", "v1beta1"]
+    rules:
+      - apiGroups:
+          - chaos-mesh.org
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - cloudstackhostchaos
+  - clientConfig:
+      caBundle: "${CA_BUNDLE}"
+      service:
+        name: chaos-mesh-controller-manager
+        namespace: "chaos-mesh"
         path: /mutate-chaos-mesh-org-v1alpha1-ciliumchaos
     failurePolicy: Fail
     name: mciliumchaos.kb.io
@@ -3125,6 +3146,27 @@ webhooks:
           - UPDATE
         resources:
           - cloudstackvmchaos
+  - clientConfig:
+      caBundle: "${CA_BUNDLE}"
+      service:
+        name: chaos-mesh-controller-manager
+        namespace: "chaos-mesh"
+        path: /validate-chaos-mesh-org-v1alpha1-cloudstackhostchaos
+    failurePolicy: Fail
+    name: vcloudstackhostchaos.kb.io
+    timeoutSeconds: 5
+    sideEffects: None
+    admissionReviewVersions: ["v1", "v1beta1"]
+    rules:
+      - apiGroups:
+          - chaos-mesh.org
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - cloudstackhostchaos
   - clientConfig:
       caBundle: "${CA_BUNDLE}"
       service:

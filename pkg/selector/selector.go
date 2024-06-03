@@ -25,6 +25,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/certificate"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackhost"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackvm"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
@@ -84,6 +85,7 @@ type SelectorParams struct {
 	NodeVolumePath          *nodevolumepath.SelectImpl
 	NodeSelector            *node.SelectImpl
 	CloudStackVMSelector    *cloudstackvm.SelectImpl
+	CloudStackHostSelector  *cloudstackhost.SelectImpl
 	K8SChaosSelector        *k8schaos.SelectImpl
 	ResourceScaleSelector   *resourcescale.SelectImpl
 	RollingRestartSelector  *rollingrestart.SelectImpl
@@ -120,6 +122,7 @@ var Module = fx.Provide(
 	nodevolumepath.New,
 	node.New,
 	cloudstackvm.New,
+	cloudstackhost.New,
 	k8schaos.New,
 	resourcescale.New,
 	rollingrestart.New,

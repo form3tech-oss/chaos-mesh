@@ -48,20 +48,15 @@ type CertificateChaosSpec struct {
 	// Duration represents the duration of the chaos action.
 	// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 	// +optional
-	// +kubebuilder:default="90m"
 	Duration *string `json:"duration,omitempty" webhook:"Duration"`
 
 	// CertificateExpiry represents the expiry period for the requested certificate.
 	// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	// +optional
-	// +kubebuilder:default="1h"
-	CertificateExpiry *metav1.Duration `json:"certificateExpiry,omitempty"`
+	CertificateExpiry *metav1.Duration `json:"certificateExpiry"`
 
 	// RenewBefore represents when the cert-manager should rotate the certificate.
 	// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	// +optional
-	// +kubebuilder:default="30m"
-	RenewBefore *metav1.Duration `json:"renewBefore,omitempty"`
+	RenewBefore *metav1.Duration `json:"renewBefore"`
 
 	// RemoteCluster represents the remote cluster where the chaos will be deployed
 	// +optional
