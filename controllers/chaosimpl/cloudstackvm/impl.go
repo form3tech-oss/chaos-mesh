@@ -20,6 +20,7 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	"github.com/chaos-mesh/chaos-mesh/controllers/action"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/hoststop"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/vmrestart"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/vmstop"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
@@ -30,6 +31,8 @@ type Impl struct {
 
 	VMStop    *vmstop.Impl    `action:"vm-stop"`
 	VMRestart *vmrestart.Impl `action:"vm-restart"`
+
+	HostStop *hoststop.Impl `action:"host-stop"`
 }
 
 func NewImpl(impl Impl) *types.ChaosImplPair {
@@ -48,4 +51,5 @@ var Module = fx.Provide(
 	},
 	vmstop.NewImpl,
 	vmrestart.NewImpl,
+	hoststop.NewImpl,
 )

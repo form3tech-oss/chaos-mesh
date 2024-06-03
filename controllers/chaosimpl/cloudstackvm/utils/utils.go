@@ -159,3 +159,33 @@ func SelectorToListParams(s *v1alpha1.CloudStackVMChaosSelector) *cloudstack.Lis
 
 	return params
 }
+
+func SelectorToHostListParams(s *v1alpha1.CloudStackVMChaosSelector) *cloudstack.ListHostsParams {
+	params := &cloudstack.ListHostsParams{}
+
+	if s.Hypervisor != nil {
+		params.SetHypervisor(*s.Hypervisor)
+	}
+
+	if s.ID != nil {
+		params.SetId(*s.ID)
+	}
+
+	if s.Keyword != nil {
+		params.SetKeyword(*s.Keyword)
+	}
+
+	if s.Name != nil {
+		params.SetName(*s.Name)
+	}
+
+	if s.State != nil {
+		params.SetState(*s.State)
+	}
+
+	if s.ZoneID != nil {
+		params.SetZoneid(*s.ZoneID)
+	}
+
+	return params
+}
