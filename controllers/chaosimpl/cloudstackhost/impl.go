@@ -13,30 +13,28 @@
 // limitations under the License.
 //
 
-package cloudstackvm
+package cloudstackhost
 
 import (
 	"go.uber.org/fx"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	"github.com/chaos-mesh/chaos-mesh/controllers/action"
-	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/vmrestart"
-	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/vmstop"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackhost/hoststop"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
 )
 
 type Impl struct {
 	fx.In
 
-	VMStop    *vmstop.Impl    `action:"vm-stop"`
-	VMRestart *vmrestart.Impl `action:"vm-restart"`
+	HostStop *hoststop.Impl `action:"host-stop"`
 }
 
 func NewImpl(impl Impl) *types.ChaosImplPair {
 	delegate := action.NewMultiplexer(&impl)
 	return &types.ChaosImplPair{
-		Name:   "cloudstackvmchaos",
-		Object: &v1alpha1.CloudStackVMChaos{},
+		Name:   "cloudstackhostchaos",
+		Object: &v1alpha1.CloudStackHostChaos{},
 		Impl:   &delegate,
 	}
 }
@@ -46,6 +44,5 @@ var Module = fx.Provide(
 		Group:  "impl",
 		Target: NewImpl,
 	},
-	vmstop.NewImpl,
-	vmrestart.NewImpl,
+	hoststop.NewImpl,
 )

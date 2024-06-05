@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
-	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm/utils"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackhost/utils"
 )
 
 type Impl struct {
@@ -47,7 +47,7 @@ const (
 )
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	cloudstackchaos := obj.(*v1alpha1.CloudStackVMChaos)
+	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
 	spec := cloudstackchaos.Spec
 
 	client, err := utils.GetCloudStackClient(ctx, impl.Client, cloudstackchaos)
@@ -55,7 +55,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("creating cloudstack api client: %w", err)
 	}
 
-	var selector v1alpha1.CloudStackVMChaosSelector
+	var selector v1alpha1.CloudStackHostChaosSelector
 	if err := json.Unmarshal([]byte(records[index].Id), &selector); err != nil {
 		return v1alpha1.NotInjected, fmt.Errorf("decoding selector: %w", err)
 	}
@@ -90,7 +90,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 }
 
 func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	cloudstackchaos := obj.(*v1alpha1.CloudStackVMChaos)
+	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
 	spec := cloudstackchaos.Spec
 
 	client, err := utils.GetCloudStackClient(ctx, impl.Client, cloudstackchaos)
@@ -98,12 +98,12 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("creating cloudstack api client: %w", err)
 	}
 
-	var selector v1alpha1.CloudStackVMChaosSelector
+	var selector v1alpha1.CloudStackHostChaosSelector
 	if err := json.Unmarshal([]byte(records[index].Id), &selector); err != nil {
 		return v1alpha1.Injected, fmt.Errorf("decoding selector: %w", err)
 	}
 
-	params := utils.SelectorToHostListParams(&selector)
+	params := utils.SelectorToListParams(&selector)
 	params.SetOutofbandmanagementenabled(true)
 	params.SetOutofbandmanagementpowerstate("Off")
 

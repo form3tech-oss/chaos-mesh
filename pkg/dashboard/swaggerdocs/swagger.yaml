@@ -3888,6 +3888,9 @@ definitions:
       ciliumChaos:
         $ref: '#/definitions/v1alpha1.CiliumChaosSpec'
         description: +optional
+      cloudstackhostChaos:
+        $ref: '#/definitions/v1alpha1.CloudStackHostChaosSpec'
+        description: +optional
       cloudstackvmChaos:
         $ref: '#/definitions/v1alpha1.CloudStackVMChaosSpec'
         description: +optional
@@ -4050,6 +4053,72 @@ definitions:
           VerifySSL defines whether certificates should be verified when connecting to the API.
           +optional
         type: boolean
+    type: object
+  v1alpha1.CloudStackHostChaosSelector:
+    properties:
+      clusterId:
+        description: |-
+          ClusterID defines the cluster the host belongs to.
+          +optional
+        type: string
+      hypervisor:
+        description: |-
+          Hypervisor defines the target hypervisor.
+          +optional
+        type: string
+      id:
+        description: |-
+          ID defines the ID of the host.
+          +optional
+        type: string
+      keyword:
+        description: |-
+          Keyword defines the keyword to list the VMs by.
+          +optional
+        type: string
+      name:
+        description: |-
+          Name defines the name of the host
+          +optiional
+        type: string
+      zoneId:
+        description: |-
+          ZoneID defines the availability zone the host belongs to.
+          +optional
+        type: string
+    type: object
+  v1alpha1.CloudStackHostChaosSpec:
+    properties:
+      action:
+        description: |-
+          Action defines the specific cloudstack chaos action.
+          Supported action: host-stop
+          Default action: host-stop
+          +kubebuilder:validation:Enum=host-stop
+        type: string
+      apiConfig:
+        $ref: '#/definitions/v1alpha1.CloudStackAPIConfig'
+        description: APIConfig defines the configuration ncessary to connect to the
+          CloudStack API.
+      dryRun:
+        description: |-
+          DryRun defines whether the chaos should run a dry-run mode.
+          +optional
+        type: boolean
+      duration:
+        description: |-
+          Duration represents the duration of the chaos action.
+          +optional
+        type: string
+      remoteCluster:
+        description: |-
+          RemoteCluster represents the remote cluster where the chaos will be deployed
+          +optional
+        type: string
+      selector:
+        $ref: '#/definitions/v1alpha1.CloudStackHostChaosSelector'
+        description: Selector defines the parameters that can be used to select target
+          VMs.
     type: object
   v1alpha1.CloudStackVMChaosSelector:
     properties:
@@ -6601,6 +6670,9 @@ definitions:
       ciliumChaos:
         $ref: '#/definitions/v1alpha1.CiliumChaosSpec'
         description: +optional
+      cloudstackhostChaos:
+        $ref: '#/definitions/v1alpha1.CloudStackHostChaosSpec'
+        description: +optional
       cloudstackvmChaos:
         $ref: '#/definitions/v1alpha1.CloudStackVMChaosSpec'
         description: +optional
@@ -7018,6 +7090,9 @@ definitions:
         type: array
       ciliumChaos:
         $ref: '#/definitions/v1alpha1.CiliumChaosSpec'
+        description: +optional
+      cloudstackhostChaos:
+        $ref: '#/definitions/v1alpha1.CloudStackHostChaosSpec'
         description: +optional
       cloudstackvmChaos:
         $ref: '#/definitions/v1alpha1.CloudStackVMChaosSpec'
