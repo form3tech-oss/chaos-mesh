@@ -60,7 +60,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.NotInjected, fmt.Errorf("decoding selector: %w", err)
 	}
 
-	params := utils.SelectorToHostListParams(&selector)
+	params := utils.SelectorToListParams(&selector)
 	params.SetOutofbandmanagementenabled(true)
 	params.SetOutofbandmanagementpowerstate("On")
 
