@@ -1090,7 +1090,7 @@ rules:
       - ""
     resources:
       - persistentvolumeclaims
-    verbs:
+    verbs: 
       - get
       - list
       - delete
@@ -1290,7 +1290,7 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: chaos-mesh-chaos-dns-server-target-namespace
-  namespace:
+  namespace: 
   labels:
     app.kubernetes.io/name: chaos-mesh
     app.kubernetes.io/instance: chaos-mesh
@@ -1661,7 +1661,7 @@ spec:
               containerPort: 31766
       volumes:
         - name: socket-path
-          hostPath:
+          hostPath: 
             path: ${socketDir}
         - name: sys-path
           hostPath:
@@ -1994,7 +1994,7 @@ spec:
                   - chaos-dns-server
               topologyKey: kubernetes.io/hostname
             weight: 100
-      priorityClassName:
+      priorityClassName: 
       containers:
       - name: chaos-dns-server
         image: ghcr.io/chaos-mesh/chaos-coredns:v0.2.6
@@ -2632,9 +2632,9 @@ webhooks:
       service:
         name: chaos-mesh-controller-manager
         namespace: "chaos-mesh"
-        path: /validate-chaos-mesh-org-v1alpha1-cloudstackhostchaos
+        path: /mutate-chaos-mesh-org-v1alpha1-cloudstackhostchaos
     failurePolicy: Fail
-    name: vcloudstackhostchaos.kb.io
+    name: mcloudstackhostchaos.kb.io
     timeoutSeconds: 5
     sideEffects: None
     admissionReviewVersions: ["v1", "v1beta1"]
