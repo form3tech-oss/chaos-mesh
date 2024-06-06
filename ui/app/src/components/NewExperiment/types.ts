@@ -180,6 +180,7 @@ export interface ExperimentType {
   AWSChaos: AWS
   AzureChaos?: unknown
   CiliumChaos?: unknown
+  CloudStackHostChaos?: unknown
   CloudStackVMChaos?: unknown
   DNSChaos: DNS
   GCPChaos: GCP
