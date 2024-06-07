@@ -192,6 +192,8 @@ func convertInnerObjectToExperiment(obj v1alpha1.InnerObject) (*core.Experiment,
 		archive.Action = ""
 	case *v1alpha1.CloudStackVMChaos:
 		archive.Action = ""
+	case *v1alpha1.CloudStackHostChaos:
+		archive.Action = ""
 	case *v1alpha1.K8SChaos:
 		archive.Action = ""
 	case *v1alpha1.ResourceScaleChaos:

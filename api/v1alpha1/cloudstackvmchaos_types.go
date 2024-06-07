@@ -80,26 +80,6 @@ type CloudStackVMChaosSpec struct {
 	RemoteCluster string `json:"remoteCluster,omitempty"`
 }
 
-type CloudStackAPIConfig struct {
-	// Address defines the address of the CloudStack instsance.
-	Address string `json:"address"`
-
-	// VerifySSL defines whether certificates should be verified when connecting to the API.
-	// +optional
-	VerifySSL bool `json:"verifySSL,omitempty"`
-
-	// SecretName defines the name of the secret where the API credentials are stored.
-	SecretName string `json:"secretName"`
-
-	// APIKeyField defines the key under which the value for API key is stored inside the secret.
-	// +optional
-	APIKeyField string `json:"apiKeyField,omitempty" default:"api-key"`
-
-	// APISecretField defines the key under which the value for API secret is stored inside the secret.
-	// +optional
-	APISecretField string `json:"apiSecretField,omitempty" default:"api-secret"`
-}
-
 // CloudStackVMChaosStatus represents the status of a CloudStackChaos.
 type CloudStackVMChaosStatus struct {
 	ChaosStatus `json:",inline"`

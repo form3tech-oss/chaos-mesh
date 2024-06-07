@@ -402,6 +402,87 @@ spec:
                       - mode
                       - selector
                       type: object
+                    cloudstackhostChaos:
+                      description: CloudStackHostChaosSpec is the content of the specification
+                        for a CloudStackChaos.
+                      properties:
+                        action:
+                          description: 'Action defines the specific cloudstack chaos
+                            action. Supported action: host-stop Default action: host-stop'
+                          enum:
+                          - host-stop
+                          type: string
+                        apiConfig:
+                          description: APIConfig defines the configuration ncessary
+                            to connect to the CloudStack API.
+                          properties:
+                            address:
+                              description: Address defines the address of the CloudStack
+                                instsance.
+                              type: string
+                            apiKeyField:
+                              description: APIKeyField defines the key under which
+                                the value for API key is stored inside the secret.
+                              type: string
+                            apiSecretField:
+                              description: APISecretField defines the key under which
+                                the value for API secret is stored inside the secret.
+                              type: string
+                            secretName:
+                              description: SecretName defines the name of the secret
+                                where the API credentials are stored.
+                              type: string
+                            verifySSL:
+                              description: VerifySSL defines whether certificates
+                                should be verified when connecting to the API.
+                              type: boolean
+                          required:
+                          - address
+                          - secretName
+                          type: object
+                        dryRun:
+                          description: DryRun defines whether the chaos should run
+                            a dry-run mode.
+                          type: boolean
+                        duration:
+                          description: Duration represents the duration of the chaos
+                            action.
+                          type: string
+                        remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
+                          type: string
+                        selector:
+                          description: Selector defines the parameters that can be
+                            used to select target VMs.
+                          properties:
+                            clusterId:
+                              description: ClusterID defines the cluster the host
+                                belongs to.
+                              type: string
+                            hypervisor:
+                              description: Hypervisor defines the target hypervisor.
+                              type: string
+                            id:
+                              description: ID defines the ID of the host.
+                              type: string
+                            keyword:
+                              description: Keyword defines the keyword to list the
+                                VMs by.
+                              type: string
+                            name:
+                              description: Name defines the name of the host
+                              type: string
+                            zoneId:
+                              description: ZoneID defines the availability zone the
+                                host belongs to.
+                              type: string
+                          type: object
+                      required:
+                      - action
+                      - apiConfig
+                      - selector
+                      type: object
                     cloudstackvmChaos:
                       description: CloudStackVMChaosSpec is the content of the specification
                         for a CloudStackChaos.
@@ -3909,6 +3990,89 @@ spec:
                           required:
                           - ciliumPodSelector
                           - mode
+                          - selector
+                          type: object
+                        cloudstackhostChaos:
+                          description: CloudStackHostChaosSpec is the content of the
+                            specification for a CloudStackChaos.
+                          properties:
+                            action:
+                              description: 'Action defines the specific cloudstack
+                                chaos action. Supported action: host-stop Default
+                                action: host-stop'
+                              enum:
+                              - host-stop
+                              type: string
+                            apiConfig:
+                              description: APIConfig defines the configuration ncessary
+                                to connect to the CloudStack API.
+                              properties:
+                                address:
+                                  description: Address defines the address of the
+                                    CloudStack instsance.
+                                  type: string
+                                apiKeyField:
+                                  description: APIKeyField defines the key under which
+                                    the value for API key is stored inside the secret.
+                                  type: string
+                                apiSecretField:
+                                  description: APISecretField defines the key under
+                                    which the value for API secret is stored inside
+                                    the secret.
+                                  type: string
+                                secretName:
+                                  description: SecretName defines the name of the
+                                    secret where the API credentials are stored.
+                                  type: string
+                                verifySSL:
+                                  description: VerifySSL defines whether certificates
+                                    should be verified when connecting to the API.
+                                  type: boolean
+                              required:
+                              - address
+                              - secretName
+                              type: object
+                            dryRun:
+                              description: DryRun defines whether the chaos should
+                                run a dry-run mode.
+                              type: boolean
+                            duration:
+                              description: Duration represents the duration of the
+                                chaos action.
+                              type: string
+                            remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
+                              type: string
+                            selector:
+                              description: Selector defines the parameters that can
+                                be used to select target VMs.
+                              properties:
+                                clusterId:
+                                  description: ClusterID defines the cluster the host
+                                    belongs to.
+                                  type: string
+                                hypervisor:
+                                  description: Hypervisor defines the target hypervisor.
+                                  type: string
+                                id:
+                                  description: ID defines the ID of the host.
+                                  type: string
+                                keyword:
+                                  description: Keyword defines the keyword to list
+                                    the VMs by.
+                                  type: string
+                                name:
+                                  description: Name defines the name of the host
+                                  type: string
+                                zoneId:
+                                  description: ZoneID defines the availability zone
+                                    the host belongs to.
+                                  type: string
+                              type: object
+                          required:
+                          - action
+                          - apiConfig
                           - selector
                           type: object
                         cloudstackvmChaos:

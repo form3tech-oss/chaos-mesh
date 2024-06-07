@@ -584,6 +584,7 @@ webhook:
     - statuscheck
     - remotecluster
     - cloudstackvmchaos
+    - cloudstackhostchaos
     - ciliumchaos
 
 bpfki:
