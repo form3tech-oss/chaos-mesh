@@ -12,7 +12,7 @@ spec:
     listKind: CloudStackHostChaosList
     plural: cloudstackhostchaos
     shortNames:
-    - csvm
+    - csh
     singular: cloudstackhostchaos
   scope: Namespaced
   versions:
