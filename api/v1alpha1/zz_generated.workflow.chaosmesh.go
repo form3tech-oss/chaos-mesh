@@ -27,6 +27,7 @@ const (
 	TypeAWSChaos TemplateType = "AWSChaos"
 	TypeAzureChaos TemplateType = "AzureChaos"
 	TypeBlockChaos TemplateType = "BlockChaos"
+	TypeCertificateChaos TemplateType = "CertificateChaos"
 	TypeCiliumChaos TemplateType = "CiliumChaos"
 	TypeCloudStackVMChaos TemplateType = "CloudStackVMChaos"
 	TypeDNSChaos TemplateType = "DNSChaos"
@@ -52,6 +53,7 @@ var allChaosTemplateType = []TemplateType{
 	TypeAWSChaos,
 	TypeAzureChaos,
 	TypeBlockChaos,
+	TypeCertificateChaos,
 	TypeCiliumChaos,
 	TypeCloudStackVMChaos,
 	TypeDNSChaos,
@@ -79,6 +81,8 @@ type EmbedChaos struct {
 	AzureChaos *AzureChaosSpec `json:"azureChaos,omitempty"`
 	// +optional
 	BlockChaos *BlockChaosSpec `json:"blockChaos,omitempty"`
+	// +optional
+	CertificateChaos *CertificateChaosSpec `json:"certificateChaos,omitempty"`
 	// +optional
 	CiliumChaos *CiliumChaosSpec `json:"ciliumChaos,omitempty"`
 	// +optional
@@ -129,6 +133,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeBlockChaos:
 		result := BlockChaos{}
 		result.Spec = *it.BlockChaos
+		return &result, nil
+	case TypeCertificateChaos:
+		result := CertificateChaos{}
+		result.Spec = *it.CertificateChaos
 		return &result, nil
 	case TypeCiliumChaos:
 		result := CiliumChaos{}
@@ -215,6 +223,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *BlockChaos:
 		*it.BlockChaos = chaos.Spec
 		return nil
+	case *CertificateChaos:
+		*it.CertificateChaos = chaos.Spec
+		return nil
 	case *CiliumChaos:
 		*it.CiliumChaos = chaos.Spec
 		return nil
@@ -282,6 +293,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeBlockChaos:
 		result := BlockChaosList{}
+		return &result, nil
+	case TypeCertificateChaos:
+		result := CertificateChaosList{}
 		return &result, nil
 	case TypeCiliumChaos:
 		result := CiliumChaosList{}
@@ -357,6 +371,14 @@ func (in *AzureChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *BlockChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *CertificateChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item
