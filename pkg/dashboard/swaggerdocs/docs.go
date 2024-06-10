@@ -3452,6 +3452,14 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.Duration": {
+            "type": "object",
+            "properties": {
+                "time.Duration": {
+                    "type": "integer"
+                }
+            }
+        },
         "v1.EmptyDirVolumeSource": {
             "type": "object",
             "properties": {
@@ -5126,6 +5134,55 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.CertificateChaosSpec": {
+            "type": "object",
+            "properties": {
+                "annotationSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on annotations.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "certificateExpiry": {
+                    "description": "CertificateExpiry represents the expiry period for the requested certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"1h\"",
+                    "$ref": "#/definitions/v1.Duration"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"90m\"",
+                    "type": "string"
+                },
+                "fieldSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on fields.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "labelSelectors": {
+                    "description": "Map of string keys and values that can be used to select objects.\nA selector based on labels.\n+optional",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "namespaces": {
+                    "description": "Namespaces is a set of namespace to which objects belong.\n+optional",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "renewBefore": {
+                    "description": "RenewBefore represents when the cert-manager should rotate the certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"30m\"",
+                    "$ref": "#/definitions/v1.Duration"
+                }
+            }
+        },
         "v1alpha1.ChaosOnlyScheduleSpec": {
             "type": "object",
             "properties": {
@@ -5141,6 +5198,21 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.BlockChaosSpec"
                 },
+<<<<<<< HEAD
+=======
+                "certificateChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CertificateChaosSpec"
+                },
+                "ciliumChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CiliumChaosSpec"
+                },
+                "cloudstackvmChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CloudStackVMChaosSpec"
+                },
+>>>>>>> c1f233f8 (feat: Certificate Chaos)
                 "concurrencyPolicy": {
                     "description": "+optional\n+kubebuilder:validation:Enum=Forbid;Allow",
                     "type": "string"
@@ -7327,6 +7399,21 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.BlockChaosSpec"
                 },
+<<<<<<< HEAD
+=======
+                "certificateChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CertificateChaosSpec"
+                },
+                "ciliumChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CiliumChaosSpec"
+                },
+                "cloudstackvmChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CloudStackVMChaosSpec"
+                },
+>>>>>>> c1f233f8 (feat: Certificate Chaos)
                 "concurrencyPolicy": {
                     "description": "+optional\n+kubebuilder:default=Forbid\n+kubebuilder:validation:Enum=Forbid;Allow",
                     "type": "string"
@@ -7616,6 +7703,10 @@ const docTemplate = `{
                 "blockChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.BlockChaosSpec"
+                },
+                "certificateChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CertificateChaosSpec"
                 },
                 "children": {
                     "description": "Children describes the children steps of serial or parallel node. Only used when Type is TypeSerial or TypeParallel.\n+optional",

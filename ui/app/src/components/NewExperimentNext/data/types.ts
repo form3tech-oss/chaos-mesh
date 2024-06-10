@@ -369,6 +369,7 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  CertificateChaos: {},
   // DNS Fault
   DNSChaos: {
     categories: [
