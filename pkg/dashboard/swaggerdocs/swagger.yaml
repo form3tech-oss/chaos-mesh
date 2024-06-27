@@ -1114,6 +1114,11 @@ definitions:
           $ref: '#/definitions/v1.DownwardAPIVolumeFile'
         type: array
     type: object
+  v1.Duration:
+    properties:
+      time.Duration:
+        type: integer
+    type: object
   v1.EmptyDirVolumeSource:
     properties:
       medium:
@@ -3874,6 +3879,66 @@ definitions:
           +kubebuilder:validation:Maximum=8192
         type: integer
     type: object
+  v1alpha1.CertificateChaosSpec:
+    properties:
+      annotationSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on annotations.
+          +optional
+        type: object
+      certificateExpiry:
+        $ref: '#/definitions/v1.Duration'
+        description: |-
+          CertificateExpiry represents the expiry period for the requested certificate.
+          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          +optional
+          +kubebuilder:default="1h"
+      duration:
+        description: |-
+          Duration represents the duration of the chaos action.
+          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          +optional
+          +kubebuilder:default="90m"
+        type: string
+      fieldSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on fields.
+          +optional
+        type: object
+      labelSelectors:
+        additionalProperties:
+          type: string
+        description: |-
+          Map of string keys and values that can be used to select objects.
+          A selector based on labels.
+          +optional
+        type: object
+      namespaces:
+        description: |-
+          Namespaces is a set of namespace to which objects belong.
+          +optional
+        items:
+          type: string
+        type: array
+      remoteCluster:
+        description: |-
+          RemoteCluster represents the remote cluster where the chaos will be deployed
+          +optional
+        type: string
+      renewBefore:
+        $ref: '#/definitions/v1.Duration'
+        description: |-
+          RenewBefore represents when the cert-manager should rotate the certificate.
+          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          +optional
+          +kubebuilder:default="30m"
+    type: object
   v1alpha1.ChaosOnlyScheduleSpec:
     properties:
       awsChaos:
@@ -3884,6 +3949,9 @@ definitions:
         description: +optional
       blockChaos:
         $ref: '#/definitions/v1alpha1.BlockChaosSpec'
+        description: +optional
+      certificateChaos:
+        $ref: '#/definitions/v1alpha1.CertificateChaosSpec'
         description: +optional
       ciliumChaos:
         $ref: '#/definitions/v1alpha1.CiliumChaosSpec'
@@ -6598,6 +6666,9 @@ definitions:
       blockChaos:
         $ref: '#/definitions/v1alpha1.BlockChaosSpec'
         description: +optional
+      certificateChaos:
+        $ref: '#/definitions/v1alpha1.CertificateChaosSpec'
+        description: +optional
       ciliumChaos:
         $ref: '#/definitions/v1alpha1.CiliumChaosSpec'
         description: +optional
@@ -7008,6 +7079,9 @@ definitions:
         description: +optional
       blockChaos:
         $ref: '#/definitions/v1alpha1.BlockChaosSpec'
+        description: +optional
+      certificateChaos:
+        $ref: '#/definitions/v1alpha1.CertificateChaosSpec'
         description: +optional
       children:
         description: |-
