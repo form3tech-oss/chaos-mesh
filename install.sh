@@ -1074,6 +1074,9 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "pods", "configmaps", "secrets"]
     verbs: [ "get", "list", "watch", "delete", "update", "patch" ]
+  - apiGroups: [ "apps" ]
+    resources: [ "replicasets", "deployments", "daemonsets", "statefulsets"]
+    verbs: [ "get", "watch", "list", "patch" ]
   - apiGroups:
       - ""
     resources:
@@ -1086,6 +1089,33 @@ rules:
       - "pods/log"
     verbs:
       - "get"
+  - apiGroups:
+      - ""
+    resources:
+      - certificates
+    verbs:
+      - get
+      - patch
+      - list
+      - watch
+  - apiGroups:
+      - "helm.toolkit.fluxcd.io"
+    resources:
+      - helmreleases
+    verbs:
+      - get
+      - patch
+      - list
+      - watch
+  - apiGroups:
+      - "kustomize.toolkit.fluxcd.io"
+    resources:
+      - kustomizations
+    verbs:
+      - get
+      - patch
+      - list
+      - watch
   - apiGroups:
       - ""
     resources:
