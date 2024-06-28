@@ -38,10 +38,10 @@ ARG TARGET_PLATFORM=amd64
 
 # The architecture part of the url is `aarch_64` or `x86_64`
 RUN case "$TARGET_PLATFORM" in \
-    'amd64') \
+    'linux/amd64') \
     export PROTOC_ARCH='x86_64'; \
     ;; \
-    'arm64') \
+    'linux/arm64') \
     export PROTOC_ARCH='aarch_64'; \
     ;; \
     *) echo >&2 "error: unsupported architecture '$TARGET_PLATFORM'"; exit 1 ;; \

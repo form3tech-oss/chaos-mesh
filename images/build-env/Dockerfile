@@ -21,7 +21,17 @@ RUN npm install pnpm@8 -g
 
 ARG TARGET_PLATFORM=amd64
 
-RUN curl -vvv https://dl.google.com/go/go1.20.8.linux-$TARGET_PLATFORM.tar.gz | tar -xz -C /usr/local
+RUN case "$TARGET_PLATFORM" in \
+    'linux/amd64') \
+    export GO_ARCH='amd64'; \
+    ;; \
+    'linux/arm64') \
+    export GO_ARCH='arm64'; \
+    ;; \
+    *) echo >&2 "error: unsupported architecture '$TARGET_PLATFORM'"; exit 1 ;; \
+    esac; \
+    curl -vvv https://dl.google.com/go/go1.20.8.linux-$GO_ARCH.tar.gz | tar -xz -C /usr/local |
+
 ENV PATH "/usr/local/go/bin:${PATH}"
 ENV GOCACHE /tmp/go-build
 ENV GOPATH /tmp/go
