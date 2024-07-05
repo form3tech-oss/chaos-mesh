@@ -97,7 +97,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return FluxSuspended, nil
 
 	case FluxSuspended:
-		var cert *cmv1.Certificate
+		cert := &cmv1.Certificate{}
 		err = impl.Get(ctx, namespacedName, cert)
 		if err != nil {
 			if apiErrors.IsNotFound(err) {
