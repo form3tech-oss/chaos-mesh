@@ -5446,7 +5446,7 @@ const docTemplate = `{
                     }
                 },
                 "certificateExpiry": {
-                    "description": "CertificateExpiry represents the expiry period for the requested certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n",
+                    "description": "CertificateExpiry represents the expiry period for the requested certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".",
                     "$ref": "#/definitions/v1.Duration"
                 },
                 "duration": {
