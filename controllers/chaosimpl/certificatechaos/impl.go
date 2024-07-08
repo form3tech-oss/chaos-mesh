@@ -97,8 +97,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return FluxSuspended, nil
 
 	case FluxSuspended:
-		var cert cmv1.Certificate
-		err = impl.Get(ctx, namespacedName, &cert)
+		cert := &cmv1.Certificate{}
+		err = impl.Get(ctx, namespacedName, cert)
 		if err != nil {
 			if apiErrors.IsNotFound(err) {
 				return v1alpha1.Injected, nil
@@ -106,17 +106,24 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 			return v1alpha1.NotInjected, err
 		}
 
-		// Update actual certificate
-		if err = impl.updateCertificate(ctx, &cert, chaos.Spec.CertificateExpiry, chaos.Spec.RenewBefore); err != nil {
-			impl.Log.Error(err, "Updating Certificate", "resource", cert.Name)
-			return record.Phase, err
+		var phase v1alpha1.Phase
+		// Check for changes - in case of exact match, there is no need to update
+		if certificateChanged(cert, chaos) {
+			// Update actual certificate
+			if err = impl.updateCertificate(ctx, cert, chaos.Spec.CertificateExpiry, chaos.Spec.RenewBefore); err != nil {
+				impl.Log.Error(err, "Updating Certificate", "resource", cert.Name)
+				return record.Phase, err
+			}
+			phase = CertUpdated
+		} else {
+			phase = CertReady
 		}
 		newInstance := chaos.Status.Instances[record.Id]
 		newInstance.OriginalExpiry = cert.Spec.Duration
 		newInstance.OriginalRenewBefore = cert.Spec.RenewBefore
 		newInstance.SecretName = cert.Spec.SecretName
 		chaos.Status.Instances[record.Id] = newInstance
-		return CertUpdated, nil
+		return phase, nil
 
 	case CertUpdated:
 		impl.Log.Info("Checking if Certificate is ready", "certificate", namespacedName.String())
@@ -161,6 +168,10 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	}
 
 	return v1alpha1.Injected, nil
+}
+
+func certificateChanged(cert *cmv1.Certificate, chaos *v1alpha1.CertificateChaos) bool {
+	return !(cert.Spec.Duration == chaos.Spec.CertificateExpiry && cert.Spec.RenewBefore == chaos.Spec.RenewBefore)
 }
 
 func (impl *Impl) getPodOwnersUsingSecret(ctx context.Context, podsList *v1.PodList, secretName string) (map[Dependent]bool, error) {

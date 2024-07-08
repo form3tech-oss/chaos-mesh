@@ -5446,11 +5446,11 @@ const docTemplate = `{
                     }
                 },
                 "certificateExpiry": {
-                    "description": "CertificateExpiry represents the expiry period for the requested certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"1h\"",
+                    "description": "CertificateExpiry represents the expiry period for the requested certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".",
                     "$ref": "#/definitions/v1.Duration"
                 },
                 "duration": {
-                    "description": "Duration represents the duration of the chaos action.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"90m\"",
+                    "description": "Duration represents the duration of the chaos action.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional",
                     "type": "string"
                 },
                 "fieldSelectors": {
@@ -5479,7 +5479,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "renewBefore": {
-                    "description": "RenewBefore represents when the cert-manager should rotate the certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".\n+optional\n+kubebuilder:default=\"30m\"",
+                    "description": "RenewBefore represents when the cert-manager should rotate the certificate.\nValid time units are \"ns\", \"us\" (or \"µs\"), \"ms\", \"s\", \"m\", \"h\".",
                     "$ref": "#/definitions/v1.Duration"
                 }
             }

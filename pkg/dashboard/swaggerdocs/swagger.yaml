@@ -3894,14 +3894,11 @@ definitions:
         description: |-
           CertificateExpiry represents the expiry period for the requested certificate.
           Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-          +optional
-          +kubebuilder:default="1h"
       duration:
         description: |-
           Duration represents the duration of the chaos action.
           Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
           +optional
-          +kubebuilder:default="90m"
         type: string
       fieldSelectors:
         additionalProperties:
@@ -3936,8 +3933,6 @@ definitions:
         description: |-
           RenewBefore represents when the cert-manager should rotate the certificate.
           Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-          +optional
-          +kubebuilder:default="30m"
     type: object
   v1alpha1.ChaosOnlyScheduleSpec:
     properties:

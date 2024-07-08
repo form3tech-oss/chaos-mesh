@@ -283,13 +283,11 @@ spec:
                   creates on a chaos experiment about pods.
                 properties:
                   certificateExpiry:
-                    default: 1h
                     description: CertificateExpiry represents the expiry period for
                       the requested certificate. Valid time units are "ns", "us" (or
                       "µs"), "ms", "s", "m", "h".
                     type: string
                   duration:
-                    default: 90m
                     description: Duration represents the duration of the chaos action.
                       Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                     type: string
@@ -298,7 +296,6 @@ spec:
                       the chaos will be deployed
                     type: string
                   renewBefore:
-                    default: 30m
                     description: RenewBefore represents when the cert-manager should
                       rotate the certificate. Valid time units are "ns", "us" (or
                       "µs"), "ms", "s", "m", "h".
@@ -363,6 +360,8 @@ spec:
                         type: array
                     type: object
                 required:
+                - certificateExpiry
+                - renewBefore
                 - selector
                 type: object
               ciliumChaos:
@@ -4109,13 +4108,11 @@ spec:
                             that a user creates on a chaos experiment about pods.
                           properties:
                             certificateExpiry:
-                              default: 1h
                               description: CertificateExpiry represents the expiry
                                 period for the requested certificate. Valid time units
                                 are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                               type: string
                             duration:
-                              default: 90m
                               description: Duration represents the duration of the
                                 chaos action. Valid time units are "ns", "us" (or
                                 "µs"), "ms", "s", "m", "h".
@@ -4125,7 +4122,6 @@ spec:
                                 where the chaos will be deployed
                               type: string
                             renewBefore:
-                              default: 30m
                               description: RenewBefore represents when the cert-manager
                                 should rotate the certificate. Valid time units are
                                 "ns", "us" (or "µs"), "ms", "s", "m", "h".
@@ -4194,6 +4190,8 @@ spec:
                                   type: array
                               type: object
                           required:
+                          - certificateExpiry
+                          - renewBefore
                           - selector
                           type: object
                         children:
@@ -7814,14 +7812,12 @@ spec:
                                 that a user creates on a chaos experiment about pods.
                               properties:
                                 certificateExpiry:
-                                  default: 1h
                                   description: CertificateExpiry represents the expiry
                                     period for the requested certificate. Valid time
                                     units are "ns", "us" (or "µs"), "ms", "s", "m",
                                     "h".
                                   type: string
                                 duration:
-                                  default: 90m
                                   description: Duration represents the duration of
                                     the chaos action. Valid time units are "ns", "us"
                                     (or "µs"), "ms", "s", "m", "h".
@@ -7831,7 +7827,6 @@ spec:
                                     cluster where the chaos will be deployed
                                   type: string
                                 renewBefore:
-                                  default: 30m
                                   description: RenewBefore represents when the cert-manager
                                     should rotate the certificate. Valid time units
                                     are "ns", "us" (or "µs"), "ms", "s", "m", "h".
@@ -7903,6 +7898,8 @@ spec:
                                       type: array
                                   type: object
                               required:
+                              - certificateExpiry
+                              - renewBefore
                               - selector
                               type: object
                             ciliumChaos:
