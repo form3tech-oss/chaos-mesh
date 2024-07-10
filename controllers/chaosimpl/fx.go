@@ -21,6 +21,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/awschaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/azurechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/blockchaos"
+	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/certificatechaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/ciliumchaos"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackhost"
 	"github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/cloudstackvm"
@@ -64,5 +65,6 @@ var AllImpl = fx.Options(
 	resourcescalechaos.Module,
 	rollingrestartchaos.Module,
 	podpvcchaos.Module,
+	certificatechaos.Module,
 
 	utils.Module)

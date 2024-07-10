@@ -297,6 +297,94 @@ spec:
                       - selector
                       - volumeName
                       type: object
+                    certificateChaos:
+                      description: CertificateChaosSpec defines the attributes that
+                        a user creates on a chaos experiment about pods.
+                      properties:
+                        certificateExpiry:
+                          description: CertificateExpiry represents the expiry period
+                            for the requested certificate. Valid time units are "ns",
+                            "us" (or "µs"), "ms", "s", "m", "h".
+                          type: string
+                        duration:
+                          description: Duration represents the duration of the chaos
+                            action. Valid time units are "ns", "us" (or "µs"), "ms",
+                            "s", "m", "h".
+                          type: string
+                        remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
+                          type: string
+                        renewBefore:
+                          description: RenewBefore represents when the cert-manager
+                            should rotate the certificate. Valid time units are "ns",
+                            "us" (or "µs"), "ms", "s", "m", "h".
+                          type: string
+                        selector:
+                          properties:
+                            annotationSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on annotations.
+                              type: object
+                            expressionSelectors:
+                              description: a slice of label selector expressions that
+                                can be used to select objects. A list of selectors
+                                based on set-based label expressions.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            fieldSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on fields.
+                              type: object
+                            labelSelectors:
+                              additionalProperties:
+                                type: string
+                              description: Map of string keys and values that can
+                                be used to select objects. A selector based on labels.
+                              type: object
+                            namespaces:
+                              description: Namespaces is a set of namespace to which
+                                objects belong.
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                      required:
+                      - certificateExpiry
+                      - renewBefore
+                      - selector
+                      type: object
                     children:
                       description: Children describes the children steps of serial
                         or parallel node. Only used when Type is TypeSerial or TypeParallel.
@@ -3888,6 +3976,97 @@ spec:
                           - mode
                           - selector
                           - volumeName
+                          type: object
+                        certificateChaos:
+                          description: CertificateChaosSpec defines the attributes
+                            that a user creates on a chaos experiment about pods.
+                          properties:
+                            certificateExpiry:
+                              description: CertificateExpiry represents the expiry
+                                period for the requested certificate. Valid time units
+                                are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                              type: string
+                            duration:
+                              description: Duration represents the duration of the
+                                chaos action. Valid time units are "ns", "us" (or
+                                "µs"), "ms", "s", "m", "h".
+                              type: string
+                            remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
+                              type: string
+                            renewBefore:
+                              description: RenewBefore represents when the cert-manager
+                                should rotate the certificate. Valid time units are
+                                "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                              type: string
+                            selector:
+                              properties:
+                                annotationSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on annotations.
+                                  type: object
+                                expressionSelectors:
+                                  description: a slice of label selector expressions
+                                    that can be used to select objects. A list of
+                                    selectors based on set-based label expressions.
+                                  items:
+                                    description: A label selector requirement is a
+                                      selector that contains values, a key, and an
+                                      operator that relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: operator represents a key's relationship
+                                          to a set of values. Valid operators are
+                                          In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: values is an array of string
+                                          values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the
+                                          operator is Exists or DoesNotExist, the
+                                          values array must be empty. This array is
+                                          replaced during a strategic merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                fieldSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on fields.
+                                  type: object
+                                labelSelectors:
+                                  additionalProperties:
+                                    type: string
+                                  description: Map of string keys and values that
+                                    can be used to select objects. A selector based
+                                    on labels.
+                                  type: object
+                                namespaces:
+                                  description: Namespaces is a set of namespace to
+                                    which objects belong.
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                          required:
+                          - certificateExpiry
+                          - renewBefore
+                          - selector
                           type: object
                         ciliumChaos:
                           description: CiliumChaosSpec defines the attributes that

@@ -25,6 +25,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackhost"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/certificate"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackvm"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
@@ -89,6 +90,7 @@ type SelectorParams struct {
 	ResourceScaleSelector   *resourcescale.SelectImpl
 	RollingRestartSelector  *rollingrestart.SelectImpl
 	PodPVCSelector          *podpvc.SelectImpl
+	CertificateSelector     *certificate.SelectImpl
 }
 
 func New(p SelectorParams) *Selector {
@@ -125,4 +127,5 @@ var Module = fx.Provide(
 	resourcescale.New,
 	rollingrestart.New,
 	podpvc.New,
+	certificate.New,
 )

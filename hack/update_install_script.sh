@@ -26,8 +26,8 @@ helm template chaos-mesh helm/chaos-mesh --namespace=chaos-mesh \
       --set enableCtrlServer=true \
       --set dashboard.securityMode=false > ${tmp_file}
 
-sed -i.bak '/helm/d' $tmp_file
-sed -i.bak '/Helm/d' $tmp_file
+sed -i.bak '/helm.sh/d' $tmp_file
+sed -i.bak '/managed-by: Helm/d' $tmp_file
 sed -i.bak 's/rollme:.*/rollme: \"install.sh\"/g' $tmp_file
 sed -i.bak 's/ca.crt:.*/ca.crt: \"\$\{CA_BUNDLE\}\"/g' $tmp_file
 sed -i.bak 's/tls.crt:.*/tls.crt: \"\$\{TLS_CRT\}\"/g' $tmp_file
