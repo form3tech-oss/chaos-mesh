@@ -15,10 +15,10 @@
 
 package v1alpha1
 
-// import (
-// 	"reflect"
-// )
+import (
+	"reflect"
+)
 
-// func (in *CloudStackHostChaosSpec) Default(root interface{}, structField *reflect.StructField) {
-// 	setDefaultsFromTags(in)
-// }
+func (in *CloudStackHostChaosSpec) Default(root interface{}, structField *reflect.StructField) {
+	setDefaultsFromTags(in)
+}
