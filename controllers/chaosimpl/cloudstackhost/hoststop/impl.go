@@ -172,10 +172,7 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 }
 
 func startStoppedVMs(client *cloudstack.CloudStackClient, hostId string) error {
-	params := client.VirtualMachine.NewListVirtualMachinesParams()
-	params.SetHostid(hostId)
-
-	resp, err := client.VirtualMachine.ListVirtualMachines(params)
+	resp, err := client.VirtualMachine.ListVirtualMachines(client.VirtualMachine.NewListVirtualMachinesParams())
 	if err != nil {
 		return err
 	}
