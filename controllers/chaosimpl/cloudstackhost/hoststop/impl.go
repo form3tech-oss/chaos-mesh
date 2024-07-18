@@ -124,19 +124,21 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 			if err != nil {
 				return v1alpha1.Injected, fmt.Errorf("starting host %s: %w", h.Name, err)
 			}
+
+			if err := waitForHostToBeUp(client, h.Id); err != nil {
+				return v1alpha1.Injected, err
+			}
+
+			impl.Log.Info("Started host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 		}
+	}
 
-		impl.Log.Info("Started host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
-
-		if err := waitForHostToBeUp(client, h.Id); err != nil {
+	if !spec.DryRun {
+		if err := impl.startStoppedVMs(client); err != nil {
 			return v1alpha1.Injected, err
 		}
 
-		if err := startStoppedVMs(client, h.Id); err != nil {
-			return v1alpha1.Injected, err
-		}
-
-		if err := destroyStuckSystemVMs(client); err != nil {
+		if err := impl.destroyStuckSystemVMs(client); err != nil {
 			return v1alpha1.Injected, err
 		}
 	}
@@ -171,16 +173,17 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 	}
 }
 
-func startStoppedVMs(client *cloudstack.CloudStackClient, hostId string) error {
+func (impl *Impl) startStoppedVMs(client *cloudstack.CloudStackClient) error {
 	resp, err := client.VirtualMachine.ListVirtualMachines(client.VirtualMachine.NewListVirtualMachinesParams())
 	if err != nil {
 		return err
 	}
 	for _, vm := range resp.VirtualMachines {
 		if vm.State == StateStopped {
+			impl.Log.Info("Starting VM", "id", vm.Id)
 			_, err := client.VirtualMachine.StartVirtualMachine(client.VirtualMachine.NewStartVirtualMachineParams(vm.Id))
 			if err != nil {
-				return fmt.Errorf("failed to start stopped vm %s for host %s: %w", vm.Name, hostId, err)
+				return fmt.Errorf("failed to start stopped vm %s: %w", vm.Name, err)
 			}
 		}
 	}
@@ -188,16 +191,17 @@ func startStoppedVMs(client *cloudstack.CloudStackClient, hostId string) error {
 	return nil
 }
 
-func destroyStuckSystemVMs(client *cloudstack.CloudStackClient) error {
+func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient) error {
 	resp, err := client.SystemVM.ListSystemVms(client.SystemVM.NewListSystemVmsParams())
 	if err != nil {
 		return err
 	}
 	for _, vm := range resp.SystemVms {
 		if vm.State == StateStopped {
+			impl.Log.Info("Destroying system VM", "id", vm.Id)
 			_, err := client.SystemVM.DestroySystemVm(client.SystemVM.NewDestroySystemVmParams(vm.Id))
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to destroy system vm %s: %w", vm.Id, err)
 			}
 		}
 	}
