@@ -181,6 +181,7 @@ export interface ExperimentType {
   AzureChaos?: unknown
   CertificateChaos?: unknown
   CiliumChaos?: unknown
+  CloudStackHostChaos?: unknown
   CloudStackVMChaos?: unknown
   DNSChaos: DNS
   GCPChaos: GCP

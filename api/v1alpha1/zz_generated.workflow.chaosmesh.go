@@ -29,6 +29,7 @@ const (
 	TypeBlockChaos TemplateType = "BlockChaos"
 	TypeCertificateChaos TemplateType = "CertificateChaos"
 	TypeCiliumChaos TemplateType = "CiliumChaos"
+	TypeCloudStackHostChaos TemplateType = "CloudStackHostChaos"
 	TypeCloudStackVMChaos TemplateType = "CloudStackVMChaos"
 	TypeDNSChaos TemplateType = "DNSChaos"
 	TypeGCPChaos TemplateType = "GCPChaos"
@@ -55,6 +56,7 @@ var allChaosTemplateType = []TemplateType{
 	TypeBlockChaos,
 	TypeCertificateChaos,
 	TypeCiliumChaos,
+	TypeCloudStackHostChaos,
 	TypeCloudStackVMChaos,
 	TypeDNSChaos,
 	TypeGCPChaos,
@@ -85,6 +87,8 @@ type EmbedChaos struct {
 	CertificateChaos *CertificateChaosSpec `json:"certificateChaos,omitempty"`
 	// +optional
 	CiliumChaos *CiliumChaosSpec `json:"ciliumChaos,omitempty"`
+	// +optional
+	CloudStackHostChaos *CloudStackHostChaosSpec `json:"cloudstackhostChaos,omitempty"`
 	// +optional
 	CloudStackVMChaos *CloudStackVMChaosSpec `json:"cloudstackvmChaos,omitempty"`
 	// +optional
@@ -141,6 +145,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeCiliumChaos:
 		result := CiliumChaos{}
 		result.Spec = *it.CiliumChaos
+		return &result, nil
+	case TypeCloudStackHostChaos:
+		result := CloudStackHostChaos{}
+		result.Spec = *it.CloudStackHostChaos
 		return &result, nil
 	case TypeCloudStackVMChaos:
 		result := CloudStackVMChaos{}
@@ -229,6 +237,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *CiliumChaos:
 		*it.CiliumChaos = chaos.Spec
 		return nil
+	case *CloudStackHostChaos:
+		*it.CloudStackHostChaos = chaos.Spec
+		return nil
 	case *CloudStackVMChaos:
 		*it.CloudStackVMChaos = chaos.Spec
 		return nil
@@ -299,6 +310,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeCiliumChaos:
 		result := CiliumChaosList{}
+		return &result, nil
+	case TypeCloudStackHostChaos:
+		result := CloudStackHostChaosList{}
 		return &result, nil
 	case TypeCloudStackVMChaos:
 		result := CloudStackVMChaosList{}
@@ -387,6 +401,14 @@ func (in *CertificateChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *CiliumChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *CloudStackHostChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item

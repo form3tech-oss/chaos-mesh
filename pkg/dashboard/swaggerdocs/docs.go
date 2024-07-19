@@ -5507,6 +5507,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.CiliumChaosSpec"
                 },
+                "cloudstackhostChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CloudStackHostChaosSpec"
+                },
                 "cloudstackvmChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.CloudStackVMChaosSpec"
@@ -5677,6 +5681,64 @@ const docTemplate = `{
                 "verifySSL": {
                     "description": "VerifySSL defines whether certificates should be verified when connecting to the API.\n+optional",
                     "type": "boolean"
+                }
+            }
+        },
+        "v1alpha1.CloudStackHostChaosSelector": {
+            "type": "object",
+            "properties": {
+                "clusterId": {
+                    "description": "ClusterID defines the cluster the host belongs to.\n+optional",
+                    "type": "string"
+                },
+                "hypervisor": {
+                    "description": "Hypervisor defines the target hypervisor.\n+optional",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID defines the ID of the host.\n+optional",
+                    "type": "string"
+                },
+                "keyword": {
+                    "description": "Keyword defines the keyword to list the VMs by.\n+optional",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name defines the name of the host\n+optiional",
+                    "type": "string"
+                },
+                "zoneId": {
+                    "description": "ZoneID defines the availability zone the host belongs to.\n+optional",
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.CloudStackHostChaosSpec": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "description": "Action defines the specific cloudstack chaos action.\nSupported action: host-stop\nDefault action: host-stop\n+kubebuilder:validation:Enum=host-stop",
+                    "type": "string"
+                },
+                "apiConfig": {
+                    "description": "APIConfig defines the configuration ncessary to connect to the CloudStack API.",
+                    "$ref": "#/definitions/v1alpha1.CloudStackAPIConfig"
+                },
+                "dryRun": {
+                    "description": "DryRun defines whether the chaos should run a dry-run mode.\n+optional",
+                    "type": "boolean"
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos action.\n+optional",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "selector": {
+                    "description": "Selector defines the parameters that can be used to select target VMs.",
+                    "$ref": "#/definitions/v1alpha1.CloudStackHostChaosSelector"
                 }
             }
         },
@@ -8062,6 +8124,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.CiliumChaosSpec"
                 },
+                "cloudstackhostChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CloudStackHostChaosSpec"
+                },
                 "cloudstackvmChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.CloudStackVMChaosSpec"
@@ -8438,6 +8504,10 @@ const docTemplate = `{
                 "ciliumChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.CiliumChaosSpec"
+                },
+                "cloudstackhostChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.CloudStackHostChaosSpec"
                 },
                 "cloudstackvmChaos": {
                     "description": "+optional",

@@ -191,4 +191,11 @@ var WebhookObjects = fx.Supply(
 			Object: &v1alpha1.CloudStackVMChaos{},
 		},
 	},
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "cloudstackhostchaos",
+			Object: &v1alpha1.CloudStackHostChaos{},
+		},
+	},
 )
