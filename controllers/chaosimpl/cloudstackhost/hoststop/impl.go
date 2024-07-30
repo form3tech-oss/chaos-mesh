@@ -117,7 +117,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	if len(resp.Hosts) == 0 {
-		return v1alpha1.Injected, fmt.Errorf("no hosts returned matching criteria")
+		impl.Log.Info("no hosts returned matching criteria, nothing to recover")
+		return v1alpha1.NotInjected, nil
 	}
 
 	for _, h := range resp.Hosts {
