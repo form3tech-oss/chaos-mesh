@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/apache/cloudstack-go/v2/cloudstack"
