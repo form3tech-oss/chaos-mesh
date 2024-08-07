@@ -116,11 +116,6 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("listing hosts: %w", err)
 	}
 
-	if len(resp.Hosts) == 0 {
-		impl.Log.Info("no hosts returned matching criteria, nothing to recover")
-		return v1alpha1.NotInjected, nil
-	}
-
 	for _, h := range resp.Hosts {
 		impl.Log.Info("Starting host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 
@@ -134,15 +129,14 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 				return v1alpha1.Injected, err
 			}
 
-			if err := impl.restartVMs(client, h.Id); err != nil {
-				return v1alpha1.Injected, err
-			}
-
 			impl.Log.Info("Started host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 		}
 	}
 
 	if !spec.DryRun {
+		if err := impl.startVMs(client); err != nil {
+			return v1alpha1.Injected, err
+		}
 		if err := impl.destroyStuckSystemVMs(client); err != nil {
 			return v1alpha1.Injected, err
 		}
@@ -178,62 +172,26 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 	}
 }
 
-func waitForVMStatus(client *cloudstack.CloudStackClient, vmId string, state string) error {
-	ticker := time.NewTicker(DownCheckInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			host, _, err := client.VirtualMachine.GetVirtualMachineByID(vmId)
-			if err != nil {
-				return fmt.Errorf("failed to query status for host %s: %w", vmId, err)
-			}
-			if host.State == state {
-				return nil
-			}
-		case <-time.After(DownCheckTimeout):
-			return fmt.Errorf("timed out waiting for host %s to be up", vmId)
-		}
-	}
-}
-
-func (impl *Impl) restartVMs(client *cloudstack.CloudStackClient, hostId string) error {
+func (impl *Impl) startVMs(client *cloudstack.CloudStackClient) error {
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
-	params.SetHostid(hostId)
+	params.SetState(StateStopped)
+
 	resp, err := client.VirtualMachine.ListVirtualMachines(params)
 	if err != nil {
 		return err
 	}
-	wg := sync.WaitGroup{}
+
 	for _, vm := range resp.VirtualMachines {
-		wg.Add(1)
-		go func(vm *cloudstack.VirtualMachine) {
-			defer wg.Done()
-			impl.Log.Info("Restarting VM", "id", vm.Id)
+		impl.Log.Info("Starting VM", "id", vm.Id)
 
-			_, err := client.VirtualMachine.StopVirtualMachine(client.VirtualMachine.NewStopVirtualMachineParams(vm.Id))
-			if err != nil {
-				impl.Log.Error(err, "failed to stop vm", vm.Name)
-				return
-			}
-			err = waitForVMStatus(client, vm.Id, StateStopped)
-			if err != nil {
-				impl.Log.Error(err, "failed to stop vm", vm.Name)
-				return
-			}
+		startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
+		startParams.SetConsiderlasthost(true) // try to schedule to the same host
 
-			startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
-			startParams.SetConsiderlasthost(true) // try to schedule to the same host
-
-			_, err = client.VirtualMachine.StartVirtualMachine(startParams)
-			if err != nil {
-				impl.Log.Error(err, "failed to start stopped vm", vm.Name)
-				return
-			}
-		}(vm)
+		_, err = client.VirtualMachine.StartVirtualMachine(startParams)
+		if err != nil {
+			impl.Log.Error(err, "failed to start stopped vm", vm.Name)
+		}
 	}
-	wg.Wait()
 
 	return nil
 }
