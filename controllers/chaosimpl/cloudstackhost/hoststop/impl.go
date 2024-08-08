@@ -139,16 +139,14 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		}
 	}
 
-	if !spec.DryRun {
-		if err := impl.startVMs(client, spec.DryRun); err != nil {
-			return v1alpha1.Injected, err
-		}
-		if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
-			return v1alpha1.Injected, err
-		}
-		if err := impl.uncordonK8sNodes(spec.DryRun); err != nil {
-			return v1alpha1.Injected, err
-		}
+	if err := impl.startVMs(client, spec.DryRun); err != nil {
+		return v1alpha1.Injected, err
+	}
+	if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
+		return v1alpha1.Injected, err
+	}
+	if err := impl.uncordonK8sNodes(spec.DryRun); err != nil {
+		return v1alpha1.Injected, err
 	}
 
 	return v1alpha1.NotInjected, nil
