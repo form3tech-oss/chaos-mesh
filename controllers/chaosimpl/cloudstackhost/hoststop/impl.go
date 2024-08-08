@@ -20,10 +20,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/apache/cloudstack-go/v2/cloudstack"
 	"github.com/go-logr/logr"
+	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
@@ -39,7 +42,11 @@ const (
 	ActionOff = "OFF"
 	ActionOn  = "ON"
 
+	ColorBlue  = "blue"
+	ColorGreen = "green"
+
 	StateUp      = "Up"
+	StateRunning = "Running"
 	StateStopped = "Stopped"
 
 	UpCheckInterval = 30 * time.Second
@@ -133,10 +140,13 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	if !spec.DryRun {
-		if err := impl.startVMs(client); err != nil {
+		if err := impl.startVMs(client, spec.DryRun); err != nil {
 			return v1alpha1.Injected, err
 		}
-		if err := impl.destroyStuckSystemVMs(client); err != nil {
+		if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
+			return v1alpha1.Injected, err
+		}
+		if err := impl.uncordonK8sNodes(spec.DryRun); err != nil {
 			return v1alpha1.Injected, err
 		}
 	}
@@ -151,6 +161,25 @@ func NewImpl(c client.Client, log logr.Logger) *Impl {
 	}
 }
 
+func waitForVmToBeRunning(client *cloudstack.CloudStackClient, vmId string) error {
+	ticker := time.NewTicker(UpCheckInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			vm, _, err := client.VirtualMachine.GetVirtualMachineByID(vmId)
+			if err != nil {
+				return fmt.Errorf("failed to query status for vm %s: %w", vmId, err)
+			}
+			if vm.State == StateRunning {
+				return nil
+			}
+		case <-time.After(UpCheckTimeout):
+			return fmt.Errorf("timed out waiting for vm %s to be up", vmId)
+		}
+	}
+}
 func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error {
 	ticker := time.NewTicker(UpCheckInterval)
 	defer ticker.Stop()
@@ -171,7 +200,58 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 	}
 }
 
-func (impl *Impl) startVMs(client *cloudstack.CloudStackClient) error {
+func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
+	nodes := v1.NodeList{}
+	err := impl.List(context.TODO(), &nodes)
+	if err != nil {
+		impl.Log.Error(err, "failed to list nodes")
+		return nil
+	}
+	activeCluster := ""
+	for _, node := range nodes.Items {
+		color := ""
+		if strings.Contains(node.Name, ColorGreen) {
+			color = ColorGreen
+		} else if strings.Contains(node.Name, ColorBlue) {
+			color = ColorBlue
+		} else {
+			continue
+		}
+		if len(node.Spec.Taints) == 0 {
+			activeCluster = color
+			break
+		}
+	}
+	if activeCluster == "" {
+		impl.Log.Info("failed to determine active cluster, not uncordoning nodes")
+		return nil
+	}
+
+	impl.Log.Info("Uncordoning nodes", "cluster", activeCluster)
+
+	for _, node := range nodes.Items {
+		if !strings.Contains(node.Name, activeCluster) {
+			continue
+		}
+		if len(node.Spec.Taints) == 0 {
+			continue
+		}
+
+		impl.Log.Info("Removing taints", "node", node.Name, "dryRun", dryRun)
+		if dryRun {
+			continue
+		}
+		node.Spec.Taints = nil
+		err := impl.Update(context.TODO(), &node)
+		if err != nil {
+			impl.Log.Error(err, "failed to uncordon node", "node", node.Name)
+		}
+		impl.Log.Info("Removed taints", "node", node.Name, "dryRun", dryRun)
+	}
+	return nil
+}
+
+func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) error {
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
 	params.SetState(StateStopped)
 
@@ -180,33 +260,53 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient) error {
 		return err
 	}
 
+	wg := sync.WaitGroup{}
 	for _, vm := range resp.VirtualMachines {
-		impl.Log.Info("Starting VM", "id", vm.Id)
+		impl.Log.Info("Starting VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
 
-		startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
-		startParams.SetConsiderlasthost(true) // try to schedule to the same host
-
-		_, err = client.VirtualMachine.StartVirtualMachine(startParams)
-		if err != nil {
-			impl.Log.Error(err, "failed to start stopped vm", vm.Name)
+		if dryRun {
+			continue
 		}
+		wg.Add(1)
+
+		go func(vm *cloudstack.VirtualMachine) {
+			defer wg.Done()
+			startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
+			startParams.SetConsiderlasthost(true) // try to schedule to the same host
+
+			_, err = client.VirtualMachine.StartVirtualMachine(startParams)
+			if err != nil {
+				impl.Log.Error(err, "failed to start stopped vm", "name", vm.Name)
+			}
+			err := waitForVmToBeRunning(client, vm.Id)
+			if err != nil {
+				impl.Log.Error(err, "failed to wait for vm to be running", "name", vm.Name)
+			}
+			impl.Log.Info("Started VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+
+		}(vm)
 	}
+	wg.Wait()
 
 	return nil
 }
 
-func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient) error {
+func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient, dryRun bool) error {
 	resp, err := client.SystemVM.ListSystemVms(client.SystemVM.NewListSystemVmsParams())
 	if err != nil {
 		return err
 	}
 	for _, vm := range resp.SystemVms {
 		if vm.State == StateStopped {
-			impl.Log.Info("Destroying system VM", "id", vm.Id)
+			impl.Log.Info("Destroying system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+			if dryRun {
+				continue
+			}
 			_, err := client.SystemVM.DestroySystemVm(client.SystemVM.NewDestroySystemVmParams(vm.Id))
 			if err != nil {
 				return fmt.Errorf("failed to destroy system vm %s: %w", vm.Id, err)
 			}
+			impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
 		}
 	}
 	return nil
