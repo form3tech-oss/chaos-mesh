@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"strings"
+	"slices"
 	"sync"
 	"time"
 
@@ -41,9 +41,6 @@ type Impl struct {
 const (
 	ActionOff = "OFF"
 	ActionOn  = "ON"
-
-	ColorBlue  = "blue"
-	ColorGreen = "green"
 
 	StateUp      = "Up"
 	StateRunning = "Running"
@@ -205,33 +202,16 @@ func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
 		impl.Log.Error(err, "failed to list nodes")
 		return nil
 	}
-	activeCluster := ""
-	for _, node := range nodes.Items {
-		color := ""
-		if strings.Contains(node.Name, ColorGreen) {
-			color = ColorGreen
-		} else if strings.Contains(node.Name, ColorBlue) {
-			color = ColorBlue
-		} else {
-			continue
-		}
-		if len(node.Spec.Taints) == 0 {
-			activeCluster = color
-			break
-		}
-	}
-	if activeCluster == "" {
-		impl.Log.Info("failed to determine active cluster, not uncordoning nodes")
-		return nil
-	}
-
-	impl.Log.Info("Uncordoning nodes", "cluster", activeCluster)
 
 	for _, node := range nodes.Items {
-		if !strings.Contains(node.Name, activeCluster) {
-			continue
-		}
-		if len(node.Spec.Taints) == 0 {
+		currentTaintsLen := len(node.Spec.Taints)
+
+		node.Spec.Taints = slices.DeleteFunc(node.Spec.Taints, func(t v1.Taint) bool {
+			return t.Effect == "NoSchedule" && t.TimeAdded != nil
+		})
+
+		if currentTaintsLen == len(node.Spec.Taints) {
+			// no change
 			continue
 		}
 
@@ -239,7 +219,6 @@ func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
 		if dryRun {
 			continue
 		}
-		node.Spec.Taints = nil
 		err := impl.Update(context.TODO(), &node)
 		if err != nil {
 			impl.Log.Error(err, "failed to uncordon node", "node", node.Name)
