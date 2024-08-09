@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"slices"
 	"sync"
 	"time"
 
@@ -204,14 +203,14 @@ func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
 	}
 
 	for _, node := range nodes.Items {
-		currentTaintsLen := len(node.Spec.Taints)
+		newTaints := []v1.Taint{}
+		for _, t := range node.Spec.Taints {
+			if !(t.Effect == "NoSchedule" && t.TimeAdded != nil) {
+				newTaints = append(newTaints, t)
+			}
+		}
 
-		node.Spec.Taints = slices.DeleteFunc(node.Spec.Taints, func(t v1.Taint) bool {
-			return t.Effect == "NoSchedule" && t.TimeAdded != nil
-		})
-
-		if currentTaintsLen == len(node.Spec.Taints) {
-			// no change
+		if len(newTaints) == len(node.Spec.Taints) {
 			continue
 		}
 
@@ -219,6 +218,7 @@ func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
 		if dryRun {
 			continue
 		}
+		node.Spec.Taints = newTaints
 		err := impl.Update(context.TODO(), &node)
 		if err != nil {
 			impl.Log.Error(err, "failed to uncordon node", "node", node.Name)
