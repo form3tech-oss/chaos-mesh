@@ -1134,6 +1134,16 @@ rules:
       - watch
       - list
       - get
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - patch
+      - create
+      - watch
+      - list
+      - get
   - apiGroups: [ "chaos-mesh.org" ]
     resources:
       - "*"
