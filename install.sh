@@ -1134,16 +1134,6 @@ rules:
       - watch
       - list
       - get
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - patch
-      - create
-      - watch
-      - list
-      - get
   - apiGroups: [ "chaos-mesh.org" ]
     resources:
       - "*"
@@ -1163,12 +1153,15 @@ metadata:
 rules:
   - apiGroups: [ "" ]
     resources:
-      - nodes
       - persistentvolumes
       - persistentvolumeclaims
       - namespaces
       - services
     verbs: [ "get", "list", "watch" ]
+  - apiGroups: [ "" ]
+    resources:
+      - nodes
+    verbs: [ "get", "list", "patch", "watch" ]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
