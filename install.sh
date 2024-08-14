@@ -1161,7 +1161,7 @@ rules:
   - apiGroups: [ "" ]
     resources:
       - nodes
-    verbs: [ "get", "list", "patch", "watch" ]
+    verbs: [ "get", "list", "update", "watch" ]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
