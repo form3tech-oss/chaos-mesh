@@ -18,6 +18,7 @@ package hoststop
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -141,7 +142,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
 		return v1alpha1.Injected, err
 	}
-	if err := impl.uncordonK8sNodes(spec.DryRun); err != nil {
+	if err := impl.uncordonK8sNodes(ctx, spec.DryRun); err != nil {
 		return v1alpha1.Injected, err
 	}
 
@@ -193,19 +194,51 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 		}
 	}
 }
+func (impl *Impl) getK8sNodesWhenReady(ctx context.Context) ([]v1.Node, error) {
+	ticker := time.NewTicker(UpCheckInterval)
+	defer ticker.Stop()
 
-func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
-	nodes := v1.NodeList{}
-	err := impl.List(context.TODO(), &nodes)
+	for {
+		select {
+		case <-ticker.C:
+			nodes := v1.NodeList{}
+			err := impl.List(ctx, &nodes)
+			if err != nil {
+				impl.Log.Error(err, "failed to list nodes")
+				continue
+			}
+			unreadyNodes := []string{}
+			for _, node := range nodes.Items {
+				for _, condition := range node.Status.Conditions {
+					if condition.Type == v1.NodeReady && condition.Status != v1.ConditionTrue {
+						unreadyNodes = append(unreadyNodes, node.Name)
+						break
+					}
+				}
+			}
+			if len(unreadyNodes) > 0 {
+				impl.Log.Info("nodes not ready", "nodes", unreadyNodes)
+			} else {
+				return nodes.Items, nil
+			}
+
+		case <-time.After(UpCheckTimeout):
+			return nil, errors.New("timed out waiting for nodes to be ready")
+		}
+	}
+}
+
+func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
+	nodes, err := impl.getK8sNodesWhenReady(ctx)
 	if err != nil {
-		impl.Log.Error(err, "failed to list nodes")
+		impl.Log.Error(err, "nodes not ready")
 		return nil
 	}
 
-	for _, node := range nodes.Items {
+	for _, node := range nodes {
 		newTaints := []v1.Taint{}
 		for _, t := range node.Spec.Taints {
-			if !(t.Effect == "NoSchedule" && t.TimeAdded != nil) {
+			if t.Effect != v1.TaintEffectNoSchedule || t.TimeAdded == nil {
 				newTaints = append(newTaints, t)
 			}
 		}
@@ -219,7 +252,7 @@ func (impl *Impl) uncordonK8sNodes(dryRun bool) error {
 			continue
 		}
 		node.Spec.Taints = newTaints
-		err := impl.Update(context.TODO(), &node)
+		err := impl.Update(ctx, &node)
 		if err != nil {
 			impl.Log.Error(err, "failed to uncordon node", "node", node.Name)
 		}
