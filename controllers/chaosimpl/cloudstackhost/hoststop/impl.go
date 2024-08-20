@@ -97,6 +97,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 }
 
 func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
+	impl.Log.Info("Starting hypervisor recovery")
 	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
 	spec := cloudstackchaos.Spec
 
@@ -104,11 +105,14 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	if err != nil {
 		return v1alpha1.Injected, fmt.Errorf("creating cloudstack api client: %w", err)
 	}
+	impl.Log.Info("Parsing selector")
 
 	var selector v1alpha1.CloudStackHostChaosSelector
 	if err := json.Unmarshal([]byte(records[index].Id), &selector); err != nil {
 		return v1alpha1.Injected, fmt.Errorf("decoding selector: %w", err)
 	}
+
+	impl.Log.Info("Looking for hosts to recover", "selector", selector)
 
 	params := utils.SelectorToListParams(&selector)
 	params.SetOutofbandmanagementenabled(true)
@@ -118,6 +122,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	if err != nil {
 		return v1alpha1.Injected, fmt.Errorf("listing hosts: %w", err)
 	}
+
+	impl.Log.Info("Found hosts to start", "len", len(resp.Hosts))
 
 	for _, h := range resp.Hosts {
 		impl.Log.Info("Starting host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
@@ -229,11 +235,13 @@ func (impl *Impl) getK8sNodesWhenReady(ctx context.Context) ([]v1.Node, error) {
 }
 
 func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
+	impl.Log.Info("Will uncordon ready nodes")
 	nodes, err := impl.getK8sNodesWhenReady(ctx)
 	if err != nil {
 		impl.Log.Error(err, "nodes not ready")
 		return nil
 	}
+	impl.Log.Info("Found ready nodes", "len", len(nodes))
 
 	for _, node := range nodes {
 		newTaints := []v1.Taint{}
@@ -262,6 +270,7 @@ func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
 }
 
 func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) error {
+	impl.Log.Info("Will start stopped VMs")
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
 	params.SetState(StateStopped)
 
@@ -269,6 +278,7 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) err
 	if err != nil {
 		return err
 	}
+	impl.Log.Info("Found vms to start", "len", len(resp.VirtualMachines))
 
 	wg := sync.WaitGroup{}
 	for _, vm := range resp.VirtualMachines {
@@ -302,22 +312,25 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) err
 }
 
 func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient, dryRun bool) error {
-	resp, err := client.SystemVM.ListSystemVms(client.SystemVM.NewListSystemVmsParams())
+	impl.Log.Info("Will destroy stuck system VMs")
+	params := client.SystemVM.NewListSystemVmsParams()
+	params.SetState(StateStopped)
+	resp, err := client.SystemVM.ListSystemVms(params)
 	if err != nil {
 		return err
 	}
+	impl.Log.Info("Found system vms to start", "len", len(resp.SystemVms))
+
 	for _, vm := range resp.SystemVms {
-		if vm.State == StateStopped {
-			impl.Log.Info("Destroying system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
-			if dryRun {
-				continue
-			}
-			_, err := client.SystemVM.DestroySystemVm(client.SystemVM.NewDestroySystemVmParams(vm.Id))
-			if err != nil {
-				return fmt.Errorf("failed to destroy system vm %s: %w", vm.Id, err)
-			}
-			impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+		impl.Log.Info("Destroying system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+		if dryRun {
+			continue
 		}
+		_, err := client.SystemVM.DestroySystemVm(client.SystemVM.NewDestroySystemVmParams(vm.Id))
+		if err != nil {
+			return fmt.Errorf("failed to destroy system vm %s: %w", vm.Id, err)
+		}
+		impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
 	}
 	return nil
 }
