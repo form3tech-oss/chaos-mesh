@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -112,7 +113,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.Injected, fmt.Errorf("decoding selector: %w", err)
 	}
 
-	impl.Log.Info("Looking for hosts to recover", "selector", selector)
+	impl.Log.Info("Looking for hosts to recover", "selector", records[index].Id)
 
 	params := utils.SelectorToListParams(&selector)
 	params.SetOutofbandmanagementenabled(true)
@@ -223,7 +224,7 @@ func (impl *Impl) getK8sNodesWhenReady(ctx context.Context) ([]v1.Node, error) {
 				}
 			}
 			if len(unreadyNodes) > 0 {
-				impl.Log.Info("nodes not ready", "nodes", unreadyNodes)
+				impl.Log.Info("nodes not ready", "nodes", strings.Join(unreadyNodes, ", "))
 			} else {
 				return nodes.Items, nil
 			}
