@@ -245,27 +245,26 @@ func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
 	impl.Log.Info("Found ready nodes", "len", len(nodes))
 
 	for _, node := range nodes {
-		newTaints := []v1.Taint{}
+		isApplicable := false
 		for _, t := range node.Spec.Taints {
-			if t.Effect != v1.TaintEffectNoSchedule || t.TimeAdded == nil {
-				newTaints = append(newTaints, t)
+			if t.Effect == v1.TaintEffectNoSchedule && t.TimeAdded != nil {
+				isApplicable = true
 			}
 		}
-
-		if len(newTaints) == len(node.Spec.Taints) {
+		if !isApplicable || !node.Spec.Unschedulable {
 			continue
 		}
 
-		impl.Log.Info("Removing taints", "node", node.Name, "dryRun", dryRun)
+		impl.Log.Info("Uncordon node", "node", node.Name, "dryRun", dryRun)
 		if dryRun {
 			continue
 		}
-		node.Spec.Taints = newTaints
+		node.Spec.Unschedulable = false
 		err := impl.Update(ctx, &node)
 		if err != nil {
 			impl.Log.Error(err, "failed to uncordon node", "node", node.Name)
 		}
-		impl.Log.Info("Removed taints", "node", node.Name, "dryRun", dryRun)
+		impl.Log.Info("Uncordoned node", "node", node.Name)
 	}
 	return nil
 }
@@ -303,7 +302,7 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) err
 			if err != nil {
 				impl.Log.Error(err, "failed to wait for vm to be running", "name", vm.Name)
 			}
-			impl.Log.Info("Started VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+			impl.Log.Info("Started VM", "id", vm.Id, "name", vm.Name)
 
 		}(vm)
 	}
@@ -331,7 +330,7 @@ func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient, dry
 		if err != nil {
 			return fmt.Errorf("failed to destroy system vm %s: %w", vm.Id, err)
 		}
-		impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
+		impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name)
 	}
 	return nil
 }
