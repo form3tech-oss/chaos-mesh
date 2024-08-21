@@ -78,7 +78,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	}
 
 	if len(resp.Hosts) == 0 {
-		return v1alpha1.NotInjected, fmt.Errorf("no hosts returned matching criteria")
+		impl.Log.Info("No hosts matching criteria")
+		return v1alpha1.Injected, nil
 	}
 
 	h := resp.Hosts[rand.Intn(len(resp.Hosts))]
