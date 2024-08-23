@@ -49,8 +49,8 @@ const (
 	StateStopped = "Stopped"
 )
 
-var retryOpts = []retry.Option{retry.Attempts(10), retry.MaxDelay(5 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
-var waitRetryOpts = []retry.Option{retry.Attempts(20), retry.MaxDelay(30 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
+var retryOpts = []retry.Option{retry.Attempts(12), retry.Delay(5 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
+var waitRetryOpts = []retry.Option{retry.Attempts(20), retry.Delay(30 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
