@@ -1153,12 +1153,15 @@ metadata:
 rules:
   - apiGroups: [ "" ]
     resources:
-      - nodes
       - persistentvolumes
       - persistentvolumeclaims
       - namespaces
       - services
     verbs: [ "get", "list", "watch" ]
+  - apiGroups: [ "" ]
+    resources:
+      - nodes
+    verbs: [ "get", "list", "update", "watch" ]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
