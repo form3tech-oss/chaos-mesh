@@ -180,6 +180,8 @@ controllerManager:
         type: DirectoryOrCreate
 
 chaosDaemon:
+  # Enable chaos-daemon
+  create: true
   # image would be constructed by <registry>/<repository>:<tag>
   image:
     # override global registry, empty value means using the global images.registry
