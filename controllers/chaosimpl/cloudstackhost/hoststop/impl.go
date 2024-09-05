@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"math/rand"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/apache/cloudstack-go/v2/cloudstack"
@@ -50,7 +49,6 @@ const (
 )
 
 var retryOpts = []retry.Option{retry.Attempts(12), retry.Delay(5 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
-var waitRetryOpts = []retry.Option{retry.Attempts(20), retry.Delay(30 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
@@ -153,13 +151,19 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		impl.Log.Info("Started host", "id", h.Id, "name", h.Name)
 	}
 
-	if err := impl.startVMs(client, spec.DryRun); err != nil {
+	err = retry.Do(func() error {
+		if err := impl.startVMs(client, spec.Keyword, spec.DryRun); err != nil {
+			return err
+		}
+		if err := impl.uncordonK8sNodes(ctx, spec.Keyword, spec.DryRun); err != nil {
+			return err
+		}
+		return nil
+	}, retryOpts...)
+	if err != nil {
 		return v1alpha1.Injected, err
 	}
 	if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
-		return v1alpha1.Injected, err
-	}
-	if err := impl.uncordonK8sNodes(ctx, spec.DryRun); err != nil {
 		return v1alpha1.Injected, err
 	}
 
@@ -173,19 +177,6 @@ func NewImpl(c client.Client, log logr.Logger) *Impl {
 	}
 }
 
-func waitForVmToBeRunning(client *cloudstack.CloudStackClient, vmId string) error {
-	return retry.Do(func() error {
-		vm, _, err := client.VirtualMachine.GetVirtualMachineByID(vmId)
-		if err != nil {
-			return errors.Wrapf(err, "failed to query status for vm %s", vmId)
-		}
-		if vm.State == StateRunning {
-			return nil
-		}
-
-		return errors.Errorf("VM %s is not running", vmId)
-	}, waitRetryOpts...)
-}
 func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error {
 	return retry.Do(func() error {
 		host, _, err := client.Host.GetHostByID(hostId)
@@ -196,9 +187,10 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 			return nil
 		}
 		return errors.Errorf("host %s is not up", hostId)
-	}, waitRetryOpts...)
+	}, retry.Attempts(20), retry.Delay(30*time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)) // wait for 10 minutes
 }
-func (impl *Impl) getK8sNodesWhenReady(ctx context.Context) ([]v1.Node, error) {
+
+func (impl *Impl) getK8sNodesWhenReady(ctx context.Context, keyword string) ([]v1.Node, error) {
 	return retry.DoWithData(func() ([]v1.Node, error) {
 		nodeList := v1.NodeList{}
 		err := impl.List(ctx, &nodeList)
@@ -206,28 +198,32 @@ func (impl *Impl) getK8sNodesWhenReady(ctx context.Context) ([]v1.Node, error) {
 			return nil, errors.Wrap(err, "failed to list nodes")
 		}
 		unreadyNodes := []string{}
+		matchingNodes := []v1.Node{}
 		for _, node := range nodeList.Items {
+			if !strings.Contains(node.Name, keyword) {
+				continue
+			}
 			for _, condition := range node.Status.Conditions {
 				if condition.Type == v1.NodeReady && condition.Status != v1.ConditionTrue {
 					unreadyNodes = append(unreadyNodes, node.Name)
 					break
 				}
 			}
+			matchingNodes = append(matchingNodes, node)
 		}
 		if len(unreadyNodes) > 0 {
 			return nil, errors.Errorf("nodes %s not ready", strings.Join(unreadyNodes, ", "))
 		}
-		return nodeList.Items, nil
+		return matchingNodes, nil
 
-	}, waitRetryOpts...)
+	}, retry.Attempts(10), retry.Delay(30*time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)) // try for 5 minutes
 }
 
-func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
-	impl.Log.Info("Will uncordon ready nodes")
-	nodes, err := impl.getK8sNodesWhenReady(ctx)
+func (impl *Impl) uncordonK8sNodes(ctx context.Context, keyword string, dryRun bool) error {
+	impl.Log.Info("Will uncordon ready nodes", "keyword", keyword)
+	nodes, err := impl.getK8sNodesWhenReady(ctx, keyword)
 	if err != nil {
-		impl.Log.Error(err, "Nodes not ready")
-		return nil
+		return errors.Wrap(err, "K8s nodes not ready")
 	}
 
 	for _, node := range nodes {
@@ -270,8 +266,8 @@ func (impl *Impl) uncordonK8sNodes(ctx context.Context, dryRun bool) error {
 	return nil
 }
 
-func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) error {
-	impl.Log.Info("Will start stopped VMs")
+func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, keyword string, dryRun bool) error {
+	impl.Log.Info("Will start stopped VMs", "keyword", keyword)
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
 	params.SetState(StateStopped)
 
@@ -279,39 +275,31 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, dryRun bool) err
 		return client.VirtualMachine.ListVirtualMachines(params)
 	}, retryOpts...)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to list stopped VMs")
 	}
 
-	wg := sync.WaitGroup{}
 	for _, vm := range resp.VirtualMachines {
+		if !strings.Contains(vm.Name, keyword) {
+			continue
+		}
+
 		impl.Log.Info("Starting VM", "id", vm.Id, "name", vm.Name, "dryRun", dryRun)
 
 		if dryRun {
 			continue
 		}
-		wg.Add(1)
 
-		go func(vm *cloudstack.VirtualMachine) {
-			defer wg.Done()
-			startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
-			startParams.SetConsiderlasthost(true) // try to schedule to the same host
+		startParams := client.VirtualMachine.NewStartVirtualMachineParams(vm.Id)
+		startParams.SetConsiderlasthost(true) // try to schedule to the same host
 
-			if retry.Do(func() error {
-				_, err := client.VirtualMachine.StartVirtualMachine(startParams)
-				return err
-			}, retryOpts...); err != nil {
-				impl.Log.Error(err, "failed to start stopped vm", "name", vm.Name)
-			}
-
-			if err := waitForVmToBeRunning(client, vm.Id); err != nil {
-				impl.Log.Error(err, "failed to wait for vm to be running", "name", vm.Name)
-			} else {
-				impl.Log.Info("Started VM", "id", vm.Id, "name", vm.Name)
-			}
-
-		}(vm)
+		if err := retry.Do(func() error {
+			_, err := client.VirtualMachine.StartVirtualMachine(startParams)
+			return err
+		}, retryOpts...); err != nil {
+			return errors.Wrapf(err, "failed to start stopped vm %s", vm.Name)
+		}
+		impl.Log.Info("Started VM", "id", vm.Id, "name", vm.Name)
 	}
-	wg.Wait()
 
 	return nil
 }
@@ -325,7 +313,7 @@ func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient, dry
 		return client.SystemVM.ListSystemVms(params)
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to list system VMs")
 	}
 
 	for _, vm := range resp.SystemVms {
@@ -341,10 +329,9 @@ func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient, dry
 		}, retryOpts...)
 
 		if err != nil {
-			impl.Log.Error(err, "Failed to destroy system vm", "id", vm.Id, "name", vm.Name)
-		} else {
-			impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name)
+			return errors.Wrapf(err, "failed to destroy system vm %s", vm.Name)
 		}
+		impl.Log.Info("Destroyed system VM", "id", vm.Id, "name", vm.Name)
 	}
 
 	return nil
