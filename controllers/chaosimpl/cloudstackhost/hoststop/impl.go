@@ -172,10 +172,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 			if err := impl.uncordonK8sNodes(ctx, vms, spec.DryRun); err != nil {
 				return err
 			}
-			if err := impl.startVMs(client, vms, spec.DryRun); err != nil {
-				return err
-			}
-			return nil
+			// try to start vms again, just in case
+			return impl.startVMs(client, vms, spec.DryRun)
 		}, retryOpts...)
 		if err != nil {
 			return v1alpha1.Injected, errors.Wrapf(err, "recover vms & nodes on host %s", h.Name)
