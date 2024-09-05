@@ -1178,6 +1178,10 @@ spec:
               duration:
                 description: Duration represents the duration of the chaos action.
                 type: string
+              keyword:
+                description: Keyword defines the keyword to filter the VMs and Nodes
+                  by.
+                type: string
               remoteCluster:
                 description: RemoteCluster represents the remote cluster where the
                   chaos will be deployed
@@ -7436,6 +7440,10 @@ spec:
                   duration:
                     description: Duration represents the duration of the chaos action.
                     type: string
+                  keyword:
+                    description: Keyword defines the keyword to filter the VMs and
+                      Nodes by.
+                    type: string
                   remoteCluster:
                     description: RemoteCluster represents the remote cluster where
                       the chaos will be deployed
@@ -11362,6 +11370,10 @@ spec:
                               description: Duration represents the duration of the
                                 chaos action.
                               type: string
+                            keyword:
+                              description: Keyword defines the keyword to filter the
+                                VMs and Nodes by.
+                              type: string
                             remoteCluster:
                               description: RemoteCluster represents the remote cluster
                                 where the chaos will be deployed
@@ -15152,6 +15164,10 @@ spec:
                                 duration:
                                   description: Duration represents the duration of
                                     the chaos action.
+                                  type: string
+                                keyword:
+                                  description: Keyword defines the keyword to filter
+                                    the VMs and Nodes by.
                                   type: string
                                 remoteCluster:
                                   description: RemoteCluster represents the remote
@@ -25509,6 +25525,10 @@ spec:
                   duration:
                     description: Duration represents the duration of the chaos action.
                     type: string
+                  keyword:
+                    description: Keyword defines the keyword to filter the VMs and
+                      Nodes by.
+                    type: string
                   remoteCluster:
                     description: RemoteCluster represents the remote cluster where
                       the chaos will be deployed
@@ -29056,6 +29076,10 @@ spec:
                       duration:
                         description: Duration represents the duration of the chaos
                           action.
+                        type: string
+                      keyword:
+                        description: Keyword defines the keyword to filter the VMs
+                          and Nodes by.
                         type: string
                       remoteCluster:
                         description: RemoteCluster represents the remote cluster where
@@ -33077,6 +33101,10 @@ spec:
                                   description: Duration represents the duration of
                                     the chaos action.
                                   type: string
+                                keyword:
+                                  description: Keyword defines the keyword to filter
+                                    the VMs and Nodes by.
+                                  type: string
                                 remoteCluster:
                                   description: RemoteCluster represents the remote
                                     cluster where the chaos will be deployed
@@ -36980,6 +37008,10 @@ spec:
                                     duration:
                                       description: Duration represents the duration
                                         of the chaos action.
+                                      type: string
+                                    keyword:
+                                      description: Keyword defines the keyword to
+                                        filter the VMs and Nodes by.
                                       type: string
                                     remoteCluster:
                                       description: RemoteCluster represents the remote
@@ -51712,6 +51744,10 @@ spec:
                           description: Duration represents the duration of the chaos
                             action.
                           type: string
+                        keyword:
+                          description: Keyword defines the keyword to filter the VMs
+                            and Nodes by.
+                          type: string
                         remoteCluster:
                           description: RemoteCluster represents the remote cluster
                             where the chaos will be deployed
@@ -55394,6 +55430,10 @@ spec:
                             duration:
                               description: Duration represents the duration of the
                                 chaos action.
+                              type: string
+                            keyword:
+                              description: Keyword defines the keyword to filter the
+                                VMs and Nodes by.
                               type: string
                             remoteCluster:
                               description: RemoteCluster represents the remote cluster

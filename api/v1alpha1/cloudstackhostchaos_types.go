@@ -75,6 +75,10 @@ type CloudStackHostChaosSpec struct {
 	// RemoteCluster represents the remote cluster where the chaos will be deployed
 	// +optional
 	RemoteCluster string `json:"remoteCluster,omitempty"`
+
+	// Keyword defines the keyword to filter the VMs and Nodes by.
+	// +optional
+	Keyword string `json:"keyword,omitempty"`
 }
 
 // CloudStackHostChaosStatus represents the status of a CloudStackChaos.
