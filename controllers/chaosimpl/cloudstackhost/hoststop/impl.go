@@ -132,6 +132,15 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	for _, h := range resp.Hosts {
 		impl.Log.Info("Starting host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 
+		vmResp, err := retry.DoWithData(func() (*cloudstack.ListVirtualMachinesResponse, error) {
+			params := client.VirtualMachine.NewListVirtualMachinesParams()
+			params.SetHostid(h.Id)
+			return client.VirtualMachine.ListVirtualMachines(params)
+		})
+		if err != nil {
+			return v1alpha1.Injected, errors.Wrapf(err, "list vms on host %s", h.Name)
+		}
+
 		if spec.DryRun {
 			continue
 		}
@@ -149,20 +158,30 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		}
 
 		impl.Log.Info("Started host", "id", h.Id, "name", h.Name)
+
+		vms := []string{}
+		for _, vm := range vmResp.VirtualMachines {
+			vms = append(vms, vm.Name)
+		}
+		impl.Log.Info("Host contained VMs", "vms", vms)
+
+		err = retry.Do(func() error {
+			if err := impl.startVMs(client, vms, spec.DryRun); err != nil {
+				return err
+			}
+			if err := impl.uncordonK8sNodes(ctx, vms, spec.DryRun); err != nil {
+				return err
+			}
+			if err := impl.startVMs(client, vms, spec.DryRun); err != nil {
+				return err
+			}
+			return nil
+		}, retryOpts...)
+		if err != nil {
+			return v1alpha1.Injected, errors.Wrapf(err, "recover vms & nodes on host %s", h.Name)
+		}
 	}
 
-	err = retry.Do(func() error {
-		if err := impl.startVMs(client, spec.Keyword, spec.DryRun); err != nil {
-			return err
-		}
-		if err := impl.uncordonK8sNodes(ctx, spec.Keyword, spec.DryRun); err != nil {
-			return err
-		}
-		return nil
-	}, retryOpts...)
-	if err != nil {
-		return v1alpha1.Injected, err
-	}
 	if err := impl.destroyStuckSystemVMs(client, spec.DryRun); err != nil {
 		return v1alpha1.Injected, err
 	}
@@ -190,7 +209,7 @@ func waitForHostToBeUp(client *cloudstack.CloudStackClient, hostId string) error
 	}, retry.Attempts(20), retry.Delay(30*time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)) // wait for 10 minutes
 }
 
-func (impl *Impl) getK8sNodesWhenReady(ctx context.Context, keyword string) ([]v1.Node, error) {
+func (impl *Impl) getK8sNodesWhenReady(ctx context.Context, names []string) ([]v1.Node, error) {
 	return retry.DoWithData(func() ([]v1.Node, error) {
 		nodeList := v1.NodeList{}
 		err := impl.List(ctx, &nodeList)
@@ -200,7 +219,14 @@ func (impl *Impl) getK8sNodesWhenReady(ctx context.Context, keyword string) ([]v
 		unreadyNodes := []string{}
 		matchingNodes := []v1.Node{}
 		for _, node := range nodeList.Items {
-			if !strings.Contains(node.Name, keyword) {
+			isMatch := false
+			for _, name := range names {
+				if name == node.Name {
+					isMatch = true
+					break
+				}
+			}
+			if !isMatch {
 				continue
 			}
 			for _, condition := range node.Status.Conditions {
@@ -219,9 +245,9 @@ func (impl *Impl) getK8sNodesWhenReady(ctx context.Context, keyword string) ([]v
 	}, retry.Attempts(10), retry.Delay(30*time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)) // try for 5 minutes
 }
 
-func (impl *Impl) uncordonK8sNodes(ctx context.Context, keyword string, dryRun bool) error {
-	impl.Log.Info("Will uncordon ready nodes", "keyword", keyword)
-	nodes, err := impl.getK8sNodesWhenReady(ctx, keyword)
+func (impl *Impl) uncordonK8sNodes(ctx context.Context, names []string, dryRun bool) error {
+	impl.Log.Info("Will uncordon ready nodes")
+	nodes, err := impl.getK8sNodesWhenReady(ctx, names)
 	if err != nil {
 		return errors.Wrap(err, "K8s nodes not ready")
 	}
@@ -266,8 +292,8 @@ func (impl *Impl) uncordonK8sNodes(ctx context.Context, keyword string, dryRun b
 	return nil
 }
 
-func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, keyword string, dryRun bool) error {
-	impl.Log.Info("Will start stopped VMs", "keyword", keyword)
+func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, names []string, dryRun bool) error {
+	impl.Log.Info("Will start stopped VMs")
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
 	params.SetState(StateStopped)
 
@@ -279,7 +305,14 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, keyword string, 
 	}
 
 	for _, vm := range resp.VirtualMachines {
-		if !strings.Contains(vm.Name, keyword) {
+		isMatch := false
+		for _, name := range names {
+			if name == vm.Name {
+				isMatch = true
+				break
+			}
+		}
+		if !isMatch {
 			continue
 		}
 
