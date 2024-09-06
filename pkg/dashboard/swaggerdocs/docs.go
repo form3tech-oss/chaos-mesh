@@ -5732,6 +5732,10 @@ const docTemplate = `{
                     "description": "Duration represents the duration of the chaos action.\n+optional",
                     "type": "string"
                 },
+                "keyword": {
+                    "description": "Keyword represents the keyword to filter VMs or Nodes by.\n+optional",
+                    "type": "string"
+                },
                 "remoteCluster": {
                     "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
                     "type": "string"
