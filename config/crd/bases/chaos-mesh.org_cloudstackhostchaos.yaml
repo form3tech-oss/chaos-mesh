@@ -198,6 +198,12 @@ spec:
                     - Stop
                     type: string
                 type: object
+              host:
+                type: string
+              vms:
+                items:
+                  type: string
+                type: array
             required:
             - experiment
             type: object

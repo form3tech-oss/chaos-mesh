@@ -80,6 +80,9 @@ type CloudStackHostChaosSpec struct {
 // CloudStackHostChaosStatus represents the status of a CloudStackChaos.
 type CloudStackHostChaosStatus struct {
 	ChaosStatus `json:",inline"`
+
+	Host string   `json:"host,omitempty"`
+	VMs  []string `json:"vms,omitempty"`
 }
 
 type CloudStackHostChaosSelector struct {
