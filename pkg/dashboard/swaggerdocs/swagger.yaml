@@ -4173,11 +4173,6 @@ definitions:
           Duration represents the duration of the chaos action.
           +optional
         type: string
-      keyword:
-        description: |-
-          Keyword represents the keyword to filter VMs or Nodes by.
-          +optional
-        type: string
       remoteCluster:
         description: |-
           RemoteCluster represents the remote cluster where the chaos will be deployed
