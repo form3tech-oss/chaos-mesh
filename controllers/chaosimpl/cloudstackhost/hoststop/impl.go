@@ -52,7 +52,7 @@ const (
 	NodesReady        = "NodesReady"
 )
 
-var retryOpts = []retry.Option{retry.Attempts(12), retry.Delay(5 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
+var retryOpts = []retry.Option{retry.Attempts(5), retry.Delay(1 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
