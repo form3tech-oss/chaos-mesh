@@ -87,7 +87,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	h := resp.Hosts[rand.Intn(len(resp.Hosts))]
 
-	cloudstackchaos.Status.Host = h.Id
+	cloudstackchaos.Status.Host = h.Name
 
 	vmResp, err := retry.DoWithData(func() (*cloudstack.ListVirtualMachinesResponse, error) {
 		params := client.VirtualMachine.NewListVirtualMachinesParams()
