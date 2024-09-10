@@ -125,3 +125,7 @@ func (selector *CloudStackHostChaosSelector) Id() string {
 func (obj *CloudStackHostChaos) GetSelectorSpecs() map[string]interface{} {
 	return map[string]interface{}{".": &obj.Spec.Selector}
 }
+
+func (obj *CloudStackHostChaos) GetCustomStatus() interface{} {
+	return &obj.Status.Instances
+}
