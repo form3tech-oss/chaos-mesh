@@ -55,17 +55,24 @@ const (
 var retryOpts = []retry.Option{retry.Attempts(5), retry.Delay(1 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
 
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
-	spec := cloudstackchaos.Spec
+	chaos, ok := obj.(*v1alpha1.CloudStackHostChaos)
+	if !ok {
+		return v1alpha1.NotInjected, errors.New("chaos is not CloudstackHostChaos")
+	}
+	if chaos.Status.Affected == nil {
+		chaos.Status.Affected = make(map[string]v1alpha1.CloudStackHostAffected)
+	}
+	spec := chaos.Spec
+	record := records[index]
 
-	client, err := utils.GetCloudStackClient(ctx, impl.Client, cloudstackchaos)
+	client, err := utils.GetCloudStackClient(ctx, impl.Client, chaos)
 	if err != nil {
 		return v1alpha1.NotInjected, errors.Wrap(err, "creating cloudstack api client")
 	}
 
 	var selector v1alpha1.CloudStackHostChaosSelector
-	if err := json.Unmarshal([]byte(records[index].Id), &selector); err != nil {
-		return v1alpha1.NotInjected, errors.Wrapf(err, "decoding selector: %s", records[index].Id)
+	if err := json.Unmarshal([]byte(record.Id), &selector); err != nil {
+		return v1alpha1.NotInjected, errors.Wrapf(err, "decoding selector: %s", record.Id)
 	}
 
 	params := utils.SelectorToListParams(&selector)
@@ -76,18 +83,16 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return client.Host.ListHosts(params)
 	})
 	if err != nil {
-		impl.Log.Error(err, "Failed to list matching hosts", "selector", records[index].Id)
+		impl.Log.Error(err, "Failed to list matching hosts", "selector", record.Id)
 		return v1alpha1.NotInjected, errors.Wrap(err, "listing hosts")
 	}
 
 	if len(resp.Hosts) == 0 {
-		impl.Log.Info("No hosts matching criteria")
+		impl.Log.Info("No hosts matching criteria", "criteria", record.Id)
 		return v1alpha1.Injected, nil
 	}
 
 	h := resp.Hosts[rand.Intn(len(resp.Hosts))]
-
-	cloudstackchaos.Status.Host = h.Name
 
 	vmResp, err := retry.DoWithData(func() (*cloudstack.ListVirtualMachinesResponse, error) {
 		params := client.VirtualMachine.NewListVirtualMachinesParams()
@@ -101,7 +106,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	for _, vm := range vmResp.VirtualMachines {
 		vms = append(vms, vm.Name)
 	}
-	cloudstackchaos.Status.VMs = vms
+
+	chaos.Status.Affected[record.Id] = v1alpha1.CloudStackHostAffected{Host: h.Name, VMs: vms}
 
 	impl.Log.Info("Stopping host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 	if !spec.DryRun {
@@ -121,18 +127,21 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 }
 
 func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	cloudstackchaos := obj.(*v1alpha1.CloudStackHostChaos)
+	chaos, ok := obj.(*v1alpha1.CloudStackHostChaos)
+	if !ok {
+		return v1alpha1.NotInjected, errors.New("chaos is not CloudstackHostChaos")
+	}
+	record := records[index]
 
-	if cloudstackchaos.Status.Host == "" {
+	affected := chaos.Status.Affected[record.Id]
+	if affected.Host == "" {
 		impl.Log.Info("Nothing to recover")
 		return v1alpha1.NotInjected, nil
 	}
 
-	hostName := cloudstackchaos.Status.Host
-	vms := cloudstackchaos.Status.VMs
-	spec := cloudstackchaos.Spec
-
-	record := records[index]
+	hostName := affected.Host
+	vms := affected.VMs
+	spec := chaos.Spec
 
 	impl.Log.Info("Hypervisor recovery", "host", hostName, "vms", vms, "phase", record.Phase, "dry-run", spec.DryRun)
 
@@ -140,7 +149,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return v1alpha1.NotInjected, nil
 	}
 
-	client, err := utils.GetCloudStackClient(ctx, impl.Client, cloudstackchaos)
+	client, err := utils.GetCloudStackClient(ctx, impl.Client, chaos)
 	if err != nil {
 		return v1alpha1.Injected, errors.Wrap(err, "creating cloudstack api client")
 	}
