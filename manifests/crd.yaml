@@ -1214,17 +1214,17 @@ spec:
           status:
             description: CloudStackHostChaosStatus represents the status of a CloudStackChaos.
             properties:
-              affected:
+              affectedHosts:
                 additionalProperties:
                   properties:
-                    host:
+                    name:
                       type: string
                     vms:
                       items:
                         type: string
                       type: array
                   type: object
-                description: Affected keeps track of the affected hosts and vms
+                description: Instances keeps track of the affected hosts and vms
                 type: object
               conditions:
                 description: Conditions represents the current global condition of

@@ -81,13 +81,13 @@ type CloudStackHostChaosSpec struct {
 type CloudStackHostChaosStatus struct {
 	ChaosStatus `json:",inline"`
 
-	// Affected keeps track of the affected hosts and vms
+	// Instances keeps track of the affected hosts and vms
 	// +optional
-	Affected map[string]CloudStackHostAffected `json:"affected,omitempty"`
+	Instances map[string]CloudStackHostAffected `json:"affectedHosts,omitempty"`
 }
 
 type CloudStackHostAffected struct {
-	Host string   `json:"host,omitempty"`
+	Name string   `json:"name,omitempty"`
 	VMs  []string `json:"vms,omitempty"`
 }
 

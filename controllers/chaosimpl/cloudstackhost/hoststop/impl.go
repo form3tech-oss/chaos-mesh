@@ -59,8 +59,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	if !ok {
 		return v1alpha1.NotInjected, errors.New("chaos is not CloudstackHostChaos")
 	}
-	if chaos.Status.Affected == nil {
-		chaos.Status.Affected = make(map[string]v1alpha1.CloudStackHostAffected)
+	if chaos.Status.Instances == nil {
+		chaos.Status.Instances = make(map[string]v1alpha1.CloudStackHostAffected)
 	}
 	spec := chaos.Spec
 	record := records[index]
@@ -107,7 +107,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		vms = append(vms, vm.Name)
 	}
 
-	chaos.Status.Affected[record.Id] = v1alpha1.CloudStackHostAffected{Host: h.Name, VMs: vms}
+	chaos.Status.Instances[record.Id] = v1alpha1.CloudStackHostAffected{Name: h.Name, VMs: vms}
 
 	impl.Log.Info("Stopping host", "id", h.Id, "name", h.Name, "dry-run", spec.DryRun)
 	if !spec.DryRun {
@@ -133,13 +133,13 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 	record := records[index]
 
-	affected := chaos.Status.Affected[record.Id]
-	if affected.Host == "" {
+	affected := chaos.Status.Instances[record.Id]
+	if affected.Name == "" {
 		impl.Log.Info("Nothing to recover")
 		return v1alpha1.NotInjected, nil
 	}
 
-	hostName := affected.Host
+	hostName := affected.Name
 	vms := affected.VMs
 	spec := chaos.Spec
 

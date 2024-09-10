@@ -1056,8 +1056,8 @@ func (in *CloudStackHostChaosSpec) DeepCopy() *CloudStackHostChaosSpec {
 func (in *CloudStackHostChaosStatus) DeepCopyInto(out *CloudStackHostChaosStatus) {
 	*out = *in
 	in.ChaosStatus.DeepCopyInto(&out.ChaosStatus)
-	if in.Affected != nil {
-		in, out := &in.Affected, &out.Affected
+	if in.Instances != nil {
+		in, out := &in.Instances, &out.Instances
 		*out = make(map[string]CloudStackHostAffected, len(*in))
 		for key, val := range *in {
 			(*out)[key] = *val.DeepCopy()
