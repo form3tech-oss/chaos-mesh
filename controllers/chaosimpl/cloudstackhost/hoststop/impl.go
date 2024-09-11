@@ -46,10 +46,11 @@ const (
 	StateRunning = "Running"
 	StateStopped = "Stopped"
 
-	HostStartingPhase = "HostStarting"
-	HostStartedPhase  = "HostStarted"
-	VMsStartedPhase   = "VMsStarted"
-	NodesReady        = "NodesReady"
+	HostStartingPhase    = "Injected/HostStarting"
+	HostStartedPhase     = "Injected/HostStarted"
+	VMsStartedPhase      = "Injected/VMsStarted"
+	NodesReadyPhase      = "Injected/NodesReady"
+	NodesUncordonedPhase = "Injected/NodesUncordoned"
 )
 
 var retryOpts = []retry.Option{retry.Attempts(5), retry.Delay(1 * time.Second), retry.DelayType(retry.FixedDelay), retry.LastErrorOnly(true)}
@@ -143,9 +144,10 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	vms := affected.VMs
 	spec := chaos.Spec
 
-	impl.Log.Info("Hypervisor recovery", "host", hostName, "vms", vms, "phase", record.Phase, "dry-run", spec.DryRun)
+	impl.Log = impl.Log.WithValues("host", hostName)
 
 	if spec.DryRun {
+		impl.Log.Info("Hypervisor recovery dry run", "vms", vms)
 		return v1alpha1.NotInjected, nil
 	}
 
@@ -156,6 +158,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	switch record.Phase {
 	case v1alpha1.Injected:
+		impl.Log.Info("Starting hypervisor recovery", "vms", vms)
 		if err := impl.startHost(client, hostName); err != nil {
 			return v1alpha1.Injected, err
 		}
@@ -163,7 +166,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	case HostStartingPhase:
 		if err := impl.ensureStartedHost(client, hostName); err != nil {
-			return HostStartingPhase, err
+			return HostStartingPhase, nil
 		}
 
 		return HostStartedPhase, nil
@@ -176,16 +179,24 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return VMsStartedPhase, nil
 
 	case VMsStartedPhase:
+		if err := impl.ensureK8sNodesReady(ctx, vms); err != nil {
+			// jump back to HostStartedPhase to make sure all VMs are started
+			return HostStartedPhase, nil
+		}
+
+		return NodesReadyPhase, nil
+
+	case NodesReadyPhase:
 		if err := impl.uncordonK8sNodes(ctx, vms); err != nil {
 			// jump back to HostStartedPhase to make sure all VMs are started
 			return HostStartedPhase, errors.Wrapf(err, "failed to uncordon nodes on host %s", hostName)
 		}
 
-		return NodesReady, nil
+		return NodesUncordonedPhase, nil
 
-	case NodesReady:
+	case NodesUncordonedPhase:
 		if err := impl.destroyStuckSystemVMs(client); err != nil {
-			return NodesReady, errors.Wrap(err, "failed to destroy stuck system VMs")
+			return NodesReadyPhase, errors.Wrap(err, "failed to destroy stuck system VMs")
 		}
 		return v1alpha1.NotInjected, nil
 
@@ -236,7 +247,7 @@ func (impl *Impl) getK8sNodes(ctx context.Context, names []string) ([]v1.Node, e
 	}, retryOpts...)
 }
 
-func (impl *Impl) uncordonK8sNodes(ctx context.Context, names []string) error {
+func (impl *Impl) ensureK8sNodesReady(ctx context.Context, names []string) error {
 	impl.Log.Info("Will uncordon ready nodes")
 	nodes, err := impl.getK8sNodes(ctx, names)
 	if err != nil {
@@ -246,6 +257,15 @@ func (impl *Impl) uncordonK8sNodes(ctx context.Context, names []string) error {
 		if !isK8sNodeReady(node) {
 			return errors.Errorf("node %s is not ready", node.Name)
 		}
+	}
+	return nil
+}
+
+func (impl *Impl) uncordonK8sNodes(ctx context.Context, names []string) error {
+	impl.Log.Info("Will uncordon ready nodes")
+	nodes, err := impl.getK8sNodes(ctx, names)
+	if err != nil {
+		return err
 	}
 
 	for _, node := range nodes {
