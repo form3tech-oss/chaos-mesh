@@ -49,14 +49,14 @@ jobs:
     steps:
       - name: Download saved images
         id: download-images
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-targets.outputs.images-artifact-name }}
           path: ./output/${{ needs.build-targets.outputs.images-artifact-name }}
 
       - name: Download chart
         id: download-chart
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-targets.outputs.chart-artifact-name }}
           path: ./output/${{ needs.build-targets.outputs.chart-artifact-name }}
