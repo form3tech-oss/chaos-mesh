@@ -85,7 +85,7 @@ jobs:
 
       - name: Post run - upload kubernetes cluster info dump
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: integration-test-kubernetes-cluster-info-dump
           path: cluster-info-dump
