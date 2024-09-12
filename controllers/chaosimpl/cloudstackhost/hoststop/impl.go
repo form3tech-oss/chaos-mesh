@@ -82,7 +82,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	resp, err := retry.DoWithData(func() (*cloudstack.ListHostsResponse, error) {
 		return client.Host.ListHosts(params)
-	})
+	}, retryOpts...)
+
 	if err != nil {
 		impl.Log.Error(err, "Failed to list matching hosts", "selector", record.Id)
 		return v1alpha1.NotInjected, errors.Wrap(err, "listing hosts")
@@ -93,13 +94,41 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.Injected, nil
 	}
 
-	h := resp.Hosts[rand.Intn(len(resp.Hosts))]
+	routerResp, err := retry.DoWithData(func() (*cloudstack.ListRoutersResponse, error) {
+		return client.Router.ListRouters(client.Router.NewListRoutersParams())
+	}, retryOpts...)
+	if err != nil {
+		impl.Log.Error(err, "Failed to list routers")
+		return v1alpha1.NotInjected, errors.Wrap(err, "listing routers")
+	}
+	matchingHosts := []*cloudstack.Host{}
+	for _, h := range resp.Hosts {
+		hostsRouter := false
+		for _, r := range routerResp.Routers {
+			if r.Hostid == h.Id {
+				impl.Log.Info("Found host with a router, excluding from the test", h.Name)
+				hostsRouter = true
+				break
+
+			}
+		}
+		if !hostsRouter {
+			matchingHosts = append(matchingHosts, h)
+		}
+	}
+
+	if len(matchingHosts) == 0 {
+		impl.Log.Info("All hosts matching criteria are hosting virtual routers", "criteria", record.Id)
+		return v1alpha1.Injected, nil
+	}
+
+	h := matchingHosts[rand.Intn(len(matchingHosts))]
 
 	vmResp, err := retry.DoWithData(func() (*cloudstack.ListVirtualMachinesResponse, error) {
 		params := client.VirtualMachine.NewListVirtualMachinesParams()
 		params.SetHostid(h.Id)
 		return client.VirtualMachine.ListVirtualMachines(params)
-	})
+	}, retryOpts...)
 	if err != nil {
 		return v1alpha1.NotInjected, errors.Wrapf(err, "list vms on host %s", h.Name)
 	}
