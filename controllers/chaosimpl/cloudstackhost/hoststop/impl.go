@@ -17,8 +17,9 @@ package hoststop
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"github.com/apache/cloudstack-go/v2/cloudstack"
@@ -82,7 +83,8 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 
 	resp, err := retry.DoWithData(func() (*cloudstack.ListHostsResponse, error) {
 		return client.Host.ListHosts(params)
-	})
+	}, retryOpts...)
+
 	if err != nil {
 		impl.Log.Error(err, "Failed to list matching hosts", "selector", record.Id)
 		return v1alpha1.NotInjected, errors.Wrap(err, "listing hosts")
@@ -93,13 +95,13 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 		return v1alpha1.Injected, nil
 	}
 
-	h := resp.Hosts[rand.Intn(len(resp.Hosts))]
+	h := randomHost(resp.Hosts)
 
 	vmResp, err := retry.DoWithData(func() (*cloudstack.ListVirtualMachinesResponse, error) {
 		params := client.VirtualMachine.NewListVirtualMachinesParams()
 		params.SetHostid(h.Id)
 		return client.VirtualMachine.ListVirtualMachines(params)
-	})
+	}, retryOpts...)
 	if err != nil {
 		return v1alpha1.NotInjected, errors.Wrapf(err, "list vms on host %s", h.Name)
 	}
@@ -144,10 +146,8 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	vms := affected.VMs
 	spec := chaos.Spec
 
-	impl.Log = impl.Log.WithValues("host", hostName)
-
 	if spec.DryRun {
-		impl.Log.Info("Hypervisor recovery dry run", "vms", vms)
+		impl.Log.Info("Hypervisor recovery dry run", "host", hostName, "vms", vms)
 		return v1alpha1.NotInjected, nil
 	}
 
@@ -158,7 +158,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	switch record.Phase {
 	case v1alpha1.Injected:
-		impl.Log.Info("Starting hypervisor recovery", "vms", vms)
+		impl.Log.Info("Starting hypervisor recovery", "host", hostName, "vms", vms)
 		if err := impl.startHost(client, hostName); err != nil {
 			return v1alpha1.Injected, err
 		}
@@ -166,12 +166,13 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	case HostStartingPhase:
 		if err := impl.ensureStartedHost(client, hostName); err != nil {
-			return HostStartingPhase, nil
+			return HostStartingPhase, err
 		}
 
 		return HostStartedPhase, nil
 
 	case HostStartedPhase:
+		impl.Log.Info("Will start stopped VMs", "host", hostName)
 		if err := impl.startVMs(client, vms); err != nil {
 			return HostStartedPhase, errors.Wrapf(err, "failed to start vms on host %s", hostName)
 		}
@@ -181,12 +182,13 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	case VMsStartedPhase:
 		if err := impl.ensureK8sNodesReady(ctx, vms); err != nil {
 			// jump back to HostStartedPhase to make sure all VMs are started
-			return HostStartedPhase, nil
+			return HostStartedPhase, err
 		}
 
 		return NodesReadyPhase, nil
 
 	case NodesReadyPhase:
+		impl.Log.Info("Will uncordon ready nodes", "host", hostName)
 		if err := impl.uncordonK8sNodes(ctx, vms); err != nil {
 			// jump back to HostStartedPhase to make sure all VMs are started
 			return HostStartedPhase, errors.Wrapf(err, "failed to uncordon nodes on host %s", hostName)
@@ -195,6 +197,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return NodesUncordonedPhase, nil
 
 	case NodesUncordonedPhase:
+		impl.Log.Info("Will destroy stuck system VMs", "host", hostName)
 		if err := impl.destroyStuckSystemVMs(client); err != nil {
 			return NodesReadyPhase, errors.Wrap(err, "failed to destroy stuck system VMs")
 		}
@@ -248,7 +251,6 @@ func (impl *Impl) getK8sNodes(ctx context.Context, names []string) ([]v1.Node, e
 }
 
 func (impl *Impl) ensureK8sNodesReady(ctx context.Context, names []string) error {
-	impl.Log.Info("Will uncordon ready nodes")
 	nodes, err := impl.getK8sNodes(ctx, names)
 	if err != nil {
 		return err
@@ -262,7 +264,6 @@ func (impl *Impl) ensureK8sNodesReady(ctx context.Context, names []string) error
 }
 
 func (impl *Impl) uncordonK8sNodes(ctx context.Context, names []string) error {
-	impl.Log.Info("Will uncordon ready nodes")
 	nodes, err := impl.getK8sNodes(ctx, names)
 	if err != nil {
 		return err
@@ -335,7 +336,6 @@ func (impl *Impl) ensureStartedHost(client *cloudstack.CloudStackClient, hostNam
 }
 
 func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, names []string) error {
-	impl.Log.Info("Will start stopped VMs")
 	params := client.VirtualMachine.NewListVirtualMachinesParams()
 	params.SetState(StateStopped)
 
@@ -369,7 +369,6 @@ func (impl *Impl) startVMs(client *cloudstack.CloudStackClient, names []string) 
 }
 
 func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient) error {
-	impl.Log.Info("Will destroy stuck system VMs")
 	params := client.SystemVM.NewListSystemVmsParams()
 	params.SetState(StateStopped)
 
@@ -396,4 +395,10 @@ func (impl *Impl) destroyStuckSystemVMs(client *cloudstack.CloudStackClient) err
 	}
 
 	return nil
+}
+
+func randomHost(hosts []*cloudstack.Host) *cloudstack.Host {
+	i, _ := rand.Int(rand.Reader, big.NewInt(int64(len(hosts))))
+
+	return hosts[i.Int64()]
 }
