@@ -109,6 +109,14 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	for _, vm := range vmResp.VirtualMachines {
 		vms = append(vms, vm.Name)
 	}
+	isActive, err := impl.isClusterActive(ctx, vms)
+	if err != nil {
+		return v1alpha1.NotInjected, errors.Wrapf(err, "check if cluster is active %s", h.Name)
+	}
+	if !isActive {
+		impl.Log.Info("Cluster inactive, skipping", "name", h.Name)
+		return v1alpha1.Injected, nil
+	}
 
 	chaos.Status.Instances[record.Id] = v1alpha1.CloudStackHostAffected{Name: h.Name, VMs: vms}
 
@@ -172,7 +180,6 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 		return HostStartedPhase, nil
 
 	case HostStartedPhase:
-		impl.Log.Info("Will start stopped VMs", "host", hostName)
 		if err := impl.startVMs(client, vms); err != nil {
 			return HostStartedPhase, errors.Wrapf(err, "failed to start vms on host %s", hostName)
 		}
@@ -248,6 +255,19 @@ func (impl *Impl) getK8sNodes(ctx context.Context, names []string) ([]v1.Node, e
 		}
 		return matchingNodes, nil
 	}, retryOpts...)
+}
+
+func (impl *Impl) isClusterActive(ctx context.Context, names []string) (bool, error) {
+	nodes, err := impl.getK8sNodes(ctx, names)
+	if err != nil {
+		return false, err
+	}
+	for _, node := range nodes {
+		if node.Spec.Unschedulable {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 func (impl *Impl) ensureK8sNodesReady(ctx context.Context, names []string) error {
