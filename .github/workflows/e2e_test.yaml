@@ -40,13 +40,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: download saved images
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.images-artifact-name }}
           path: ./output/saved-images
 
       - name: download e2e binary
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.e2e-binary-name }}
           path: ./output/e2e-binary

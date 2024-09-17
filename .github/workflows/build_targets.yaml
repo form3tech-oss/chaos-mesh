@@ -100,7 +100,7 @@ jobs:
           key: ${{ inputs.images-cache-key }}
 
       - name: Upload saved images
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.images-artifact-name }}
           path: ./output/saved-images
@@ -134,7 +134,7 @@ jobs:
           key: ${{ inputs.e2e-binary-cache-key }}
 
       - name: Upload e2e binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.e2e-binary-name }}
           path: ./e2e-test/image/e2e/bin
@@ -169,7 +169,7 @@ jobs:
           echo "chart-name=$chart_name" >> $GITHUB_OUTPUT
 
       - name: Upload chart
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.chart-artifact-name }}
           path: ${{ steps.build-chart.outputs.chart-path }}

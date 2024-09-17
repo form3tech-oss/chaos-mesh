@@ -80,6 +80,15 @@ type CloudStackHostChaosSpec struct {
 // CloudStackHostChaosStatus represents the status of a CloudStackChaos.
 type CloudStackHostChaosStatus struct {
 	ChaosStatus `json:",inline"`
+
+	// Instances keeps track of the affected hosts and vms
+	// +optional
+	Instances map[string]CloudStackHostAffected `json:"affectedHosts,omitempty"`
+}
+
+type CloudStackHostAffected struct {
+	Name string   `json:"name,omitempty"`
+	VMs  []string `json:"vms,omitempty"`
 }
 
 type CloudStackHostChaosSelector struct {
@@ -115,4 +124,8 @@ func (selector *CloudStackHostChaosSelector) Id() string {
 
 func (obj *CloudStackHostChaos) GetSelectorSpecs() map[string]interface{} {
 	return map[string]interface{}{".": &obj.Spec.Selector}
+}
+
+func (obj *CloudStackHostChaos) GetCustomStatus() interface{} {
+	return &obj.Status.Instances
 }

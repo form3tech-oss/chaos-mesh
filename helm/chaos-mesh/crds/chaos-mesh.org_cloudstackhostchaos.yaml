@@ -120,6 +120,18 @@ spec:
           status:
             description: CloudStackHostChaosStatus represents the status of a CloudStackChaos.
             properties:
+              affectedHosts:
+                additionalProperties:
+                  properties:
+                    name:
+                      type: string
+                    vms:
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                description: Instances keeps track of the affected hosts and vms
+                type: object
               conditions:
                 description: Conditions represents the current global condition of
                   the chaos
