@@ -61,39 +61,46 @@ func (it *FakeImage) AttachToProcess(pid int, variables map[string]uint64) (err 
 		return errors.New("fake image: extern variable number not match")
 	}
 
+	it.logger.Info("AttachToProcess: before LockOSThread")
 	runtime.LockOSThread()
 	defer func() {
 		runtime.UnlockOSThread()
 	}()
 
+	it.logger.Info("AttachToProcess: before ptrace.Trace")
 	program, err := ptrace.Trace(pid, it.logger.WithName("ptrace").WithValues("pid", pid))
 	if err != nil {
 		return errors.Wrapf(err, "ptrace on target process, pid: %d", pid)
 	}
 	defer func() {
+		it.logger.Info("AttachToProcess: before program.Detach")
 		err = program.Detach()
 		if err != nil {
 			it.logger.Error(err, "fail to detach program", "pid", program.Pid())
 		}
 	}()
 
+	it.logger.Info("AttachToProcess: before FindVDSOEntry")
 	vdsoEntry, err := FindVDSOEntry(program)
 	if err != nil {
 		return errors.Wrapf(err, "PID : %d", pid)
 	}
 
+	it.logger.Info("AttachToProcess: before FindInjectedImage")
 	fakeEntry, err := it.FindInjectedImage(program, len(variables))
 	if err != nil {
 		return errors.Wrapf(err, "PID : %d", pid)
 	}
 	// target process has not been injected yet
 	if fakeEntry == nil {
+		it.logger.Info("AttachToProcess: before InjectFakeImage")
 		fakeEntry, err = it.InjectFakeImage(program, vdsoEntry)
 		if err != nil {
 			return errors.Wrapf(err, "injecting fake image , PID : %d", pid)
 		}
 		defer func() {
 			if err != nil {
+				it.logger.Info("AttachToProcess: before TryReWriteFakeImage")
 				errIn := it.TryReWriteFakeImage(program)
 				if errIn != nil {
 					it.logger.Error(errIn, "rewrite fail, recover fail")
@@ -105,6 +112,7 @@ func (it *FakeImage) AttachToProcess(pid int, variables map[string]uint64) (err 
 	}
 
 	for k, v := range variables {
+		it.logger.Info("AttachToProcess: before SetVarUint64, " + k)
 		err = it.SetVarUint64(program, fakeEntry, k, v)
 
 		if err != nil {
