@@ -18,6 +18,7 @@ package chaosdaemon
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
@@ -41,6 +42,11 @@ func findIPOnEndpoints(e *v1.Endpoints, nodeName string) string {
 		for _, addr := range subset.Addresses {
 			if addr.NodeName != nil && *addr.NodeName == nodeName {
 				return addr.IP
+			}
+			if addr.NodeName == nil {
+				log.Info("Not Matched: addr.NodeName is nil")
+			} else {
+				log.Info(fmt.Sprintf("Not Matched: addr.NodeName %s", addr.NodeName))
 			}
 		}
 	}
