@@ -44,7 +44,7 @@ jobs:
 
   release:
     runs-on: ubuntu-20.04
-    needs: [calculate-tag, build-targets]
+    needs: [calculate-tag, build-targets, e2e-test, integration-test]
     permissions: write-all
     steps:
       - name: Download saved images
