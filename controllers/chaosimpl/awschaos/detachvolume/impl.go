@@ -29,6 +29,7 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/api/v1alpha1"
 	impltypes "github.com/chaos-mesh/chaos-mesh/controllers/chaosimpl/types"
+	selector "github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 )
 
 var _ impltypes.ChaosImpl = (*Impl)(nil)
@@ -68,7 +69,7 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	}
 	ec2client := ec2.NewFromConfig(cfg)
 
-	var selected v1alpha1.AWSSelector
+	var selected selector.Instance
 	err = json.Unmarshal([]byte(records[index].Id), &selected)
 	if err != nil {
 		impl.Log.Error(err, "fail to unmarshal the selector")
@@ -79,8 +80,13 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	_, err = ec2client.DetachVolume(context.TODO(), &ec2.DetachVolumeInput{
 		VolumeId:   selected.EbsVolume,
 		Device:     selected.DeviceName,
+<<<<<<< HEAD
 		Force:      &force,
 		InstanceId: &selected.Ec2Instance,
+=======
+		Force:      true,
+		InstanceId: &selected.InstanceID,
+>>>>>>> 9df16631 (feat: improve aws chaos, adding filters support (#93))
 	})
 
 	if err != nil {
@@ -120,7 +126,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 	ec2client := ec2.NewFromConfig(cfg)
 
-	var selected v1alpha1.AWSSelector
+	var selected selector.Instance
 	err = json.Unmarshal([]byte(records[index].Id), &selected)
 	if err != nil {
 		impl.Log.Error(err, "fail to unmarshal the selector")
@@ -129,7 +135,7 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 
 	_, err = ec2client.AttachVolume(context.TODO(), &ec2.AttachVolumeInput{
 		Device:     selected.DeviceName,
-		InstanceId: &selected.Ec2Instance,
+		InstanceId: &selected.InstanceID,
 		VolumeId:   selected.EbsVolume,
 	})
 
