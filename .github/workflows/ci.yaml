@@ -42,6 +42,41 @@ jobs:
     with:
       images-artifact-name: ${{ needs.build-targets.outputs.images-artifact-name }}
 
+  pass:
+    if: always()
+    needs:
+      - changed-files
+      - unit-test
+      - integration-test
+      - e2e-test
+    name: All Checks Pass
+    runs-on: ubuntu-20.04
+    steps:
+      - run: |
+          result="${{ needs.changed-files.result }}"
+          if [[ ! $result == "success" ]]; then
+            echo "changed-files has failed"
+            exit 1
+          fi
+
+          result="${{ needs.unit-test.result }}"
+          if [[ ! ($result == "success" || $result == "skipped") ]]; then
+            echo "unit-test has failed"
+            exit 1
+          fi
+
+          result="${{ needs.integration-test.result }}"
+          if [[ ! ($result == "success" || $result == "skipped") ]]; then
+            echo "integration-test has failed"
+            exit 1
+          fi
+
+          result="${{ needs.e2e-test.result }}"
+          if [[ ! ($result == "success" || $result == "skipped") ]]; then
+            echo "e2e-test has failed"
+            exit 1
+          fi
+
   release:
     runs-on: ubuntu-20.04
     needs: [calculate-tag, build-targets]
