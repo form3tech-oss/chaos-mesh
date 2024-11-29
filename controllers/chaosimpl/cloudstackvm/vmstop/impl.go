@@ -32,6 +32,11 @@ type Impl struct {
 	Log logr.Logger
 }
 
+const (
+	StateRunning = "Running"
+	StateStopped = "Stopped"
+)
+
 func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	cloudstackchaos := obj.(*v1alpha1.CloudStackVMChaos)
 	spec := cloudstackchaos.Spec
@@ -47,13 +52,15 @@ func (impl *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Reco
 	}
 
 	params := utils.SelectorToListParams(&selector)
+	params.SetState(StateRunning)
 	resp, err := client.VirtualMachine.ListVirtualMachines(params)
 	if err != nil {
 		return v1alpha1.NotInjected, fmt.Errorf("listing VMs: %w", err)
 	}
 
 	if len(resp.VirtualMachines) == 0 {
-		return v1alpha1.NotInjected, fmt.Errorf("no VMs returned matching criteria")
+		impl.Log.Info("no running VMs returned matching criteria")
+		return v1alpha1.Injected, nil
 	}
 
 	for _, vm := range resp.VirtualMachines {
@@ -87,13 +94,15 @@ func (impl *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Re
 	}
 
 	params := utils.SelectorToListParams(&selector)
+	params.SetState(StateStopped)
 	resp, err := client.VirtualMachine.ListVirtualMachines(params)
 	if err != nil {
 		return v1alpha1.Injected, fmt.Errorf("listing VMs: %w", err)
 	}
 
 	if len(resp.VirtualMachines) == 0 {
-		return v1alpha1.Injected, fmt.Errorf("no VMs returned matching criteria")
+		impl.Log.Info("no stopped VMs returned matching criteria")
+		return v1alpha1.NotInjected, nil
 	}
 
 	for _, vm := range resp.VirtualMachines {
