@@ -178,7 +178,7 @@ func contains(arr []string, target string) bool {
 
 func convertExtra(in map[string]authnv1.ExtraValue) map[string]authzv1.ExtraValue {
 	// map from authentication and authorization types
-	extra := map[string]authzv1.ExtraValue{}
+	extra := make(map[string]authzv1.ExtraValue{}, len(in))
 	for key, value := range in {
 		extra[key] = authzv1.ExtraValue(value)
 	}
