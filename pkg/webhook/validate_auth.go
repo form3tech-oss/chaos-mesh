@@ -23,8 +23,8 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
-	v1 "k8s.io/api/authentication/v1"
-	authv1 "k8s.io/api/authorization/v1"
+	authnv1 "k8s.io/api/authentication/v1"
+	authzv1 "k8s.io/api/authorization/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	authorizationv1 "k8s.io/client-go/kubernetes/typed/authorization/v1"
@@ -133,15 +133,15 @@ func (v *AuthValidator) Handle(ctx context.Context, req admission.Request) admis
 	return admission.Allowed("")
 }
 
-func (v *AuthValidator) auth(userInfo v1.UserInfo, namespace string, chaosKind string) (bool, error) {
+func (v *AuthValidator) auth(userInfo authnv1.UserInfo, namespace string, chaosKind string) (bool, error) {
 	resourceName, err := v.resourceFor(chaosKind)
 	if err != nil {
 		return false, err
 	}
 
-	sar := authv1.SubjectAccessReview{
-		Spec: authv1.SubjectAccessReviewSpec{
-			ResourceAttributes: &authv1.ResourceAttributes{
+	sar := authzv1.SubjectAccessReview{
+		Spec: authzv1.SubjectAccessReviewSpec{
+			ResourceAttributes: &authzv1.ResourceAttributes{
 				Namespace: namespace,
 				Verb:      "create",
 				Group:     "chaos-mesh.org",
@@ -176,11 +176,11 @@ func contains(arr []string, target string) bool {
 	return false
 }
 
-func convertExtra(in map[string]v1.ExtraValue) map[string]authv1.ExtraValue {
+func convertExtra(in map[string]authnv1.ExtraValue) map[string]authzv1.ExtraValue {
 	// map from authentication and authorization types
-	extra := map[string]authv1.ExtraValue{}
+	extra := map[string]authzv1.ExtraValue{}
 	for key, value := range in {
-		extra[key] = authv1.ExtraValue(value)
+		extra[key] = authzv1.ExtraValue(value)
 	}
 	return extra
 }
