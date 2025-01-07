@@ -729,6 +729,7 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
+  NodeSelectorChaos: {},
   CiliumChaos: {},
   // Pod Fault
   PodChaos: {

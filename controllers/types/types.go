@@ -156,6 +156,14 @@ var ChaosObjects = fx.Supply(
 			Object: &v1alpha1.CiliumChaos{},
 		},
 	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "nodeselectorchaos",
+			Object: &v1alpha1.NodeSelectorChaos{},
+		},
+	},
 )
 
 // WebhookObject only used for registration the

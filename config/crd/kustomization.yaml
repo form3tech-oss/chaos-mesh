@@ -34,6 +34,7 @@ resources:
 - bases/chaos-mesh.org_resourcescalechaos.yaml
 - bases/chaos-mesh.org_podpvcchaos.yaml
 - bases/chaos-mesh.org_certificatechaos.yaml
+- bases/chaos-mesh.org_nodeselectorchaos.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

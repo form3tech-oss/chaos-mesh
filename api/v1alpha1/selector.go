@@ -164,3 +164,12 @@ type NodeSelectorSpec struct {
 	// +optional
 	ExpressionSelectors LabelSelectorRequirements `json:"expressionSelectors,omitempty" swaggerignore:"true"`
 }
+
+type DeploymentSelector struct {
+	// Map of namespace names to a list of deployments in that namespace.
+	Deployments map[string][]string `json:"deployments,omitempty"`
+}
+
+type DeploymentSelectorSpec struct {
+	DeploymentSelector `json:",inline"`
+}

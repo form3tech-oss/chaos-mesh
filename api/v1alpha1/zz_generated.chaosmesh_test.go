@@ -970,6 +970,69 @@ func TestNetworkChaosListChaos(t *testing.T) {
 	chaos.ListChaos()
 }
 
+func TestNodeSelectorChaosIsDeleted(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &NodeSelectorChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsDeleted()
+}
+
+func TestNodeSelectorChaosIsIsPaused(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &NodeSelectorChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.IsPaused()
+}
+
+func TestNodeSelectorChaosGetDuration(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &NodeSelectorChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.Spec.GetDuration()
+}
+
+func TestNodeSelectorChaosGetStatus(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &NodeSelectorChaos{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.GetStatus()
+}
+
+func TestNodeSelectorChaosGetSpecAndMetaString(t *testing.T) {
+	g := NewGomegaWithT(t)
+	chaos := &NodeSelectorChaos{}
+	err := faker.FakeData(chaos)
+	g.Expect(err).To(BeNil())
+	chaos.GetSpecAndMetaString()
+}
+
+func TestNodeSelectorChaosListChaos(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	chaos := &NodeSelectorChaosList{}
+	err := faker.FakeData(chaos)
+
+	g.Expect(err).To(BeNil())
+
+	chaos.ListChaos()
+}
+
 func TestPhysicalMachineChaosIsDeleted(t *testing.T) {
 	g := NewGomegaWithT(t)
 

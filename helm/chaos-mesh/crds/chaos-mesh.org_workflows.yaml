@@ -2382,6 +2382,39 @@ spec:
                       - mode
                       - selector
                       type: object
+                    nodeselectorChaos:
+                      properties:
+                        duration:
+                          description: Duration represents the duration of the chaos
+                          type: string
+                        key:
+                          description: Key is the name of the key that will be applied
+                            to the deployment's nodeSelector field.
+                          type: string
+                        remoteCluster:
+                          description: RemoteCluster represents the remote cluster
+                            where the chaos will be deployed
+                          type: string
+                        selector:
+                          properties:
+                            deployments:
+                              additionalProperties:
+                                items:
+                                  type: string
+                                type: array
+                              description: Map of namespace names to a list of deployments
+                                in that namespace.
+                              type: object
+                          type: object
+                        value:
+                          description: Value is the value assigned to the provided
+                            key.
+                          type: string
+                      required:
+                      - key
+                      - selector
+                      - value
+                      type: object
                     physicalmachineChaos:
                       description: PhysicalMachineChaosSpec defines the desired state
                         of PhysicalMachineChaos
@@ -6145,6 +6178,40 @@ spec:
                           - action
                           - mode
                           - selector
+                          type: object
+                        nodeselectorChaos:
+                          properties:
+                            duration:
+                              description: Duration represents the duration of the
+                                chaos
+                              type: string
+                            key:
+                              description: Key is the name of the key that will be
+                                applied to the deployment's nodeSelector field.
+                              type: string
+                            remoteCluster:
+                              description: RemoteCluster represents the remote cluster
+                                where the chaos will be deployed
+                              type: string
+                            selector:
+                              properties:
+                                deployments:
+                                  additionalProperties:
+                                    items:
+                                      type: string
+                                    type: array
+                                  description: Map of namespace names to a list of
+                                    deployments in that namespace.
+                                  type: object
+                              type: object
+                            value:
+                              description: Value is the value assigned to the provided
+                                key.
+                              type: string
+                          required:
+                          - key
+                          - selector
+                          - value
                           type: object
                         physicalmachineChaos:
                           description: PhysicalMachineChaosSpec defines the desired
