@@ -39,6 +39,7 @@ const (
 	TypeK8SChaos TemplateType = "K8SChaos"
 	TypeKernelChaos TemplateType = "KernelChaos"
 	TypeNetworkChaos TemplateType = "NetworkChaos"
+	TypeNodeSelectorChaos TemplateType = "NodeSelectorChaos"
 	TypePhysicalMachineChaos TemplateType = "PhysicalMachineChaos"
 	TypePodChaos TemplateType = "PodChaos"
 	TypePodPVCChaos TemplateType = "PodPVCChaos"
@@ -66,6 +67,7 @@ var allChaosTemplateType = []TemplateType{
 	TypeK8SChaos,
 	TypeKernelChaos,
 	TypeNetworkChaos,
+	TypeNodeSelectorChaos,
 	TypePhysicalMachineChaos,
 	TypePodChaos,
 	TypePodPVCChaos,
@@ -107,6 +109,8 @@ type EmbedChaos struct {
 	KernelChaos *KernelChaosSpec `json:"kernelChaos,omitempty"`
 	// +optional
 	NetworkChaos *NetworkChaosSpec `json:"networkChaos,omitempty"`
+	// +optional
+	NodeSelectorChaos *NodeSelectorChaosSpec `json:"nodeselectorChaos,omitempty"`
 	// +optional
 	PhysicalMachineChaos *PhysicalMachineChaosSpec `json:"physicalmachineChaos,omitempty"`
 	// +optional
@@ -185,6 +189,10 @@ func (it *EmbedChaos) SpawnNewObject(templateType TemplateType) (GenericChaos, e
 	case TypeNetworkChaos:
 		result := NetworkChaos{}
 		result.Spec = *it.NetworkChaos
+		return &result, nil
+	case TypeNodeSelectorChaos:
+		result := NodeSelectorChaos{}
+		result.Spec = *it.NodeSelectorChaos
 		return &result, nil
 	case TypePhysicalMachineChaos:
 		result := PhysicalMachineChaos{}
@@ -267,6 +275,9 @@ func (it *EmbedChaos) RestoreChaosSpec(root interface{}) error {
 	case *NetworkChaos:
 		*it.NetworkChaos = chaos.Spec
 		return nil
+	case *NodeSelectorChaos:
+		*it.NodeSelectorChaos = chaos.Spec
+		return nil
 	case *PhysicalMachineChaos:
 		*it.PhysicalMachineChaos = chaos.Spec
 		return nil
@@ -340,6 +351,9 @@ func (it *EmbedChaos) SpawnNewList(templateType TemplateType) (GenericChaosList,
 		return &result, nil
 	case TypeNetworkChaos:
 		result := NetworkChaosList{}
+		return &result, nil
+	case TypeNodeSelectorChaos:
+		result := NodeSelectorChaosList{}
 		return &result, nil
 	case TypePhysicalMachineChaos:
 		result := PhysicalMachineChaosList{}
@@ -481,6 +495,14 @@ func (in *KernelChaosList) GetItems() []GenericChaos {
 	return result
 }
 func (in *NetworkChaosList) GetItems() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+func (in *NodeSelectorChaosList) GetItems() []GenericChaos {
 	var result []GenericChaos
 	for _, item := range in.Items {
 		item := item
