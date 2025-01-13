@@ -12,6 +12,7 @@ const mapping = new Map<ExperimentKind, string>([
   ['K8SChaos', 'k8sChaos'],
   ['KernelChaos', 'kernelChaos'],
   ['NetworkChaos', 'networkChaos'],
+  ['NodeSelectorChaos', 'nodeselectorChaos'],
   ['PhysicalMachineChaos', 'physicalmachineChaos'],
   ['PodChaos', 'podChaos'],
   ['PodPVCChaos', 'podpvcChaos'],

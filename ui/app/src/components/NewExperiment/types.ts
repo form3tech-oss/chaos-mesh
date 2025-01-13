@@ -187,6 +187,7 @@ export interface ExperimentType {
   K8SChaos?: unknown
   KernelChaos: Kernel
   NetworkChaos: Network
+  NodeSelectorChaos?: unknown
   PodChaos: Pod
   PodPVCChaos: PodPVC
   ResourceScaleChaos: ResourceScale

@@ -30,6 +30,11 @@ resources:
 - bases/chaos-mesh.org_k8schaos.yaml
 - bases/chaos-mesh.org_resourcescalechaos.yaml
 - bases/chaos-mesh.org_podpvcchaos.yaml
+<<<<<<< HEAD
+=======
+- bases/chaos-mesh.org_certificatechaos.yaml
+- bases/chaos-mesh.org_nodeselectorchaos.yaml
+>>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

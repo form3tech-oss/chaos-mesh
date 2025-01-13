@@ -32,7 +32,8 @@ func GenKeyForImage(pc *v1alpha1.PodChaos, containerName string, isInit bool) st
 	} else {
 		containerName += "-normal"
 	}
-	imageKey := fmt.Sprintf("%s-%s-%s-%s-image", AnnotationPrefix, pc.Name, pc.Spec.Action, containerName)
+	imageKey := fmt.Sprintf("%s-%s-%s-%s-image",
+		AnnotationPrefix, pc.Name, pc.Spec.Action, containerName)
 
 	// name part of annotation must be no more than 63 characters.
 	// If the key is too long, we just use containerName as the key of annotation.
