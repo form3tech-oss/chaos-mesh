@@ -25,6 +25,7 @@ import (
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/deployment"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/k8schaos"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
@@ -83,6 +84,11 @@ type SelectorParams struct {
 	ResourceScaleSelector   *resourcescale.SelectImpl
 	RollingRestartSelector  *rollingrestart.SelectImpl
 	PodPVCSelector          *podpvc.SelectImpl
+<<<<<<< HEAD
+=======
+	CertificateSelector     *certificate.SelectImpl
+	DeploymentSelector      *deployment.SelectImpl
+>>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))
 }
 
 func New(p SelectorParams) *Selector {
@@ -116,4 +122,9 @@ var Module = fx.Provide(
 	resourcescale.New,
 	rollingrestart.New,
 	podpvc.New,
+<<<<<<< HEAD
+=======
+	certificate.New,
+	deployment.New,
+>>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))
 )

@@ -136,3 +136,44 @@ func (in PodSelectorSpec) ClusterScoped() bool {
 
 	return false
 }
+<<<<<<< HEAD
+=======
+
+type NodeSelector struct {
+	// Selector is used to select nodes into which to inject chaos.
+	Selector NodeSelectorSpec `json:"selector"`
+
+	// Mode defines the mode to run chaos action.
+	// Supported mode: one / all / fixed / fixed-percent / random-max-percent
+	// +kubebuilder:validation:Enum=one;all;fixed;fixed-percent;random-max-percent
+	Mode SelectorMode `json:"mode"`
+
+	// Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+	// If `FixedMode`, provide an integer of pods to do chaos action.
+	// If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+	// IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+	// +optional
+	Value string `json:"value,omitempty"`
+}
+
+type NodeSelectorSpec struct {
+	// Map of string keys and values that can be used to select objects.
+	// A selector based on labels.
+	// +optional
+	LabelSelectors map[string]string `json:"labelSelectors,omitempty"`
+
+	// a slice of label selector expressions that can be used to select objects.
+	// A list of selectors based on set-based label expressions.
+	// +optional
+	ExpressionSelectors LabelSelectorRequirements `json:"expressionSelectors,omitempty" swaggerignore:"true"`
+}
+
+type DeploymentSelector struct {
+	// Map of namespace names to a list of deployments in that namespace.
+	Deployments map[string][]string `json:"deployments,omitempty"`
+}
+
+type DeploymentSelectorSpec struct {
+	DeploymentSelector `json:",inline"`
+}
+>>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))

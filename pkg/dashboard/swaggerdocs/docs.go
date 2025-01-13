@@ -5584,6 +5584,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
                 },
+                "nodeselectorChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeSelectorChaosSpec"
+                },
                 "physicalmachineChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PhysicalMachineChaosSpec"
@@ -7272,6 +7276,37 @@ const docTemplate = `{
                 }
             }
         },
+        "v1alpha1.NodeSelectorChaosSpec": {
+            "type": "object",
+            "properties": {
+                "deployments": {
+                    "description": "Map of namespace names to a list of deployments in that namespace.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "duration": {
+                    "description": "Duration represents the duration of the chaos\n+optional",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Key is the name of the key that will be applied to the deployment's nodeSelector field.",
+                    "type": "string"
+                },
+                "remoteCluster": {
+                    "description": "RemoteCluster represents the remote cluster where the chaos will be deployed\n+optional",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Value is the value assigned to the provided key.",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.NodeSelectorSpec": {
             "type": "object",
             "properties": {
@@ -8201,6 +8236,10 @@ const docTemplate = `{
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
                 },
+                "nodeselectorChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeSelectorChaosSpec"
+                },
                 "physicalmachineChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.PhysicalMachineChaosSpec"
@@ -8587,6 +8626,10 @@ const docTemplate = `{
                 "networkChaos": {
                     "description": "+optional",
                     "$ref": "#/definitions/v1alpha1.NetworkChaosSpec"
+                },
+                "nodeselectorChaos": {
+                    "description": "+optional",
+                    "$ref": "#/definitions/v1alpha1.NodeSelectorChaosSpec"
                 },
                 "physicalmachineChaos": {
                     "description": "+optional",
