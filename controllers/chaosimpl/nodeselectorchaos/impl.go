@@ -60,48 +60,29 @@ func (i *Impl) Apply(ctx context.Context, index int, records []*v1alpha1.Record,
 		return v1alpha1.NotInjected, err
 	}
 
-	data := []byte(fmt.Sprintf(`{"spec": {"template": {"spec": {"nodeSelector": {"%s" :"%s"}}}}}`, chaos.Spec.Key, chaos.Spec.Value))
-	patch := client.RawPatch(types.MergePatchType, data)
-	err = i.Client.Patch(ctx, &deployment, patch)
-	if err != nil {
-		i.Log.Error(err, "patching deployment")
-		return v1alpha1.NotInjected, err
+	if chaos.Spec.Value == "" {
+		escapedKey := strings.ReplaceAll(chaos.Spec.Key, "/", "~1")
+		data := []byte(fmt.Sprintf(`[{"op": "remove", "path": "/spec/template/spec/nodeSelector/%s"}]`, escapedKey))
+		patch := client.RawPatch(types.JSONPatchType, data)
+		err = i.Client.Patch(ctx, &deployment, patch)
+		if err != nil {
+			i.Log.Error(err, "patching deployment")
+			return v1alpha1.NotInjected, err
+		}
+	} else {
+		data := []byte(fmt.Sprintf(`{"spec": {"template": {"spec": {"nodeSelector": {"%s" :"%s"}}}}}`, chaos.Spec.Key, chaos.Spec.Value))
+		patch := client.RawPatch(types.MergePatchType, data)
+		err = i.Client.Patch(ctx, &deployment, patch)
+		if err != nil {
+			i.Log.Error(err, "patching deployment")
+			return v1alpha1.NotInjected, err
+		}
 	}
 
 	return v1alpha1.Injected, nil
 }
 
-func (i *Impl) Recover(ctx context.Context, index int, records []*v1alpha1.Record, obj v1alpha1.InnerObject) (v1alpha1.Phase, error) {
-	chaos, ok := obj.(*v1alpha1.NodeSelectorChaos)
-
-	if !ok {
-		err := errors.New("not NodeSelectorChaos")
-		i.Log.Error(err, "casting InnerObject to NodeSelectorChaos")
-		return v1alpha1.NotInjected, err
-	}
-
-	name, err := controller.ParseNamespacedName(records[index].Id)
-	if err != nil {
-		i.Log.Error(err, "parsing record name")
-		return v1alpha1.Injected, err
-	}
-
-	var deployment v1.Deployment
-	err = i.Client.Get(ctx, name, &deployment)
-	if err != nil {
-		i.Log.Error(err, "getting deployment")
-		return v1alpha1.Injected, err
-	}
-
-	escapedKey := strings.ReplaceAll(chaos.Spec.Key, "/", "~1")
-	data := []byte(fmt.Sprintf(`[{"op": "remove", "path": "/spec/template/spec/nodeSelector/%s"}]`, escapedKey))
-	patch := client.RawPatch(types.JSONPatchType, data)
-	err = i.Client.Patch(ctx, &deployment, patch)
-	if err != nil {
-		i.Log.Error(err, "patching deployment")
-		return v1alpha1.Injected, err
-	}
-
+func (i *Impl) Recover(_ context.Context, _ int, _ []*v1alpha1.Record, _ v1alpha1.InnerObject) (v1alpha1.Phase, error) {
 	return v1alpha1.NotInjected, nil
 }
 

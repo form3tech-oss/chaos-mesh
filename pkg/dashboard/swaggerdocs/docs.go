@@ -7302,7 +7302,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "value": {
-                    "description": "Value is the value assigned to the provided key.",
+                    "description": "Value is the value assigned to the provided key. If empty, the key will be removed.\n+optional",
                     "type": "string"
                 }
             }
