@@ -55,12 +55,12 @@ spec:
                     type: object
                 type: object
               value:
-                description: Value is the value assigned to the provided key.
+                description: Value is the value assigned to the provided key. If empty,
+                  the key will be removed.
                 type: string
             required:
             - key
             - selector
-            - value
             type: object
           status:
             properties:

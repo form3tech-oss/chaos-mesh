@@ -1976,11 +1976,11 @@ spec:
                     type: object
                   value:
                     description: Value is the value assigned to the provided key.
+                      If empty, the key will be removed.
                     type: string
                 required:
                 - key
                 - selector
-                - value
                 type: object
               physicalmachineChaos:
                 description: PhysicalMachineChaosSpec defines the desired state of
@@ -5683,12 +5683,11 @@ spec:
                               type: object
                             value:
                               description: Value is the value assigned to the provided
-                                key.
+                                key. If empty, the key will be removed.
                               type: string
                           required:
                           - key
                           - selector
-                          - value
                           type: object
                         physicalmachineChaos:
                           description: PhysicalMachineChaosSpec defines the desired
@@ -9060,12 +9059,11 @@ spec:
                                   type: object
                                 value:
                                   description: Value is the value assigned to the
-                                    provided key.
+                                    provided key. If empty, the key will be removed.
                                   type: string
                               required:
                               - key
                               - selector
-                              - value
                               type: object
                             physicalmachineChaos:
                               description: PhysicalMachineChaosSpec defines the desired
