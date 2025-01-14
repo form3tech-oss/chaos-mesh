@@ -5762,7 +5762,9 @@ definitions:
           +optional
         type: string
       value:
-        description: Value is the value assigned to the provided key.
+        description: |-
+          Value is the value assigned to the provided key. If empty, the key will be removed.
+          +optional
         type: string
     type: object
   v1alpha1.NodeSelectorSpec:

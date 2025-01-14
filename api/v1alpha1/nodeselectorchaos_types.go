@@ -38,7 +38,8 @@ type NodeSelectorChaosSpec struct {
 	DeploymentSelectorSpec `json:"selector"`
 	// Key is the name of the key that will be applied to the deployment's nodeSelector field.
 	Key string `json:"key"`
-	// Value is the value assigned to the provided key.
+	// Value is the value assigned to the provided key. If empty, the key will be removed.
+	// +optional
 	Value string `json:"value"`
 	// Duration represents the duration of the chaos
 	// +optional
