@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -61,8 +62,7 @@ type RawProvider struct {
 	raw TLSRaw
 }
 
-type InsecureProvider struct {
-}
+type InsecureProvider struct{}
 
 type CredentialProvider interface {
 	getCredentialOption() (grpc.DialOption, error)
@@ -122,7 +122,10 @@ func Builder(address string, port int) *GrpcBuilder {
 }
 
 func (it *GrpcBuilder) WithDefaultTimeout() *GrpcBuilder {
-	it.options = append(it.options, grpc.WithUnaryInterceptor(TimeoutClientInterceptor(DefaultRPCTimeout)))
+	it.options = append(
+		it.options,
+		grpc.WithUnaryInterceptor(TimeoutClientInterceptor(DefaultRPCTimeout)),
+	)
 	return it
 }
 
@@ -161,7 +164,11 @@ func (it *GrpcBuilder) TLSFromRaw(caCert []byte, cert []byte, key []byte) *GrpcB
 	return it
 }
 
-func (it *GrpcBuilder) TLSFromFile(caCertPath string, certPath string, keyPath string) *GrpcBuilder {
+func (it *GrpcBuilder) TLSFromFile(
+	caCertPath string,
+	certPath string,
+	keyPath string,
+) *GrpcBuilder {
 	it.credentialProvider = &FileProvider{
 		file: TLSFile{
 			CaCert: caCertPath,
@@ -185,10 +192,13 @@ func (it *GrpcBuilder) Build() (*grpc.ClientConn, error) {
 }
 
 // TimeoutClientInterceptor wraps the RPC with a timeout.
-func TimeoutClientInterceptor(timeout time.Duration) func(context.Context, string, interface{}, interface{},
+func TimeoutClientInterceptor(
+	timeout time.Duration,
+) func(context.Context, string, interface{}, interface{},
 	*grpc.ClientConn, grpc.UnaryInvoker, ...grpc.CallOption) error {
 	return func(ctx context.Context, method string, req, reply interface{},
-		cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+		cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
+	) error {
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 		return invoker(ctx, method, req, reply, cc, opts...)
@@ -198,9 +208,20 @@ func TimeoutClientInterceptor(timeout time.Duration) func(context.Context, strin
 // TimeoutServerInterceptor ensures the context is intact before handling over the
 // request to application.
 func TimeoutServerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (interface{}, error) {
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 	return handler(ctx, req)
+}
+
+func RequestLoggingServerInterceptor(logger logr.Logger) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+		logger.Info("grpc request", "server", info.Server, "method", info.FullMethod)
+		return handler(ctx, req)
+	}
 }

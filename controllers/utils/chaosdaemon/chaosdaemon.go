@@ -17,6 +17,8 @@ package chaosdaemon
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
@@ -34,15 +36,27 @@ import (
 var log = ctrl.Log.WithName("controller-chaos-daemon-client-utils")
 
 func findIPOnEndpoints(e *v1.Endpoints, nodeName string) string {
+	log.Info("findIPOnEndpoints: %s", nodeName)
+	log.Info("endpoints: %s", jsonDump(e))
 	for _, subset := range e.Subsets {
 		for _, addr := range subset.Addresses {
 			if addr.NodeName != nil && *addr.NodeName == nodeName {
 				return addr.IP
 			}
+			if addr.NodeName == nil {
+				log.Info("Not Matched: addr.NodeName is nil")
+			} else {
+				log.Info(fmt.Sprintf("Not Matched: addr.NodeName %s", addr.NodeName))
+			}
 		}
 	}
 
 	return ""
+}
+
+func jsonDump(i interface{}) string {
+	s, _ := json.Marshal(i)
+	return string(s)
 }
 
 type ChaosDaemonClientBuilder struct {
