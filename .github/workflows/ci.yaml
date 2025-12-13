@@ -50,7 +50,8 @@ jobs:
       - integration-test
       - e2e-test
     name: All Checks Pass
-    runs-on: ubuntu-20.04
+    runs-on:
+      group: builder-small
     steps:
       - run: |
           result="${{ needs.changed-files.result }}"
@@ -78,7 +79,8 @@ jobs:
           fi
 
   release:
-    runs-on: ubuntu-20.04
+    runs-on:
+      group: builder-small
     needs: [calculate-tag, build-targets]
     permissions: write-all
     steps:
