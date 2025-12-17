@@ -1,6 +1,6 @@
 module github.com/chaos-mesh/chaos-mesh
 
-go 1.20
+go 1.24.0
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20200131002437-cf55d5288a48
@@ -68,11 +68,11 @@ require (
 	github.com/vishvananda/netlink v1.2.1-beta.2
 	go.uber.org/fx v1.19.2
 	go.uber.org/zap v1.25.0
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.45.0
 	golang.org/x/oauth2 v0.12.0
-	golang.org/x/sync v0.3.0
-	golang.org/x/sys v0.14.0
-	golang.org/x/term v0.13.0
+	golang.org/x/sync v0.18.0
+	golang.org/x/sys v0.38.0
+	golang.org/x/term v0.37.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	google.golang.org/api v0.140.0
 	google.golang.org/grpc v1.59.0
@@ -266,11 +266,12 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
+	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/tools/godoc v0.1.0-deprecated // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230822172742-b8732ec3820d // indirect
