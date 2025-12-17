@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 2
 
       - name: Get changed files
-        uses: tj-actions/changed-files@v34
+        uses: step-security/changed-files@v46
         id: filter
         with:
           files: |
@@ -32,4 +32,9 @@ jobs:
             .github/**
 
       - name: Echo changed files
-        run: echo "${{ toJSON(steps.filter.outputs) }}"
+        env:
+          ALL_CHANGED_FILES: ${{ steps.filter.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
