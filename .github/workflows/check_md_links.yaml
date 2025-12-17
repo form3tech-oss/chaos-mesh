@@ -7,7 +7,8 @@ permissions: read-all
 
 jobs:
   changed-files:
-    runs-on: ubuntu-20.04
+    runs-on:
+      group: builder-small
     outputs:
       any-changed: ${{ steps.filter.outputs.any_changed }}
     steps:
@@ -17,7 +18,7 @@ jobs:
           fetch-depth: 2
 
       - name: Get changed files
-        uses: tj-actions/changed-files@v34
+        uses: step-security/changed-files@v46
         id: filter
         with:
           files: |
@@ -27,7 +28,8 @@ jobs:
   markdown-link-check:
     needs: changed-files
     if: needs.changed-files.outputs.any-changed == 'false'
-    runs-on: ubuntu-20.04
+    runs-on:
+      group: builder-small
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

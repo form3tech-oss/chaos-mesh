@@ -13,7 +13,8 @@ permissions: read-all
 jobs:
   run:
     name: Integration Test
-    runs-on: ubuntu-20.04
+    runs-on:
+      group: builder-small
     steps:
       - uses: actions/checkout@v3
         with:
