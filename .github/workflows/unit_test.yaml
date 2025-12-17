@@ -7,8 +7,7 @@ permissions: read-all
 
 jobs:
   changes:
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     outputs:
       go: ${{ steps.filter.outputs.go }}
       ui: ${{ steps.filter.outputs.ui }}
@@ -38,8 +37,7 @@ jobs:
         job:
           - verify
           - test
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -74,8 +72,7 @@ jobs:
         job:
           - build
           - test
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
