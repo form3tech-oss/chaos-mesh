@@ -62,10 +62,10 @@ permissions: read-all
 
 jobs:
   build-images:
-    runs-on: ubuntu-22.04
     strategy:
       matrix:
         arch: [amd64, arm64]
+    runs-on: ${{ fromJSON('{"amd64":"ubuntu-22.04", "arm64":"ubuntu-22.04-arm"}')[matrix.arch] }}
     env:
       TARGET_PLATFORM: ${{ matrix.arch }}
     steps:
