@@ -24,8 +24,7 @@ on:
 
 jobs:
   calculate-tag:
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     permissions: read-all
     outputs:
       tag: "${{ steps.tag.outputs.tag }}"

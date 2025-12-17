@@ -7,8 +7,7 @@ permissions: read-all
 
 jobs:
   check-license:
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

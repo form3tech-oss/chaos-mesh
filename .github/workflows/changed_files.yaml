@@ -11,8 +11,7 @@ permissions: read-all
 
 jobs:
   changed-files:
-    runs-on:
-      group: builder-small
+    runs-on: ubuntu-latest
     outputs:
       only_changed: ${{ steps.filter.outputs.only_changed }}
     steps:
