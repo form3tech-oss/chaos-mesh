@@ -7,7 +7,7 @@ permissions: read-all
 
 jobs:
   changed-files:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       any-changed: ${{ steps.filter.outputs.any_changed }}
     steps:
@@ -27,7 +27,7 @@ jobs:
   markdown-link-check:
     needs: changed-files
     if: needs.changed-files.outputs.any-changed == 'false'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

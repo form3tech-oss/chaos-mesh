@@ -7,7 +7,7 @@ permissions: read-all
 
 jobs:
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       go: ${{ steps.filter.outputs.go }}
       ui: ${{ steps.filter.outputs.ui }}
@@ -37,7 +37,7 @@ jobs:
         job:
           - verify
           - test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -72,7 +72,7 @@ jobs:
         job:
           - build
           - test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2

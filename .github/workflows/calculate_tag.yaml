@@ -24,7 +24,7 @@ on:
 
 jobs:
   calculate-tag:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions: read-all
     outputs:
       tag: "${{ steps.tag.outputs.tag }}"
