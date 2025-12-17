@@ -11,7 +11,7 @@ permissions: read-all
 
 jobs:
   changed-files:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       only_changed: ${{ steps.filter.outputs.only_changed }}
     steps:
