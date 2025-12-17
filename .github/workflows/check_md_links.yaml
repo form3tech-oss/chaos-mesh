@@ -8,7 +8,7 @@ permissions: read-all
 jobs:
   changed-files:
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     outputs:
       any-changed: ${{ steps.filter.outputs.any_changed }}
     steps:
@@ -29,7 +29,7 @@ jobs:
     needs: changed-files
     if: needs.changed-files.outputs.any-changed == 'false'
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

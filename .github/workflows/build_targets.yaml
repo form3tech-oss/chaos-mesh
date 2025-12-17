@@ -63,7 +63,7 @@ permissions: read-all
 jobs:
   build-images:
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -114,7 +114,7 @@ jobs:
 
   build-e2e-binary:
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -149,7 +149,7 @@ jobs:
 
   build-chart:
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     outputs:
       chart-name: ${{ steps.build-chart.outputs.chart-name }}
 
@@ -187,6 +187,6 @@ jobs:
     needs: [build-images, build-e2e-binary, build-chart]
     name: Build passed
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     steps:
       - run: echo "🎉 Build Passed!"

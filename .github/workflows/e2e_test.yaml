@@ -17,7 +17,7 @@ permissions: read-all
 jobs:
   e2e-test-matrix:
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -124,6 +124,6 @@ jobs:
       - e2e-test-matrix
     name: E2E Test Passed
     runs-on:
-      group: builder-small
+      group: ubuntu-latest
     steps:
       - run: echo "🎉 E2E Test Passed!"
