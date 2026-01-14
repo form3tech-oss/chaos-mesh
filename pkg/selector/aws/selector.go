@@ -53,6 +53,9 @@ type Instance struct {
 	SecretName *string
 	EbsVolume  *string
 	DeviceName *string
+	// Tags is only used for debug information
+	// It is saved to the selector and logged in the id column
+	Tags map[string]string
 }
 
 func (instance *Instance) Id() string {
@@ -96,6 +99,7 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 			SecretName: awsSelector.SecretName,
 			EbsVolume:  awsSelector.EbsVolume,
 			DeviceName: awsSelector.DeviceName,
+			Tags:       readTags(r.Instances[0].Tags),
 		})
 	}
 	mode := awsSelector.Mode
@@ -107,6 +111,16 @@ func (impl *SelectImpl) Select(ctx context.Context, awsSelector *v1alpha1.AWSSel
 	}
 
 	return filteredInstances, nil
+}
+
+func readTags(sourceTags []ec2types.Tag) map[string]string {
+	tags := map[string]string{}
+	for _, tag := range sourceTags {
+		if tag.Key != nil && tag.Value != nil {
+			tags[*tag.Key] = *tag.Value
+		}
+	}
+	return tags
 }
 
 type Params struct {
