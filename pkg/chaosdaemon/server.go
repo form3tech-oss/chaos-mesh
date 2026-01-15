@@ -93,7 +93,11 @@ func (s *DaemonServer) getLoggerFromContext(ctx context.Context) logr.Logger {
 	return log.EnrichLoggerWithContext(ctx, s.rootLogger)
 }
 
-func newDaemonServer(clientConfig *crclients.CrClientConfig, reg prometheus.Registerer, log logr.Logger) (*DaemonServer, error) {
+func newDaemonServer(
+	clientConfig *crclients.CrClientConfig,
+	reg prometheus.Registerer,
+	log logr.Logger,
+) (*DaemonServer, error) {
 	crClient, err := crclients.CreateContainerRuntimeInfoClient(clientConfig)
 	if err != nil {
 		return nil, err
@@ -103,7 +107,11 @@ func newDaemonServer(clientConfig *crclients.CrClientConfig, reg prometheus.Regi
 }
 
 // NewDaemonServerWithCRClient returns DaemonServer with container runtime client
-func NewDaemonServerWithCRClient(crClient crclients.ContainerRuntimeInfoClient, reg prometheus.Registerer, log logr.Logger) *DaemonServer {
+func NewDaemonServerWithCRClient(
+	crClient crclients.ContainerRuntimeInfoClient,
+	reg prometheus.Registerer,
+	log logr.Logger,
+) *DaemonServer {
 	return &DaemonServer{
 		IPSetLocker:              locker.New(),
 		crClient:                 crClient,
@@ -112,14 +120,20 @@ func NewDaemonServerWithCRClient(crClient crclients.ContainerRuntimeInfoClient, 
 		rootLogger:               log,
 		timeChaosServer: TimeChaosServer{
 			podContainerNameProcessMap: tasks.NewPodProcessMap(),
-			manager:                    tasks.NewTaskManager(logr.New(log.GetSink()).WithName("TimeChaos")),
-			nameLocker:                 tasks.NewLockMap[tasks.PodContainerName](),
-			logger:                     logr.New(log.GetSink()).WithName("TimeChaos"),
+			manager: tasks.NewTaskManager(
+				logr.New(log.GetSink()).WithName("TimeChaos"),
+			),
+			nameLocker: tasks.NewLockMap[tasks.PodContainerName](),
+			logger:     logr.New(log.GetSink()).WithName("TimeChaos"),
 		},
 	}
 }
 
-func newGRPCServer(daemonServer *DaemonServer, reg prometheus.Registerer, tlsConf tlsConfig) (*grpc.Server, error) {
+func newGRPCServer(
+	daemonServer *DaemonServer,
+	reg prometheus.Registerer,
+	tlsConf tlsConfig,
+) (*grpc.Server, error) {
 	grpcMetrics := grpc_prometheus.NewServerMetrics()
 	grpcMetrics.EnableHandlingTimeHistogram(
 		grpc_prometheus.WithHistogramBuckets(metrics.ChaosDaemonGrpcServerBuckets),
@@ -135,6 +149,7 @@ func newGRPCServer(daemonServer *DaemonServer, reg prometheus.Registerer, tlsCon
 			grpcUtils.TimeoutServerInterceptor,
 			grpcMetrics.UnaryServerInterceptor(),
 			MetadataExtractor(log.MetaNamespacedName),
+			grpcUtils.RequestLoggingServerInterceptor(daemonServer.rootLogger),
 		),
 	}
 
@@ -213,7 +228,10 @@ func BuildServer(conf *Config, reg RegisterGatherer, log logr.Logger) (*Server, 
 		return nil, errors.Wrap(err, "create daemon server")
 	}
 
-	server.httpServer = newHTTPServerBuilder().Addr(conf.HttpAddr()).Metrics(reg).Profiling(conf.Profiling).Build()
+	server.httpServer = newHTTPServerBuilder().Addr(conf.HttpAddr()).
+		Metrics(reg).
+		Profiling(conf.Profiling).
+		Build()
 	server.grpcServer, err = newGRPCServer(server.daemonServer, reg, conf.tlsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "create grpc server")
@@ -241,7 +259,13 @@ func (s *Server) Start() error {
 	})
 
 	eg.Go(func() error {
-		s.logger.Info("Starting grpc endpoint", "address", grpcBindAddr, "runtime", s.conf.CrClientConfig.Runtime)
+		s.logger.Info(
+			"Starting grpc endpoint",
+			"address",
+			grpcBindAddr,
+			"runtime",
+			s.conf.CrClientConfig.Runtime,
+		)
 		if err := s.grpcServer.Serve(grpcListener); err != nil {
 			return errors.Wrap(err, "start grpc endpoint")
 		}

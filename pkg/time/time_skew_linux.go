@@ -200,6 +200,7 @@ func (s *Skew) Inject(pid tasks.IsID) error {
 	if err != nil {
 		return err
 	}
+	s.logger.Info("after clockGetTime.AttachToProcess")
 
 	err = s.getTimeOfDay.AttachToProcess(int(sysPID), map[string]uint64{
 		externVarTvSecDelta:  uint64(s.SkewConfig.deltaSeconds),
@@ -208,6 +209,8 @@ func (s *Skew) Inject(pid tasks.IsID) error {
 	if err != nil {
 		return err
 	}
+	s.logger.Info("after getTimeOfDay.AttachToProcess")
+
 	return nil
 }
 
