@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -21,7 +21,9 @@ RUN npm install pnpm@8 -g
 
 ARG TARGET_PLATFORM=amd64
 
-RUN curl -vvv https://dl.google.com/go/go1.20.8.linux-$TARGET_PLATFORM.tar.gz | tar -xz -C /usr/local
+# Go 1.25.12 is the minimum stable toolchain that remediates the Go CVEs
+# reported for chaos-mesh (including CVE-2026-39822).
+RUN curl -fsS https://dl.google.com/go/go1.25.12.linux-$TARGET_PLATFORM.tar.gz | tar -xz -C /usr/local
 ENV PATH "/usr/local/go/bin:${PATH}"
 ENV GOCACHE /tmp/go-build
 ENV GOPATH /tmp/go

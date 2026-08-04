@@ -86,6 +86,11 @@ jobs:
           DOCKER_CACHE_DIR: ${{github.workspace}}/cache
           GO_BUILD_CACHE: ${{github.workspace}}/cache
           DOCKER_CLI_EXPERIMENTAL: enabled
+          # Build env images from the updated Dockerfiles so the release
+          # binaries are compiled with Go 1.25.12 instead of the pulled
+          # ghcr.io/chaos-mesh/*-env images that still ship Go 1.20.8.
+          IMAGE_BUILD_ENV_BUILD: "1"
+          IMAGE_DEV_ENV_BUILD: "1"
         run: |
           docker buildx create --use --name chaos-mesh-builder
           make -j4 image e2e-image

@@ -8,6 +8,10 @@ For more information and how-to, see [RFC: Keep A Changelog](https://github.com/
 
 ## [Unreleased]
 
+### Fixed
+
+- Remediate outstanding Go toolchain, module, and alpine package CVEs reported against `chaos-mesh:v2.6.1-f3-6a30e` by bumping Go to 1.25.12, upgrading vulnerable dependencies to the minimum stable fixed versions, and upgrading alpine packages in the chaos-mesh image
+
 ### Added
 
 - Allow annotations on chaos-controller-manager and chaos-daemon ServiceAccount [#4106](https://github.com/chaos-mesh/chaos-mesh/pull/4106)
