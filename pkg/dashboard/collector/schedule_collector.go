@@ -114,6 +114,10 @@ func (r *ScheduleCollector) setUnarchivedSchedule(req ctrl.Request, schedule v1a
 		archive.Action = ""
 	case v1alpha1.ScheduleTypeRollingRestartChaos:
 		archive.Action = ""
+	case v1alpha1.ScheduleTypeCloudStackVMChaos, v1alpha1.ScheduleTypeCloudStackHostChaos:
+		archive.Action = ""
+	case v1alpha1.ScheduleTypeCiliumChaos, v1alpha1.ScheduleTypeCertificateChaos:
+		archive.Action = ""
 	default:
 		return errors.New("unsupported chaos type " + string(schedule.Spec.Type))
 	}

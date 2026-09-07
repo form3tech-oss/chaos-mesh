@@ -155,6 +155,30 @@ var ChaosObjects = fx.Supply(
 			Object: &v1alpha1.NodeSelectorChaos{},
 		},
 	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "ciliumchaos",
+			Object: &v1alpha1.CiliumChaos{},
+		},
+	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "cloudstackvmchaos",
+			Object: &v1alpha1.CloudStackVMChaos{},
+		},
+	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "cloudstackhostchaos",
+			Object: &v1alpha1.CloudStackHostChaos{},
+		},
+	},
 )
 
 // WebhookObject only used for registration the
@@ -181,6 +205,20 @@ var WebhookObjects = fx.Supply(
 		Target: WebhookObject{
 			Name:   "statuscheck",
 			Object: &v1alpha1.StatusCheck{},
+		},
+	},
+	fx.Annotated{
+		Group: "webhookObjs",
+		Target: WebhookObject{
+			Name:   "cloudstackvmchaos",
+			Object: &v1alpha1.CloudStackVMChaos{},
+		},
+	},
+	fx.Annotated{
+		Group: "webhookObjs",
+		Target: WebhookObject{
+			Name:   "cloudstackhostchaos",
+			Object: &v1alpha1.CloudStackHostChaos{},
 		},
 	},
 )

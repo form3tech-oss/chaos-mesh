@@ -27,6 +27,10 @@ const (
 	ScheduleTypeAWSChaos ScheduleTemplateType = "AWSChaos"
 	ScheduleTypeAzureChaos ScheduleTemplateType = "AzureChaos"
 	ScheduleTypeBlockChaos ScheduleTemplateType = "BlockChaos"
+	ScheduleTypeCertificateChaos ScheduleTemplateType = "CertificateChaos"
+	ScheduleTypeCiliumChaos ScheduleTemplateType = "CiliumChaos"
+	ScheduleTypeCloudStackHostChaos ScheduleTemplateType = "CloudStackHostChaos"
+	ScheduleTypeCloudStackVMChaos ScheduleTemplateType = "CloudStackVMChaos"
 	ScheduleTypeDNSChaos ScheduleTemplateType = "DNSChaos"
 	ScheduleTypeGCPChaos ScheduleTemplateType = "GCPChaos"
 	ScheduleTypeHTTPChaos ScheduleTemplateType = "HTTPChaos"
@@ -51,6 +55,10 @@ var allScheduleTemplateType = []ScheduleTemplateType{
 	ScheduleTypeAWSChaos,
 	ScheduleTypeAzureChaos,
 	ScheduleTypeBlockChaos,
+	ScheduleTypeCertificateChaos,
+	ScheduleTypeCiliumChaos,
+	ScheduleTypeCloudStackHostChaos,
+	ScheduleTypeCloudStackVMChaos,
 	ScheduleTypeDNSChaos,
 	ScheduleTypeGCPChaos,
 	ScheduleTypeHTTPChaos,
@@ -84,6 +92,22 @@ func (it *ScheduleItem) SpawnNewObject(templateType ScheduleTemplateType) (Gener
 	case ScheduleTypeBlockChaos:
 		result := BlockChaos{}
 		result.Spec = *it.BlockChaos
+		return &result, nil
+	case ScheduleTypeCertificateChaos:
+		result := CertificateChaos{}
+		result.Spec = *it.CertificateChaos
+		return &result, nil
+	case ScheduleTypeCiliumChaos:
+		result := CiliumChaos{}
+		result.Spec = *it.CiliumChaos
+		return &result, nil
+	case ScheduleTypeCloudStackHostChaos:
+		result := CloudStackHostChaos{}
+		result.Spec = *it.CloudStackHostChaos
+		return &result, nil
+	case ScheduleTypeCloudStackVMChaos:
+		result := CloudStackVMChaos{}
+		result.Spec = *it.CloudStackVMChaos
 		return &result, nil
 	case ScheduleTypeDNSChaos:
 		result := DNSChaos{}
@@ -169,6 +193,18 @@ func (it *ScheduleItem) RestoreChaosSpec(root interface{}) error {
 		return nil
 	case *BlockChaos:
 		*it.BlockChaos = chaos.Spec
+		return nil
+	case *CertificateChaos:
+		*it.CertificateChaos = chaos.Spec
+		return nil
+	case *CiliumChaos:
+		*it.CiliumChaos = chaos.Spec
+		return nil
+	case *CloudStackHostChaos:
+		*it.CloudStackHostChaos = chaos.Spec
+		return nil
+	case *CloudStackVMChaos:
+		*it.CloudStackVMChaos = chaos.Spec
 		return nil
 	case *DNSChaos:
 		*it.DNSChaos = chaos.Spec
