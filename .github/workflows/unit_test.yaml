@@ -1,0 +1,104 @@
+name: Units test
+
+on:
+  workflow_call: {}
+
+permissions: read-all
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
+      ui: ${{ steps.filter.outputs.ui }}
+    steps:
+      - name: checkout codes
+        uses: actions/checkout@v2
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            go:
+              - Makefile
+              - go.*
+              - '**.go'
+              - 'helm/**'
+            ui:
+              - 'ui/**'
+              - '**.js'
+              - '**.ts'
+  go:
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - verify
+          - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: ${{ matrix.job }}
+        env:
+          job: ${{ matrix.job }}
+        run: |
+          if [[ "$job" == "verify" ]]; then
+            make check
+            echo "Please make check before creating a PR"
+            git diff --quiet -- . || (git diff | cat && false)
+          elif [[ "$job" == "test" ]]; then
+            make test
+          else
+            make $job
+          fi
+
+      - name: Upload Code Coverage
+        uses: codecov/codecov-action@v3
+        if: matrix.job == 'test'
+        with:
+          files: ./cover.out
+  ui:
+    needs: changes
+    if: ${{ needs.changes.outputs.ui == 'true' }}
+    defaults:
+      run:
+        working-directory: ./ui
+    strategy:
+      matrix:
+        job:
+          - build
+          - test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+          cache-dependency-path: "ui/pnpm-lock.yaml"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Cache app/build
+        if: ${{ matrix.job == 'build' }}
+        uses: actions/cache@v2
+        with:
+          path: ./ui/app/build
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('ui/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Build app
+        if: ${{ matrix.job == 'build' }}
+        run: pnpm build
+
+      - name: Run tests
+        if: ${{ matrix.job == 'test' }}
+        run: pnpm test

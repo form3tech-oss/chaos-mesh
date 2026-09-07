@@ -1,14 +1,24 @@
-name: Form3 Upload Image
+name: Upload multi-arch images
 
-# Thin wrapper around upstream upload_image.yml for form3tech-oss releases.
-# Upstream workflows gate on repository_owner == 'chaos-mesh'; this file builds
-# multi-arch images when we tag v2.8.3-f3-* on the overlay branch.
+# Ported from upstream upload_image.yml: per-arch build + manifest list publish.
+# Form3 fork CI (ci.yaml / build_targets.yaml) keeps amd64 artifacts for tests.
 
 on:
-  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      image_tag:
+        description: "Image tag to publish (without arch suffix)"
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to publish"
+        required: true
+        type: string
   push:
     tags:
-      - "v2.8.3-f3-*"
+      - "v*-f3-*"
 
 permissions: read-all
 
@@ -30,11 +40,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract Image Tag
+      - name: Extract image tag
         id: image_tag
         shell: bash
         run: |
-          IMAGE_TAG=${GITHUB_REF##*/}
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            IMAGE_TAG="${{ inputs.image_tag }}"
+          else
+            IMAGE_TAG=${GITHUB_REF#refs/tags/}
+          fi
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container registry
@@ -65,7 +79,7 @@ jobs:
             UI=$UI \
             image-$IMAGE
 
-      - name: Upload Chaos Mesh
+      - name: Push image
         env:
           IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
           ARCH: ${{ matrix.arch }}
@@ -95,7 +109,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push the manifest list
+      - name: Create and push manifest list
         env:
           IMAGE: ${{ matrix.image }}
         run: |
