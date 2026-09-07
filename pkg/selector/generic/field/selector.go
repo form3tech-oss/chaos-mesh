@@ -16,6 +16,7 @@
 package field
 
 import (
+	cmv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -56,6 +57,9 @@ func (s *fieldSelector) Match(obj client.Object) bool {
 		objFields = toPodSelectableFields(obj)
 	case *v1alpha1.PhysicalMachine:
 		objFields = toPhysicalMachineSelectableFields(obj)
+	case *cmv1.Certificate:
+		return true // TODO do we want to allow field selector for certificates?
+
 	default:
 		// not support
 		return false
