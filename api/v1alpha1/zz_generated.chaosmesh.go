@@ -518,6 +518,646 @@ func (in *BlockChaos) Default(_ context.Context, obj runtime.Object) error {
 	return nil
 }
 
+const KindCertificateChaos = "CertificateChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CertificateChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CertificateChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CertificateChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CertificateChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CertificateChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CertificateChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CertificateChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CertificateChaosList contains a list of CertificateChaos
+type CertificateChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CertificateChaos `json:"items"`
+}
+
+func (in *CertificateChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CertificateChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CertificateChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CertificateChaos) IsOneShot() bool {
+	return false
+}
+
+var CertificateChaosWebhookLog = logf.Log.WithName("CertificateChaos-resource")
+
+func (in *CertificateChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CertificateChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CertificateChaos, got %T", obj)
+	}
+	CertificateChaosWebhookLog.V(1).Info("validate create", "name", typedObj.GetName())
+
+	return typedObj.Validate()
+}
+
+// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CertificateChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
+	typedOldObj, ok := oldObj.(*CertificateChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CertificateChaos, got %T", oldObj)
+	}
+
+	typedNewObj, ok := newObj.(*CertificateChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CertificateChaos, got %T", newObj)
+	}
+
+	CertificateChaosWebhookLog.V(1).Info("validate update", "name", typedOldObj.GetName())
+	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return typedNewObj.Validate()
+}
+
+// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CertificateChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CertificateChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CertificateChaos, got %T", obj)
+	}
+
+	CertificateChaosWebhookLog.V(1).Info("validate delete", "name", typedObj.GetName())
+
+	return nil, nil
+}
+
+var _ webhook.CustomValidator = &CertificateChaos{}
+
+func (in *CertificateChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.CustomDefaulter = &CertificateChaos{}
+
+func (in *CertificateChaos) Default(_ context.Context, obj runtime.Object) error {
+	gw.Default(obj)
+	return nil
+}
+
+const KindCiliumChaos = "CiliumChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CiliumChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CiliumChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CiliumChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CiliumChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CiliumChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CiliumChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CiliumChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CiliumChaosList contains a list of CiliumChaos
+type CiliumChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CiliumChaos `json:"items"`
+}
+
+func (in *CiliumChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CiliumChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CiliumChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CiliumChaos) IsOneShot() bool {
+	return false
+}
+
+var CiliumChaosWebhookLog = logf.Log.WithName("CiliumChaos-resource")
+
+func (in *CiliumChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CiliumChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CiliumChaos, got %T", obj)
+	}
+	CiliumChaosWebhookLog.V(1).Info("validate create", "name", typedObj.GetName())
+
+	return typedObj.Validate()
+}
+
+// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CiliumChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
+	typedOldObj, ok := oldObj.(*CiliumChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CiliumChaos, got %T", oldObj)
+	}
+
+	typedNewObj, ok := newObj.(*CiliumChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CiliumChaos, got %T", newObj)
+	}
+
+	CiliumChaosWebhookLog.V(1).Info("validate update", "name", typedOldObj.GetName())
+	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return typedNewObj.Validate()
+}
+
+// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CiliumChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CiliumChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CiliumChaos, got %T", obj)
+	}
+
+	CiliumChaosWebhookLog.V(1).Info("validate delete", "name", typedObj.GetName())
+
+	return nil, nil
+}
+
+var _ webhook.CustomValidator = &CiliumChaos{}
+
+func (in *CiliumChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.CustomDefaulter = &CiliumChaos{}
+
+func (in *CiliumChaos) Default(_ context.Context, obj runtime.Object) error {
+	gw.Default(obj)
+	return nil
+}
+
+const KindCloudStackHostChaos = "CloudStackHostChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CloudStackHostChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CloudStackHostChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CloudStackHostChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CloudStackHostChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CloudStackHostChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CloudStackHostChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CloudStackHostChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CloudStackHostChaosList contains a list of CloudStackHostChaos
+type CloudStackHostChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CloudStackHostChaos `json:"items"`
+}
+
+func (in *CloudStackHostChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CloudStackHostChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CloudStackHostChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CloudStackHostChaos) IsOneShot() bool {
+	if in.Spec.Action==HostStop {
+		return true
+	}
+
+	return false
+}
+
+var CloudStackHostChaosWebhookLog = logf.Log.WithName("CloudStackHostChaos-resource")
+
+func (in *CloudStackHostChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CloudStackHostChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackHostChaos, got %T", obj)
+	}
+	CloudStackHostChaosWebhookLog.V(1).Info("validate create", "name", typedObj.GetName())
+
+	return typedObj.Validate()
+}
+
+// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CloudStackHostChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
+	typedOldObj, ok := oldObj.(*CloudStackHostChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackHostChaos, got %T", oldObj)
+	}
+
+	typedNewObj, ok := newObj.(*CloudStackHostChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackHostChaos, got %T", newObj)
+	}
+
+	CloudStackHostChaosWebhookLog.V(1).Info("validate update", "name", typedOldObj.GetName())
+	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return typedNewObj.Validate()
+}
+
+// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CloudStackHostChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CloudStackHostChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackHostChaos, got %T", obj)
+	}
+
+	CloudStackHostChaosWebhookLog.V(1).Info("validate delete", "name", typedObj.GetName())
+
+	return nil, nil
+}
+
+var _ webhook.CustomValidator = &CloudStackHostChaos{}
+
+func (in *CloudStackHostChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.CustomDefaulter = &CloudStackHostChaos{}
+
+func (in *CloudStackHostChaos) Default(_ context.Context, obj runtime.Object) error {
+	gw.Default(obj)
+	return nil
+}
+
+const KindCloudStackVMChaos = "CloudStackVMChaos"
+
+// IsDeleted returns whether this resource has been deleted
+func (in *CloudStackVMChaos) IsDeleted() bool {
+	return !in.DeletionTimestamp.IsZero()
+}
+
+// IsPaused returns whether this resource has been paused
+func (in *CloudStackVMChaos) IsPaused() bool {
+	if in.Annotations == nil || in.Annotations[PauseAnnotationKey] != "true" {
+		return false
+	}
+	return true
+}
+
+// GetObjectMeta would return the ObjectMeta for chaos
+func (in *CloudStackVMChaos) GetObjectMeta() *metav1.ObjectMeta {
+	return &in.ObjectMeta
+}
+
+// GetDuration would return the duration for chaos
+func (in *CloudStackVMChaosSpec) GetDuration() (*time.Duration, error) {
+	if in.Duration == nil {
+		return nil, nil
+	}
+	duration, err := time.ParseDuration(string(*in.Duration))
+	if err != nil {
+		return nil, err
+	}
+	return &duration, nil
+}
+
+// GetStatus returns the status
+func (in *CloudStackVMChaos) GetStatus() *ChaosStatus {
+	return &in.Status.ChaosStatus
+}
+
+// GetRemoteCluster returns the remoteCluster
+func (in *CloudStackVMChaos) GetRemoteCluster() string {
+	return in.Spec.RemoteCluster
+}
+
+// GetSpecAndMetaString returns a string including the meta and spec field of this chaos object.
+func (in *CloudStackVMChaos) GetSpecAndMetaString() (string, error) {
+	spec, err := json.Marshal(in.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	meta := in.ObjectMeta.DeepCopy()
+	meta.SetResourceVersion("")
+	meta.SetGeneration(0)
+
+	return string(spec) + meta.String(), nil
+}
+
+// +kubebuilder:object:root=true
+
+// CloudStackVMChaosList contains a list of CloudStackVMChaos
+type CloudStackVMChaosList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CloudStackVMChaos `json:"items"`
+}
+
+func (in *CloudStackVMChaosList) DeepCopyList() GenericChaosList {
+	return in.DeepCopy()
+}
+
+// ListChaos returns a list of chaos
+func (in *CloudStackVMChaosList) ListChaos() []GenericChaos {
+	var result []GenericChaos
+	for _, item := range in.Items {
+		item := item
+		result = append(result, &item)
+	}
+	return result
+}
+
+func (in *CloudStackVMChaos) DurationExceeded(now time.Time) (bool, time.Duration, error) {
+	duration, err := in.Spec.GetDuration()
+	if err != nil {
+		return false, 0, err
+	}
+
+	if duration != nil {
+		stopTime := in.GetCreationTimestamp().Add(*duration)
+		if stopTime.Before(now) {
+			return true, 0, nil
+		}
+
+		return false, stopTime.Sub(now), nil
+	}
+
+	return false, 0, nil
+}
+
+func (in *CloudStackVMChaos) IsOneShot() bool {
+	if in.Spec.Action==VMRestart {
+		return true
+	}
+
+	return false
+}
+
+var CloudStackVMChaosWebhookLog = logf.Log.WithName("CloudStackVMChaos-resource")
+
+func (in *CloudStackVMChaos) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CloudStackVMChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackVMChaos, got %T", obj)
+	}
+	CloudStackVMChaosWebhookLog.V(1).Info("validate create", "name", typedObj.GetName())
+
+	return typedObj.Validate()
+}
+
+// ValidateUpdate implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CloudStackVMChaos) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
+	typedOldObj, ok := oldObj.(*CloudStackVMChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackVMChaos, got %T", oldObj)
+	}
+
+	typedNewObj, ok := newObj.(*CloudStackVMChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackVMChaos, got %T", newObj)
+	}
+
+	CloudStackVMChaosWebhookLog.V(1).Info("validate update", "name", typedOldObj.GetName())
+	if !reflect.DeepEqual(typedOldObj.Spec, typedNewObj.Spec) {
+		return nil, ErrCanNotUpdateChaos
+	}
+	return typedNewObj.Validate()
+}
+
+// ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
+func (in *CloudStackVMChaos) ValidateDelete(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
+	typedObj, ok := obj.(*CloudStackVMChaos)
+	if !ok {
+		return nil, errors.Errorf("expected type *CloudStackVMChaos, got %T", obj)
+	}
+
+	CloudStackVMChaosWebhookLog.V(1).Info("validate delete", "name", typedObj.GetName())
+
+	return nil, nil
+}
+
+var _ webhook.CustomValidator = &CloudStackVMChaos{}
+
+func (in *CloudStackVMChaos) Validate() ([]string, error) {
+	errs := gw.Validate(in)
+	return nil, gw.Aggregate(errs)
+}
+
+var _ webhook.CustomDefaulter = &CloudStackVMChaos{}
+
+func (in *CloudStackVMChaos) Default(_ context.Context, obj runtime.Object) error {
+	gw.Default(obj)
+	return nil
+}
+
 const KindDNSChaos = "DNSChaos"
 
 // IsDeleted returns whether this resource has been deleted
@@ -3423,6 +4063,30 @@ func init() {
 		list:  &BlockChaosList{},
 	})
 
+	SchemeBuilder.Register(&CertificateChaos{}, &CertificateChaosList{})
+	all.register(KindCertificateChaos, &ChaosKind{
+		chaos: &CertificateChaos{},
+		list:  &CertificateChaosList{},
+	})
+
+	SchemeBuilder.Register(&CiliumChaos{}, &CiliumChaosList{})
+	all.register(KindCiliumChaos, &ChaosKind{
+		chaos: &CiliumChaos{},
+		list:  &CiliumChaosList{},
+	})
+
+	SchemeBuilder.Register(&CloudStackHostChaos{}, &CloudStackHostChaosList{})
+	all.register(KindCloudStackHostChaos, &ChaosKind{
+		chaos: &CloudStackHostChaos{},
+		list:  &CloudStackHostChaosList{},
+	})
+
+	SchemeBuilder.Register(&CloudStackVMChaos{}, &CloudStackVMChaosList{})
+	all.register(KindCloudStackVMChaos, &ChaosKind{
+		chaos: &CloudStackVMChaos{},
+		list:  &CloudStackVMChaosList{},
+	})
+
 	SchemeBuilder.Register(&DNSChaos{}, &DNSChaosList{})
 	all.register(KindDNSChaos, &ChaosKind{
 		chaos: &DNSChaos{},
@@ -3545,6 +4209,26 @@ func init() {
 	allScheduleItem.register(KindBlockChaos, &ChaosKind{
 		chaos: &BlockChaos{},
 		list:  &BlockChaosList{},
+	})
+
+	allScheduleItem.register(KindCertificateChaos, &ChaosKind{
+		chaos: &CertificateChaos{},
+		list:  &CertificateChaosList{},
+	})
+
+	allScheduleItem.register(KindCiliumChaos, &ChaosKind{
+		chaos: &CiliumChaos{},
+		list:  &CiliumChaosList{},
+	})
+
+	allScheduleItem.register(KindCloudStackHostChaos, &ChaosKind{
+		chaos: &CloudStackHostChaos{},
+		list:  &CloudStackHostChaosList{},
+	})
+
+	allScheduleItem.register(KindCloudStackVMChaos, &ChaosKind{
+		chaos: &CloudStackVMChaos{},
+		list:  &CloudStackVMChaosList{},
 	})
 
 	allScheduleItem.register(KindDNSChaos, &ChaosKind{

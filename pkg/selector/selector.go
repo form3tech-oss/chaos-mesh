@@ -24,10 +24,14 @@ import (
 
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/aws"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/azure"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/certificate"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackhost"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/cloudstackvm"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/container"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/deployment"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/gcp"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/k8schaos"
+	"github.com/chaos-mesh/chaos-mesh/pkg/selector/node"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/nodevolumepath"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/physicalmachine"
 	"github.com/chaos-mesh/chaos-mesh/pkg/selector/pod"
@@ -80,10 +84,14 @@ type SelectorParams struct {
 	GCPSelector             *gcp.SelectImpl
 	PhysicalMachineSelector *physicalmachine.SelectImpl
 	NodeVolumePath          *nodevolumepath.SelectImpl
+	NodeSelector            *node.SelectImpl
+	CloudStackVMSelector    *cloudstackvm.SelectImpl
+	CloudStackHostSelector  *cloudstackhost.SelectImpl
 	K8SChaosSelector        *k8schaos.SelectImpl
 	ResourceScaleSelector   *resourcescale.SelectImpl
 	RollingRestartSelector  *rollingrestart.SelectImpl
 	PodPVCSelector          *podpvc.SelectImpl
+	CertificateSelector     *certificate.SelectImpl
 	DeploymentSelector      *deployment.SelectImpl
 }
 
@@ -114,9 +122,13 @@ var Module = fx.Provide(
 	gcp.New,
 	physicalmachine.New,
 	nodevolumepath.New,
+	node.New,
+	cloudstackvm.New,
+	cloudstackhost.New,
 	k8schaos.New,
 	resourcescale.New,
 	rollingrestart.New,
 	podpvc.New,
+	certificate.New,
 	deployment.New,
 )
