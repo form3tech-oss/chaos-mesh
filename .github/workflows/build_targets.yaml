@@ -68,11 +68,11 @@ jobs:
       TARGET_PLATFORM: amd64
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
 
       - name: Restore build cache
         id: cache
-        uses: martijnhols/actions-cache/restore@main
+        uses: martijnhols/actions-cache/restore@0c8b146960b781c0cf795fb1fa4a0e183f82ac9b
         with:
           path: cache
           key: ${{ inputs.images-cache-key }}
@@ -97,13 +97,13 @@ jobs:
           docker image save ghcr.io/chaos-mesh/e2e-helper:latest > ./output/saved-images/e2e-helper.tgz
 
       - name: Upload build cache
-        uses: martijnhols/actions-cache/save@main
+        uses: martijnhols/actions-cache/save@0c8b146960b781c0cf795fb1fa4a0e183f82ac9b
         with:
           path: cache
           key: ${{ inputs.images-cache-key }}
 
       - name: Upload saved images
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ inputs.images-artifact-name }}
           path: ./output/saved-images
@@ -113,11 +113,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
 
       - name: Restore build cache
         id: cache
-        uses: martijnhols/actions-cache/restore@main
+        uses: martijnhols/actions-cache/restore@0c8b146960b781c0cf795fb1fa4a0e183f82ac9b
         with:
           path: cache
           key: ${{ inputs.e2e-binary-cache-key }}
@@ -131,13 +131,13 @@ jobs:
           make e2e-build
 
       - name: Upload build cache
-        uses: martijnhols/actions-cache/save@main
+        uses: martijnhols/actions-cache/save@0c8b146960b781c0cf795fb1fa4a0e183f82ac9b
         with:
           path: cache
           key: ${{ inputs.e2e-binary-cache-key }}
 
       - name: Upload e2e binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ inputs.e2e-binary-name }}
           path: ./e2e-test/image/e2e/bin
@@ -150,10 +150,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
 
       - name: Setup Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -172,7 +172,7 @@ jobs:
           echo "chart-name=$chart_name" >> $GITHUB_OUTPUT
 
       - name: Upload chart
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ inputs.chart-artifact-name }}
           path: ${{ steps.build-chart.outputs.chart-path }}
