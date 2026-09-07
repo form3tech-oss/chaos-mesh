@@ -1,0 +1,104 @@
+name: Form3 Upload Image
+
+# Thin wrapper around upstream upload_image.yml for form3tech-oss releases.
+# Upstream workflows gate on repository_owner == 'chaos-mesh'; this file builds
+# multi-arch images when we tag v2.8.3-f3-* on the overlay branch.
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v2.8.3-f3-*"
+
+permissions: read-all
+
+jobs:
+  build-specific-architecture:
+    if: github.repository_owner == 'form3tech-oss'
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+        image:
+          [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
+    outputs:
+      image_tag: ${{ steps.image_tag.outputs.image_tag }}
+    runs-on: ${{ fromJSON('{"amd64":"ubuntu-22.04", "arm64":"github-arm64-2c-8gb"}')[matrix.arch] }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Extract Image Tag
+        id: image_tag
+        shell: bash
+        run: |
+          IMAGE_TAG=${GITHUB_REF##*/}
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Chaos Mesh
+        env:
+          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
+          ARCH: ${{ matrix.arch }}
+          IMAGE: ${{ matrix.image }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "${IMAGE}" = "chaos-dashboard" ]; then
+            UI=1
+          else
+            UI=0
+          fi
+
+          make -B \
+            TARGET_PLATFORM=$ARCH \
+            IMAGE_TAG=$IMAGE_TAG-$ARCH \
+            IMAGE_DEV_ENV_BUILD=1 \
+            IMAGE_BUILD_ENV_BUILD=1 \
+            UI=$UI \
+            image-$IMAGE
+
+      - name: Upload Chaos Mesh
+        env:
+          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
+          ARCH: ${{ matrix.arch }}
+          IMAGE: ${{ matrix.image }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          docker push ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-$ARCH
+
+  upload-manifest:
+    needs: build-specific-architecture
+    if: github.repository_owner == 'form3tech-oss'
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        image:
+          [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
+    env:
+      IMAGE_TAG: ${{ needs.build-specific-architecture.outputs.image_tag }}
+      GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+    steps:
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push the manifest list
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          docker buildx imagetools create -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG \
+            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-amd64 \
+            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-arm64
