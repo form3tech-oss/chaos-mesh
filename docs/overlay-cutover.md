@@ -6,7 +6,7 @@ Form3 `master` in the sibling clone remains the read-only patch source; do not m
 ## Release tags
 
 - Overlay releases use `v2.8.3-f3-<shortsha>` (short git SHA of the overlay commit).
-- Multi-arch images are published by `.github/workflows/f3_upload_image.yml` on tag push.
+- Multi-arch images are published by `.github/workflows/upload_multiarch_images.yaml` (on `master` push and `v*-f3-*` tags).
 
 ## Helm upgrade
 

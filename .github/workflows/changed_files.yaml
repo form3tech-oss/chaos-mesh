@@ -1,0 +1,39 @@
+name: Detect changes files
+
+on:
+    workflow_call:
+      outputs:
+        only_changed:
+          description: "Whether only the specified files have changed."
+          value: ${{ jobs.changed-files.outputs.only_changed }}
+
+permissions: read-all
+
+jobs:
+  changed-files:
+    runs-on: ubuntu-latest
+    outputs:
+      only_changed: ${{ steps.filter.outputs.only_changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Get changed files
+        uses: step-security/changed-files@v46
+        id: filter
+        with:
+          files: |
+            .gitignore
+            **.md
+            ui/**
+            .github/**
+
+      - name: Echo changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.filter.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
