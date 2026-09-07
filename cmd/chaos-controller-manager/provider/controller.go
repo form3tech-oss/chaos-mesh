@@ -21,6 +21,7 @@ import (
 	"net"
 	"strconv"
 
+	certmanagerv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	"github.com/go-logr/logr"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"go.uber.org/fx"
@@ -46,6 +47,7 @@ var (
 )
 
 func init() {
+	_ = certmanagerv1.AddToScheme(scheme)
 	_ = clientgoscheme.AddToScheme(scheme)
 
 	_ = v1alpha1.AddToScheme(scheme)
@@ -100,6 +102,7 @@ func NewOption(logger logr.Logger, scheme *runtime.Scheme) *ctrl.Options {
 			opts.DefaultNamespaces = map[string]cache.Config{
 				config.ControllerCfg.TargetNamespace: {},
 			}
+
 			return cache.New(cfg, opts)
 		}
 	}
@@ -184,6 +187,7 @@ func NewControlPlaneCacheReader(logger logr.Logger, cfg *rest.Config) (controlPl
 
 	scheme := runtime.NewScheme()
 	_ = clientgoscheme.AddToScheme(scheme)
+	_ = certmanagerv1.AddToScheme(scheme)
 
 	// Create the cache for the cached read client and registering informers
 	cacheReader, err := cache.New(cfg, cache.Options{
