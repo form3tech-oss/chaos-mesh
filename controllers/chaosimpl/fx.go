@@ -59,10 +59,6 @@ var AllImpl = fx.Options(
 	resourcescalechaos.Module,
 	rollingrestartchaos.Module,
 	podpvcchaos.Module,
-<<<<<<< HEAD
-=======
-	certificatechaos.Module,
 	nodeselectorchaos.Module,
->>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))
 
 	utils.Module)

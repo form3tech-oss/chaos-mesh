@@ -136,8 +136,6 @@ func (in PodSelectorSpec) ClusterScoped() bool {
 
 	return false
 }
-<<<<<<< HEAD
-=======
 
 type NodeSelector struct {
 	// Selector is used to select nodes into which to inject chaos.
@@ -176,4 +174,3 @@ type DeploymentSelector struct {
 type DeploymentSelectorSpec struct {
 	DeploymentSelector `json:",inline"`
 }
->>>>>>> bdc0e4f4 (feat: Add NodeSelectorChaos (#99))
