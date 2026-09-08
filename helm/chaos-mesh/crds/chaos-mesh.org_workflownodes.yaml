@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: workflownodes.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -78,11 +78,11 @@ spec:
                       Just used it in test now.
                     type: string
                   filters:
-                    description: 'Filters defines the filters to pass to the AWS api
-                      to query the list of instances. Can be specified instead of
-                      Ec2Instance, in order to specify instances by tag or other attributes
-                      Any parameter supported by AWS DescribeInstances method can
-                      be used. For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html'
+                    description: |-
+                      Filters defines the filters to pass to the AWS api to query the list of instances.
+                      Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+                      Any parameter supported by AWS DescribeInstances method can be used.
+                      For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                     items:
                       properties:
                         name:
@@ -97,9 +97,10 @@ spec:
                       type: object
                     type: array
                   mode:
-                    description: 'Mode defines the mode to run chaos action. Used
-                      only if Filters is specified. Supported mode: one / all / fixed
-                      / fixed-percent / random-max-percent'
+                    description: |-
+                      Mode defines the mode to run chaos action.
+                      Used only if Filters is specified.
+                      Supported mode: one / all / fixed / fixed-percent / random-max-percent
                     enum:
                     - one
                     - all
@@ -115,13 +116,11 @@ spec:
                     description: SecretName defines the name of kubernetes secret.
                     type: string
                   value:
-                    description: Value is required when the mode is set to `FixedMode`
-                      / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
-                      provide an integer of pods to do chaos action. If `FixedPercentMode`,
-                      provide a number from 0-100 to specify the percent of pods the
-                      server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                      a number from 0-100 to specify the max percent of pods to do
-                      chaos action
+                    description: |-
+                      Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                      If `FixedMode`, provide an integer of pods to do chaos action.
+                      If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                      IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                     type: string
                   volumeID:
                     description: |-
@@ -341,10 +340,447 @@ spec:
                 - selector
                 - volumeName
                 type: object
+              certificateChaos:
+                description: CertificateChaosSpec defines the attributes that a user
+                  creates on a chaos experiment about pods.
+                properties:
+                  certificateExpiry:
+                    description: |-
+                      CertificateExpiry represents the expiry period for the requested certificate.
+                      Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                    type: string
+                  duration:
+                    description: |-
+                      Duration represents the duration of the chaos action.
+                      Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                  renewBefore:
+                    description: |-
+                      RenewBefore represents when the cert-manager should rotate the certificate.
+                      Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                    type: string
+                  selector:
+                    properties:
+                      annotationSelectors:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on annotations.
+                        type: object
+                      expressionSelectors:
+                        description: |-
+                          a slice of label selector expressions that can be used to select objects.
+                          A list of selectors based on set-based label expressions.
+                        items:
+                          description: |-
+                            A label selector requirement is a selector that contains values, a key, and an operator that
+                            relates the key and values.
+                          properties:
+                            key:
+                              description: key is the label key that the selector
+                                applies to.
+                              type: string
+                            operator:
+                              description: |-
+                                operator represents a key's relationship to a set of values.
+                                Valid operators are In, NotIn, Exists and DoesNotExist.
+                              type: string
+                            values:
+                              description: |-
+                                values is an array of string values. If the operator is In or NotIn,
+                                the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced during a strategic
+                                merge patch.
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          required:
+                          - key
+                          - operator
+                          type: object
+                        type: array
+                      fieldSelectors:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on fields.
+                        type: object
+                      labelSelectors:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on labels.
+                        type: object
+                      namespaces:
+                        description: Namespaces is a set of namespace to which objects
+                          belong.
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                required:
+                - certificateExpiry
+                - renewBefore
+                - selector
+                type: object
               children:
                 items:
                   type: string
                 type: array
+              ciliumChaos:
+                description: CiliumChaosSpec defines the attributes that a user creates
+                  on a chaos experiment affecting cilium CNI.
+                properties:
+                  ciliumPodSelector:
+                    description: |-
+                      CiliumPodSelector provides a custom selector to find the cilium-agent pod for the node.
+
+                      If not specified, it will default to selecting pods from the `kube-system` namespace with labels
+                      `app.kubernetes.io/name=cilium-agent` and `app.kubernetes.io/part-of=cilium` (which are used by default by the cilium
+                      helm chart)
+                    properties:
+                      labelSelectors:
+                        additionalProperties:
+                          type: string
+                        description: Map of label selector expressions that can be
+                          used to select the cilium-agent pods..
+                        type: object
+                      namespace:
+                        description: Namespace to restrict cilium-agent pod selection
+                          to
+                        type: string
+                    type: object
+                  duration:
+                    description: Duration represents the duration of the chaos action.
+                    type: string
+                  mode:
+                    description: |-
+                      Mode defines the mode to run chaos action.
+                      Supported mode: one / all / fixed / fixed-percent / random-max-percent
+                    enum:
+                    - one
+                    - all
+                    - fixed
+                    - fixed-percent
+                    - random-max-percent
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                  selector:
+                    description: Selector is used to select nodes into which to inject
+                      chaos.
+                    properties:
+                      expressionSelectors:
+                        description: |-
+                          a slice of label selector expressions that can be used to select objects.
+                          A list of selectors based on set-based label expressions.
+                        items:
+                          description: |-
+                            A label selector requirement is a selector that contains values, a key, and an operator that
+                            relates the key and values.
+                          properties:
+                            key:
+                              description: key is the label key that the selector
+                                applies to.
+                              type: string
+                            operator:
+                              description: |-
+                                operator represents a key's relationship to a set of values.
+                                Valid operators are In, NotIn, Exists and DoesNotExist.
+                              type: string
+                            values:
+                              description: |-
+                                values is an array of string values. If the operator is In or NotIn,
+                                the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced during a strategic
+                                merge patch.
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          required:
+                          - key
+                          - operator
+                          type: object
+                        type: array
+                      labelSelectors:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on labels.
+                        type: object
+                    type: object
+                  value:
+                    description: |-
+                      Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                      If `FixedMode`, provide an integer of pods to do chaos action.
+                      If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                      IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+                    type: string
+                required:
+                - ciliumPodSelector
+                - mode
+                - selector
+                type: object
+              cloudstackhostChaos:
+                description: CloudStackHostChaosSpec is the content of the specification
+                  for a CloudStackChaos.
+                properties:
+                  action:
+                    description: |-
+                      Action defines the specific cloudstack chaos action.
+                      Supported action: host-stop
+                      Default action: host-stop
+                    enum:
+                    - host-stop
+                    type: string
+                  apiConfig:
+                    description: APIConfig defines the configuration ncessary to connect
+                      to the CloudStack API.
+                    properties:
+                      address:
+                        description: Address defines the address of the CloudStack
+                          instsance.
+                        type: string
+                      apiKeyField:
+                        description: APIKeyField defines the key under which the value
+                          for API key is stored inside the secret.
+                        type: string
+                      apiSecretField:
+                        description: APISecretField defines the key under which the
+                          value for API secret is stored inside the secret.
+                        type: string
+                      secretName:
+                        description: SecretName defines the name of the secret where
+                          the API credentials are stored.
+                        type: string
+                      verifySSL:
+                        description: VerifySSL defines whether certificates should
+                          be verified when connecting to the API.
+                        type: boolean
+                    required:
+                    - address
+                    - secretName
+                    type: object
+                  dryRun:
+                    description: DryRun defines whether the chaos should run a dry-run
+                      mode.
+                    type: boolean
+                  duration:
+                    description: Duration represents the duration of the chaos action.
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                  selector:
+                    description: Selector defines the parameters that can be used
+                      to select target VMs.
+                    properties:
+                      clusterId:
+                        description: ClusterID defines the cluster the host belongs
+                          to.
+                        type: string
+                      hypervisor:
+                        description: Hypervisor defines the target hypervisor.
+                        type: string
+                      id:
+                        description: ID defines the ID of the host.
+                        type: string
+                      keyword:
+                        description: Keyword defines the keyword to list the VMs by.
+                        type: string
+                      name:
+                        description: Name defines the name of the host
+                        type: string
+                      zoneId:
+                        description: ZoneID defines the availability zone the host
+                          belongs to.
+                        type: string
+                    type: object
+                required:
+                - action
+                - apiConfig
+                - selector
+                type: object
+              cloudstackvmChaos:
+                description: CloudStackVMChaosSpec is the content of the specification
+                  for a CloudStackChaos.
+                properties:
+                  action:
+                    description: |-
+                      Action defines the specific cloudstack chaos action.
+                      Supported action: vm-stop / vm-restart
+                      Default action: vm-stop
+                    enum:
+                    - vm-stop
+                    - vm-restart
+                    type: string
+                  apiConfig:
+                    description: APIConfig defines the configuration ncessary to connect
+                      to the CloudStack API.
+                    properties:
+                      address:
+                        description: Address defines the address of the CloudStack
+                          instsance.
+                        type: string
+                      apiKeyField:
+                        description: APIKeyField defines the key under which the value
+                          for API key is stored inside the secret.
+                        type: string
+                      apiSecretField:
+                        description: APISecretField defines the key under which the
+                          value for API secret is stored inside the secret.
+                        type: string
+                      secretName:
+                        description: SecretName defines the name of the secret where
+                          the API credentials are stored.
+                        type: string
+                      verifySSL:
+                        description: VerifySSL defines whether certificates should
+                          be verified when connecting to the API.
+                        type: boolean
+                    required:
+                    - address
+                    - secretName
+                    type: object
+                  dryRun:
+                    description: DryRun defines whether the chaos should run a dry-run
+                      mode.
+                    type: boolean
+                  duration:
+                    description: Duration represents the duration of the chaos action.
+                    type: string
+                  remoteCluster:
+                    description: RemoteCluster represents the remote cluster where
+                      the chaos will be deployed
+                    type: string
+                  selector:
+                    description: Selector defines the parameters that can be used
+                      to select target VMs.
+                    properties:
+                      account:
+                        description: Account defines account to list resources by.
+                          Must be used with the domainId parameter.
+                        type: string
+                      affinityGroupId:
+                        description: AffinityGroupID defines affinity group to list
+                          the VMs by.
+                        type: string
+                      displayVm:
+                        description: DisplayVM defines a flag that indicates whether
+                          to list VMs by the display flag.
+                        type: boolean
+                      domainId:
+                        description: DomainID defines domain ID the VMs belong to.
+                        type: string
+                      groupId:
+                        description: GroupID defines the ID of the group the VMs belong
+                          to.
+                        type: string
+                      hostId:
+                        description: HostID defines the ID of the host the VMs belong
+                          to.
+                        type: string
+                      hypervisor:
+                        description: Hypervisor defines the target hypervisor.
+                        type: string
+                      id:
+                        description: ID defines the ID of the VM.
+                        type: string
+                      ids:
+                        description: IDs defines a list of VM IDs, mutually exclusive
+                          with ID.
+                        items:
+                          type: string
+                        type: array
+                      isRecursive:
+                        description: IsRecursive defines whether VMs should be listed
+                          recursively from parent specified by DomainID.
+                        type: boolean
+                      isoid:
+                        description: ISOID defines the ISO ID to list the VMs by.
+                        type: string
+                      keyPair:
+                        description: KeyPair defines the SSH keypair name to list
+                          the VMs by.
+                        type: string
+                      keyword:
+                        description: Keyword defines the keyword to list the VMs by.
+                        type: string
+                      listAll:
+                        description: |-
+                          ListAll defines whether to list just the resources that belong to the caller or all the resources the caller is
+                          authorised to see.
+                        type: boolean
+                      name:
+                        description: Name defines the name of the VM instance.
+                        type: string
+                      networkId:
+                        description: NetworkID defines the ID of the network to list
+                          the VMs by.
+                        type: string
+                      projectId:
+                        description: ProjectID defines the project ID to list the
+                          VMs by.
+                        type: string
+                      serviceOffering:
+                        description: ServiceOffering defines the service offering
+                          to list the VMs by.
+                        type: string
+                      state:
+                        description: State defines the state of the VM that should
+                          match.
+                        enum:
+                        - Running
+                        - Stopped
+                        - Present
+                        - Destroyed
+                        - Expunged
+                        type: string
+                      storageId:
+                        description: StorageID defines the ID the storage where VM's
+                          volumes belong to.
+                        type: string
+                      tags:
+                        additionalProperties:
+                          type: string
+                        description: Tags defines key/value pairs that should match
+                          the tags of the VMs.
+                        type: object
+                      templateId:
+                        description: TemplateID defines the ID of the template that
+                          was used to create the VMs.
+                        type: string
+                      userId:
+                        description: UserID defines the user ID that created the VM
+                          and is under the account that owns the VM.
+                        type: string
+                      vpcId:
+                        description: VPCID defines the ID of the VPC the VM belongs
+                          to.
+                        type: string
+                      zoneId:
+                        description: ZoneID defines the availability zone the VM belongs
+                          to.
+                        type: string
+                    type: object
+                required:
+                - action
+                - apiConfig
+                - selector
+                type: object
               conditionalBranches:
                 items:
                   properties:
@@ -3133,24 +3569,25 @@ spec:
                   on a chaos experiment about pods.
                 properties:
                   duration:
-                    description: Duration represents the duration of the chaos action.
-                      It is required when the action is `PodFailureAction`. A duration
-                      string is a possibly signed sequence of decimal numbers, each
-                      with optional fraction and a unit suffix, such as "300ms", "-1.5h"
-                      or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms",
-                      "s", "m", "h".
+                    description: |-
+                      Duration represents the duration of the chaos action.
+                      It is required when the action is `PodFailureAction`.
+                      A duration string is a possibly signed sequence of
+                      decimal numbers, each with optional fraction and a unit suffix,
+                      such as "300ms", "-1.5h" or "2h45m".
+                      Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                     type: string
                   gracePeriod:
-                    description: GracePeriod is used in pod-kill action. It represents
-                      the duration in seconds before the pod should be deleted. Value
-                      must be non-negative integer. The default value is zero that
-                      indicates delete immediately.
+                    description: |-
+                      GracePeriod is used in pod-kill action. It represents the duration in seconds before the pod should be deleted.
+                      Value must be non-negative integer. The default value is zero that indicates delete immediately.
                     format: int64
                     minimum: 0
                     type: integer
                   mode:
-                    description: 'Mode defines the mode to run chaos action. Supported
-                      mode: one / all / fixed / fixed-percent / random-max-percent'
+                    description: |-
+                      Mode defines the mode to run chaos action.
+                      Supported mode: one / all / fixed / fixed-percent / random-max-percent
                     enum:
                     - one
                     - all
@@ -3169,36 +3606,38 @@ spec:
                       annotationSelectors:
                         additionalProperties:
                           type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on annotations.
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on annotations.
                         type: object
                       expressionSelectors:
-                        description: a slice of label selector expressions that can
-                          be used to select objects. A list of selectors based on
-                          set-based label expressions.
+                        description: |-
+                          a slice of label selector expressions that can be used to select objects.
+                          A list of selectors based on set-based label expressions.
                         items:
-                          description: A label selector requirement is a selector
-                            that contains values, a key, and an operator that relates
-                            the key and values.
+                          description: |-
+                            A label selector requirement is a selector that contains values, a key, and an operator that
+                            relates the key and values.
                           properties:
                             key:
                               description: key is the label key that the selector
                                 applies to.
                               type: string
                             operator:
-                              description: operator represents a key's relationship
-                                to a set of values. Valid operators are In, NotIn,
-                                Exists and DoesNotExist.
+                              description: |-
+                                operator represents a key's relationship to a set of values.
+                                Valid operators are In, NotIn, Exists and DoesNotExist.
                               type: string
                             values:
-                              description: values is an array of string values. If
-                                the operator is In or NotIn, the values array must
-                                be non-empty. If the operator is Exists or DoesNotExist,
-                                the values array must be empty. This array is replaced
-                                during a strategic merge patch.
+                              description: |-
+                                values is an array of string values. If the operator is In or NotIn,
+                                the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced during a strategic
+                                merge patch.
                               items:
                                 type: string
                               type: array
+                              x-kubernetes-list-type: atomic
                           required:
                           - key
                           - operator
@@ -3207,14 +3646,16 @@ spec:
                       fieldSelectors:
                         additionalProperties:
                           type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on fields.
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on fields.
                         type: object
                       labelSelectors:
                         additionalProperties:
                           type: string
-                        description: Map of string keys and values that can be used
-                          to select objects. A selector based on labels.
+                        description: |-
+                          Map of string keys and values that can be used to select objects.
+                          A selector based on labels.
                         type: object
                       namespaces:
                         description: Namespaces is a set of namespace to which objects
@@ -3225,8 +3666,9 @@ spec:
                       nodeSelectors:
                         additionalProperties:
                           type: string
-                        description: Map of string keys and values that can be used
-                          to select nodes. Selector which must match a node's labels,
+                        description: |-
+                          Map of string keys and values that can be used to select nodes.
+                          Selector which must match a node's labels,
                           and objects must belong to these selected nodes.
                         type: object
                       nodes:
@@ -3236,9 +3678,9 @@ spec:
                           type: string
                         type: array
                       podPhaseSelectors:
-                        description: 'PodPhaseSelectors is a set of condition of a
-                          pod at the current time. supported value: Pending / Running
-                          / Succeeded / Failed / Unknown'
+                        description: |-
+                          PodPhaseSelectors is a set of condition of a pod at the current time.
+                          supported value: Pending / Running / Succeeded / Failed / Unknown
                         items:
                           type: string
                         type: array
@@ -3247,19 +3689,18 @@ spec:
                           items:
                             type: string
                           type: array
-                        description: Pods is a map of string keys and a set values
-                          that used to select pods. The key defines the namespace
-                          which pods belong, and the each values is a set of pod names.
+                        description: |-
+                          Pods is a map of string keys and a set values that used to select pods.
+                          The key defines the namespace which pods belong,
+                          and the each values is a set of pod names.
                         type: object
                     type: object
                   value:
-                    description: Value is required when the mode is set to `FixedMode`
-                      / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
-                      provide an integer of pods to do chaos action. If `FixedPercentMode`,
-                      provide a number from 0-100 to specify the percent of pods the
-                      server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                      a number from 0-100 to specify the max percent of pods to do
-                      chaos action
+                    description: |-
+                      Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                      If `FixedMode`, provide an integer of pods to do chaos action.
+                      If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                      IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                     type: string
                   volumeName:
                     description: VolumeName defines the name of the Volume to target.
@@ -3318,9 +3759,9 @@ spec:
                       the chaos will be deployed
                     type: string
                   resourceType:
-                    description: 'ResourceType defines the specific resource type
-                      to restart Supported resource types: daemonset / deployment
-                      / statefulset'
+                    description: |-
+                      ResourceType defines the specific resource type to restart
+                      Supported resource types: daemonset / deployment / statefulset
                     enum:
                     - daemonset
                     - deployment
@@ -3364,11 +3805,11 @@ spec:
                           Just used it in test now.
                         type: string
                       filters:
-                        description: 'Filters defines the filters to pass to the AWS
-                          api to query the list of instances. Can be specified instead
-                          of Ec2Instance, in order to specify instances by tag or
-                          other attributes Any parameter supported by AWS DescribeInstances
-                          method can be used. For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html'
+                        description: |-
+                          Filters defines the filters to pass to the AWS api to query the list of instances.
+                          Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+                          Any parameter supported by AWS DescribeInstances method can be used.
+                          For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                         items:
                           properties:
                             name:
@@ -3383,9 +3824,10 @@ spec:
                           type: object
                         type: array
                       mode:
-                        description: 'Mode defines the mode to run chaos action. Used
-                          only if Filters is specified. Supported mode: one / all
-                          / fixed / fixed-percent / random-max-percent'
+                        description: |-
+                          Mode defines the mode to run chaos action.
+                          Used only if Filters is specified.
+                          Supported mode: one / all / fixed / fixed-percent / random-max-percent
                         enum:
                         - one
                         - all
@@ -3401,13 +3843,11 @@ spec:
                         description: SecretName defines the name of kubernetes secret.
                         type: string
                       value:
-                        description: Value is required when the mode is set to `FixedMode`
-                          / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
-                          provide an integer of pods to do chaos action. If `FixedPercentMode`,
-                          provide a number from 0-100 to specify the percent of pods
-                          the server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                          a number from 0-100 to specify the max percent of pods to
-                          do chaos action
+                        description: |-
+                          Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                          If `FixedMode`, provide an integer of pods to do chaos action.
+                          If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                          IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                         type: string
                       volumeID:
                         description: |-
@@ -3628,6 +4068,450 @@ spec:
                     - mode
                     - selector
                     - volumeName
+                    type: object
+                  certificateChaos:
+                    description: CertificateChaosSpec defines the attributes that
+                      a user creates on a chaos experiment about pods.
+                    properties:
+                      certificateExpiry:
+                        description: |-
+                          CertificateExpiry represents the expiry period for the requested certificate.
+                          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                        type: string
+                      duration:
+                        description: |-
+                          Duration represents the duration of the chaos action.
+                          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                      renewBefore:
+                        description: |-
+                          RenewBefore represents when the cert-manager should rotate the certificate.
+                          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                        type: string
+                      selector:
+                        properties:
+                          annotationSelectors:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on annotations.
+                            type: object
+                          expressionSelectors:
+                            description: |-
+                              a slice of label selector expressions that can be used to select objects.
+                              A list of selectors based on set-based label expressions.
+                            items:
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          fieldSelectors:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on fields.
+                            type: object
+                          labelSelectors:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on labels.
+                            type: object
+                          namespaces:
+                            description: Namespaces is a set of namespace to which
+                              objects belong.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    required:
+                    - certificateExpiry
+                    - renewBefore
+                    - selector
+                    type: object
+                  ciliumChaos:
+                    description: CiliumChaosSpec defines the attributes that a user
+                      creates on a chaos experiment affecting cilium CNI.
+                    properties:
+                      ciliumPodSelector:
+                        description: |-
+                          CiliumPodSelector provides a custom selector to find the cilium-agent pod for the node.
+
+                          If not specified, it will default to selecting pods from the `kube-system` namespace with labels
+                          `app.kubernetes.io/name=cilium-agent` and `app.kubernetes.io/part-of=cilium` (which are used by default by the cilium
+                          helm chart)
+                        properties:
+                          labelSelectors:
+                            additionalProperties:
+                              type: string
+                            description: Map of label selector expressions that can
+                              be used to select the cilium-agent pods..
+                            type: object
+                          namespace:
+                            description: Namespace to restrict cilium-agent pod selection
+                              to
+                            type: string
+                        type: object
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action.
+                        type: string
+                      mode:
+                        description: |-
+                          Mode defines the mode to run chaos action.
+                          Supported mode: one / all / fixed / fixed-percent / random-max-percent
+                        enum:
+                        - one
+                        - all
+                        - fixed
+                        - fixed-percent
+                        - random-max-percent
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                      selector:
+                        description: Selector is used to select nodes into which to
+                          inject chaos.
+                        properties:
+                          expressionSelectors:
+                            description: |-
+                              a slice of label selector expressions that can be used to select objects.
+                              A list of selectors based on set-based label expressions.
+                            items:
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          labelSelectors:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on labels.
+                            type: object
+                        type: object
+                      value:
+                        description: |-
+                          Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                          If `FixedMode`, provide an integer of pods to do chaos action.
+                          If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                          IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+                        type: string
+                    required:
+                    - ciliumPodSelector
+                    - mode
+                    - selector
+                    type: object
+                  cloudstackhostChaos:
+                    description: CloudStackHostChaosSpec is the content of the specification
+                      for a CloudStackChaos.
+                    properties:
+                      action:
+                        description: |-
+                          Action defines the specific cloudstack chaos action.
+                          Supported action: host-stop
+                          Default action: host-stop
+                        enum:
+                        - host-stop
+                        type: string
+                      apiConfig:
+                        description: APIConfig defines the configuration ncessary
+                          to connect to the CloudStack API.
+                        properties:
+                          address:
+                            description: Address defines the address of the CloudStack
+                              instsance.
+                            type: string
+                          apiKeyField:
+                            description: APIKeyField defines the key under which the
+                              value for API key is stored inside the secret.
+                            type: string
+                          apiSecretField:
+                            description: APISecretField defines the key under which
+                              the value for API secret is stored inside the secret.
+                            type: string
+                          secretName:
+                            description: SecretName defines the name of the secret
+                              where the API credentials are stored.
+                            type: string
+                          verifySSL:
+                            description: VerifySSL defines whether certificates should
+                              be verified when connecting to the API.
+                            type: boolean
+                        required:
+                        - address
+                        - secretName
+                        type: object
+                      dryRun:
+                        description: DryRun defines whether the chaos should run a
+                          dry-run mode.
+                        type: boolean
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action.
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                      selector:
+                        description: Selector defines the parameters that can be used
+                          to select target VMs.
+                        properties:
+                          clusterId:
+                            description: ClusterID defines the cluster the host belongs
+                              to.
+                            type: string
+                          hypervisor:
+                            description: Hypervisor defines the target hypervisor.
+                            type: string
+                          id:
+                            description: ID defines the ID of the host.
+                            type: string
+                          keyword:
+                            description: Keyword defines the keyword to list the VMs
+                              by.
+                            type: string
+                          name:
+                            description: Name defines the name of the host
+                            type: string
+                          zoneId:
+                            description: ZoneID defines the availability zone the
+                              host belongs to.
+                            type: string
+                        type: object
+                    required:
+                    - action
+                    - apiConfig
+                    - selector
+                    type: object
+                  cloudstackvmChaos:
+                    description: CloudStackVMChaosSpec is the content of the specification
+                      for a CloudStackChaos.
+                    properties:
+                      action:
+                        description: |-
+                          Action defines the specific cloudstack chaos action.
+                          Supported action: vm-stop / vm-restart
+                          Default action: vm-stop
+                        enum:
+                        - vm-stop
+                        - vm-restart
+                        type: string
+                      apiConfig:
+                        description: APIConfig defines the configuration ncessary
+                          to connect to the CloudStack API.
+                        properties:
+                          address:
+                            description: Address defines the address of the CloudStack
+                              instsance.
+                            type: string
+                          apiKeyField:
+                            description: APIKeyField defines the key under which the
+                              value for API key is stored inside the secret.
+                            type: string
+                          apiSecretField:
+                            description: APISecretField defines the key under which
+                              the value for API secret is stored inside the secret.
+                            type: string
+                          secretName:
+                            description: SecretName defines the name of the secret
+                              where the API credentials are stored.
+                            type: string
+                          verifySSL:
+                            description: VerifySSL defines whether certificates should
+                              be verified when connecting to the API.
+                            type: boolean
+                        required:
+                        - address
+                        - secretName
+                        type: object
+                      dryRun:
+                        description: DryRun defines whether the chaos should run a
+                          dry-run mode.
+                        type: boolean
+                      duration:
+                        description: Duration represents the duration of the chaos
+                          action.
+                        type: string
+                      remoteCluster:
+                        description: RemoteCluster represents the remote cluster where
+                          the chaos will be deployed
+                        type: string
+                      selector:
+                        description: Selector defines the parameters that can be used
+                          to select target VMs.
+                        properties:
+                          account:
+                            description: Account defines account to list resources
+                              by. Must be used with the domainId parameter.
+                            type: string
+                          affinityGroupId:
+                            description: AffinityGroupID defines affinity group to
+                              list the VMs by.
+                            type: string
+                          displayVm:
+                            description: DisplayVM defines a flag that indicates whether
+                              to list VMs by the display flag.
+                            type: boolean
+                          domainId:
+                            description: DomainID defines domain ID the VMs belong
+                              to.
+                            type: string
+                          groupId:
+                            description: GroupID defines the ID of the group the VMs
+                              belong to.
+                            type: string
+                          hostId:
+                            description: HostID defines the ID of the host the VMs
+                              belong to.
+                            type: string
+                          hypervisor:
+                            description: Hypervisor defines the target hypervisor.
+                            type: string
+                          id:
+                            description: ID defines the ID of the VM.
+                            type: string
+                          ids:
+                            description: IDs defines a list of VM IDs, mutually exclusive
+                              with ID.
+                            items:
+                              type: string
+                            type: array
+                          isRecursive:
+                            description: IsRecursive defines whether VMs should be
+                              listed recursively from parent specified by DomainID.
+                            type: boolean
+                          isoid:
+                            description: ISOID defines the ISO ID to list the VMs
+                              by.
+                            type: string
+                          keyPair:
+                            description: KeyPair defines the SSH keypair name to list
+                              the VMs by.
+                            type: string
+                          keyword:
+                            description: Keyword defines the keyword to list the VMs
+                              by.
+                            type: string
+                          listAll:
+                            description: |-
+                              ListAll defines whether to list just the resources that belong to the caller or all the resources the caller is
+                              authorised to see.
+                            type: boolean
+                          name:
+                            description: Name defines the name of the VM instance.
+                            type: string
+                          networkId:
+                            description: NetworkID defines the ID of the network to
+                              list the VMs by.
+                            type: string
+                          projectId:
+                            description: ProjectID defines the project ID to list
+                              the VMs by.
+                            type: string
+                          serviceOffering:
+                            description: ServiceOffering defines the service offering
+                              to list the VMs by.
+                            type: string
+                          state:
+                            description: State defines the state of the VM that should
+                              match.
+                            enum:
+                            - Running
+                            - Stopped
+                            - Present
+                            - Destroyed
+                            - Expunged
+                            type: string
+                          storageId:
+                            description: StorageID defines the ID the storage where
+                              VM's volumes belong to.
+                            type: string
+                          tags:
+                            additionalProperties:
+                              type: string
+                            description: Tags defines key/value pairs that should
+                              match the tags of the VMs.
+                            type: object
+                          templateId:
+                            description: TemplateID defines the ID of the template
+                              that was used to create the VMs.
+                            type: string
+                          userId:
+                            description: UserID defines the user ID that created the
+                              VM and is under the account that owns the VM.
+                            type: string
+                          vpcId:
+                            description: VPCID defines the ID of the VPC the VM belongs
+                              to.
+                            type: string
+                          zoneId:
+                            description: ZoneID defines the availability zone the
+                              VM belongs to.
+                            type: string
+                        type: object
+                    required:
+                    - action
+                    - apiConfig
+                    - selector
                     type: object
                   concurrencyPolicy:
                     default: Forbid
@@ -6433,24 +7317,25 @@ spec:
                       creates on a chaos experiment about pods.
                     properties:
                       duration:
-                        description: Duration represents the duration of the chaos
-                          action. It is required when the action is `PodFailureAction`.
-                          A duration string is a possibly signed sequence of decimal
-                          numbers, each with optional fraction and a unit suffix,
-                          such as "300ms", "-1.5h" or "2h45m". Valid time units are
-                          "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                        description: |-
+                          Duration represents the duration of the chaos action.
+                          It is required when the action is `PodFailureAction`.
+                          A duration string is a possibly signed sequence of
+                          decimal numbers, each with optional fraction and a unit suffix,
+                          such as "300ms", "-1.5h" or "2h45m".
+                          Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                         type: string
                       gracePeriod:
-                        description: GracePeriod is used in pod-kill action. It represents
-                          the duration in seconds before the pod should be deleted.
-                          Value must be non-negative integer. The default value is
-                          zero that indicates delete immediately.
+                        description: |-
+                          GracePeriod is used in pod-kill action. It represents the duration in seconds before the pod should be deleted.
+                          Value must be non-negative integer. The default value is zero that indicates delete immediately.
                         format: int64
                         minimum: 0
                         type: integer
                       mode:
-                        description: 'Mode defines the mode to run chaos action. Supported
-                          mode: one / all / fixed / fixed-percent / random-max-percent'
+                        description: |-
+                          Mode defines the mode to run chaos action.
+                          Supported mode: one / all / fixed / fixed-percent / random-max-percent
                         enum:
                         - one
                         - all
@@ -6469,16 +7354,17 @@ spec:
                           annotationSelectors:
                             additionalProperties:
                               type: string
-                            description: Map of string keys and values that can be
-                              used to select objects. A selector based on annotations.
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on annotations.
                             type: object
                           expressionSelectors:
-                            description: a slice of label selector expressions that
-                              can be used to select objects. A list of selectors based
-                              on set-based label expressions.
+                            description: |-
+                              a slice of label selector expressions that can be used to select objects.
+                              A list of selectors based on set-based label expressions.
                             items:
-                              description: A label selector requirement is a selector
-                                that contains values, a key, and an operator that
+                              description: |-
+                                A label selector requirement is a selector that contains values, a key, and an operator that
                                 relates the key and values.
                               properties:
                                 key:
@@ -6486,20 +7372,20 @@ spec:
                                     applies to.
                                   type: string
                                 operator:
-                                  description: operator represents a key's relationship
-                                    to a set of values. Valid operators are In, NotIn,
-                                    Exists and DoesNotExist.
+                                  description: |-
+                                    operator represents a key's relationship to a set of values.
+                                    Valid operators are In, NotIn, Exists and DoesNotExist.
                                   type: string
                                 values:
-                                  description: values is an array of string values.
-                                    If the operator is In or NotIn, the values array
-                                    must be non-empty. If the operator is Exists or
-                                    DoesNotExist, the values array must be empty.
-                                    This array is replaced during a strategic merge
-                                    patch.
+                                  description: |-
+                                    values is an array of string values. If the operator is In or NotIn,
+                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                    the values array must be empty. This array is replaced during a strategic
+                                    merge patch.
                                   items:
                                     type: string
                                   type: array
+                                  x-kubernetes-list-type: atomic
                               required:
                               - key
                               - operator
@@ -6508,14 +7394,16 @@ spec:
                           fieldSelectors:
                             additionalProperties:
                               type: string
-                            description: Map of string keys and values that can be
-                              used to select objects. A selector based on fields.
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on fields.
                             type: object
                           labelSelectors:
                             additionalProperties:
                               type: string
-                            description: Map of string keys and values that can be
-                              used to select objects. A selector based on labels.
+                            description: |-
+                              Map of string keys and values that can be used to select objects.
+                              A selector based on labels.
                             type: object
                           namespaces:
                             description: Namespaces is a set of namespace to which
@@ -6526,9 +7414,10 @@ spec:
                           nodeSelectors:
                             additionalProperties:
                               type: string
-                            description: Map of string keys and values that can be
-                              used to select nodes. Selector which must match a node's
-                              labels, and objects must belong to these selected nodes.
+                            description: |-
+                              Map of string keys and values that can be used to select nodes.
+                              Selector which must match a node's labels,
+                              and objects must belong to these selected nodes.
                             type: object
                           nodes:
                             description: Nodes is a set of node name and objects must
@@ -6537,9 +7426,9 @@ spec:
                               type: string
                             type: array
                           podPhaseSelectors:
-                            description: 'PodPhaseSelectors is a set of condition
-                              of a pod at the current time. supported value: Pending
-                              / Running / Succeeded / Failed / Unknown'
+                            description: |-
+                              PodPhaseSelectors is a set of condition of a pod at the current time.
+                              supported value: Pending / Running / Succeeded / Failed / Unknown
                             items:
                               type: string
                             type: array
@@ -6548,20 +7437,18 @@ spec:
                               items:
                                 type: string
                               type: array
-                            description: Pods is a map of string keys and a set values
-                              that used to select pods. The key defines the namespace
-                              which pods belong, and the each values is a set of pod
-                              names.
+                            description: |-
+                              Pods is a map of string keys and a set values that used to select pods.
+                              The key defines the namespace which pods belong,
+                              and the each values is a set of pod names.
                             type: object
                         type: object
                       value:
-                        description: Value is required when the mode is set to `FixedMode`
-                          / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`,
-                          provide an integer of pods to do chaos action. If `FixedPercentMode`,
-                          provide a number from 0-100 to specify the percent of pods
-                          the server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                          a number from 0-100 to specify the max percent of pods to
-                          do chaos action
+                        description: |-
+                          Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                          If `FixedMode`, provide an integer of pods to do chaos action.
+                          If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                          IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                         type: string
                       volumeName:
                         description: VolumeName defines the name of the Volume to
@@ -6624,9 +7511,9 @@ spec:
                           the chaos will be deployed
                         type: string
                       resourceType:
-                        description: 'ResourceType defines the specific resource type
-                          to restart Supported resource types: daemonset / deployment
-                          / statefulset'
+                        description: |-
+                          ResourceType defines the specific resource type to restart
+                          Supported resource types: daemonset / deployment / statefulset
                         enum:
                         - daemonset
                         - deployment
@@ -7049,12 +7936,11 @@ spec:
                                     the aws server. Just used it in test now.
                                   type: string
                                 filters:
-                                  description: 'Filters defines the filters to pass
-                                    to the AWS api to query the list of instances.
-                                    Can be specified instead of Ec2Instance, in order
-                                    to specify instances by tag or other attributes
-                                    Any parameter supported by AWS DescribeInstances
-                                    method can be used. For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html'
+                                  description: |-
+                                    Filters defines the filters to pass to the AWS api to query the list of instances.
+                                    Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+                                    Any parameter supported by AWS DescribeInstances method can be used.
+                                    For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                                   items:
                                     properties:
                                       name:
@@ -7069,9 +7955,10 @@ spec:
                                     type: object
                                   type: array
                                 mode:
-                                  description: 'Mode defines the mode to run chaos
-                                    action. Used only if Filters is specified. Supported
-                                    mode: one / all / fixed / fixed-percent / random-max-percent'
+                                  description: |-
+                                    Mode defines the mode to run chaos action.
+                                    Used only if Filters is specified.
+                                    Supported mode: one / all / fixed / fixed-percent / random-max-percent
                                   enum:
                                   - one
                                   - all
@@ -7088,14 +7975,11 @@ spec:
                                     secret.
                                   type: string
                                 value:
-                                  description: Value is required when the mode is
-                                    set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
-                                    If `FixedMode`, provide an integer of pods to
-                                    do chaos action. If `FixedPercentMode`, provide
-                                    a number from 0-100 to specify the percent of
-                                    pods the server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                                    a number from 0-100 to specify the max percent
-                                    of pods to do chaos action
+                                  description: |-
+                                    Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                    If `FixedMode`, provide an integer of pods to do chaos action.
+                                    If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                    IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                                   type: string
                                 volumeID:
                                   description: |-
@@ -7321,6 +8205,97 @@ spec:
                               - selector
                               - volumeName
                               type: object
+                            certificateChaos:
+                              description: CertificateChaosSpec defines the attributes
+                                that a user creates on a chaos experiment about pods.
+                              properties:
+                                certificateExpiry:
+                                  description: |-
+                                    CertificateExpiry represents the expiry period for the requested certificate.
+                                    Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                  type: string
+                                duration:
+                                  description: |-
+                                    Duration represents the duration of the chaos action.
+                                    Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                                renewBefore:
+                                  description: |-
+                                    RenewBefore represents when the cert-manager should rotate the certificate.
+                                    Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                  type: string
+                                selector:
+                                  properties:
+                                    annotationSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on annotations.
+                                      type: object
+                                    expressionSelectors:
+                                      description: |-
+                                        a slice of label selector expressions that can be used to select objects.
+                                        A list of selectors based on set-based label expressions.
+                                      items:
+                                        description: |-
+                                          A label selector requirement is a selector that contains values, a key, and an operator that
+                                          relates the key and values.
+                                        properties:
+                                          key:
+                                            description: key is the label key that
+                                              the selector applies to.
+                                            type: string
+                                          operator:
+                                            description: |-
+                                              operator represents a key's relationship to a set of values.
+                                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                                            type: string
+                                          values:
+                                            description: |-
+                                              values is an array of string values. If the operator is In or NotIn,
+                                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This array is replaced during a strategic
+                                              merge patch.
+                                            items:
+                                              type: string
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                        required:
+                                        - key
+                                        - operator
+                                        type: object
+                                      type: array
+                                    fieldSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on fields.
+                                      type: object
+                                    labelSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on labels.
+                                      type: object
+                                    namespaces:
+                                      description: Namespaces is a set of namespace
+                                        to which objects belong.
+                                      items:
+                                        type: string
+                                      type: array
+                                  type: object
+                              required:
+                              - certificateExpiry
+                              - renewBefore
+                              - selector
+                              type: object
                             children:
                               description: Children describes the children steps of
                                 serial or parallel node. Only used when Type is TypeSerial
@@ -7328,6 +8303,371 @@ spec:
                               items:
                                 type: string
                               type: array
+                            ciliumChaos:
+                              description: CiliumChaosSpec defines the attributes
+                                that a user creates on a chaos experiment affecting
+                                cilium CNI.
+                              properties:
+                                ciliumPodSelector:
+                                  description: |-
+                                    CiliumPodSelector provides a custom selector to find the cilium-agent pod for the node.
+
+                                    If not specified, it will default to selecting pods from the `kube-system` namespace with labels
+                                    `app.kubernetes.io/name=cilium-agent` and `app.kubernetes.io/part-of=cilium` (which are used by default by the cilium
+                                    helm chart)
+                                  properties:
+                                    labelSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: Map of label selector expressions
+                                        that can be used to select the cilium-agent
+                                        pods..
+                                      type: object
+                                    namespace:
+                                      description: Namespace to restrict cilium-agent
+                                        pod selection to
+                                      type: string
+                                  type: object
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action.
+                                  type: string
+                                mode:
+                                  description: |-
+                                    Mode defines the mode to run chaos action.
+                                    Supported mode: one / all / fixed / fixed-percent / random-max-percent
+                                  enum:
+                                  - one
+                                  - all
+                                  - fixed
+                                  - fixed-percent
+                                  - random-max-percent
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                                selector:
+                                  description: Selector is used to select nodes into
+                                    which to inject chaos.
+                                  properties:
+                                    expressionSelectors:
+                                      description: |-
+                                        a slice of label selector expressions that can be used to select objects.
+                                        A list of selectors based on set-based label expressions.
+                                      items:
+                                        description: |-
+                                          A label selector requirement is a selector that contains values, a key, and an operator that
+                                          relates the key and values.
+                                        properties:
+                                          key:
+                                            description: key is the label key that
+                                              the selector applies to.
+                                            type: string
+                                          operator:
+                                            description: |-
+                                              operator represents a key's relationship to a set of values.
+                                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                                            type: string
+                                          values:
+                                            description: |-
+                                              values is an array of string values. If the operator is In or NotIn,
+                                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This array is replaced during a strategic
+                                              merge patch.
+                                            items:
+                                              type: string
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                        required:
+                                        - key
+                                        - operator
+                                        type: object
+                                      type: array
+                                    labelSelectors:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on labels.
+                                      type: object
+                                  type: object
+                                value:
+                                  description: |-
+                                    Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                    If `FixedMode`, provide an integer of pods to do chaos action.
+                                    If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                    IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+                                  type: string
+                              required:
+                              - ciliumPodSelector
+                              - mode
+                              - selector
+                              type: object
+                            cloudstackhostChaos:
+                              description: CloudStackHostChaosSpec is the content
+                                of the specification for a CloudStackChaos.
+                              properties:
+                                action:
+                                  description: |-
+                                    Action defines the specific cloudstack chaos action.
+                                    Supported action: host-stop
+                                    Default action: host-stop
+                                  enum:
+                                  - host-stop
+                                  type: string
+                                apiConfig:
+                                  description: APIConfig defines the configuration
+                                    ncessary to connect to the CloudStack API.
+                                  properties:
+                                    address:
+                                      description: Address defines the address of
+                                        the CloudStack instsance.
+                                      type: string
+                                    apiKeyField:
+                                      description: APIKeyField defines the key under
+                                        which the value for API key is stored inside
+                                        the secret.
+                                      type: string
+                                    apiSecretField:
+                                      description: APISecretField defines the key
+                                        under which the value for API secret is stored
+                                        inside the secret.
+                                      type: string
+                                    secretName:
+                                      description: SecretName defines the name of
+                                        the secret where the API credentials are stored.
+                                      type: string
+                                    verifySSL:
+                                      description: VerifySSL defines whether certificates
+                                        should be verified when connecting to the
+                                        API.
+                                      type: boolean
+                                  required:
+                                  - address
+                                  - secretName
+                                  type: object
+                                dryRun:
+                                  description: DryRun defines whether the chaos should
+                                    run a dry-run mode.
+                                  type: boolean
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action.
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                                selector:
+                                  description: Selector defines the parameters that
+                                    can be used to select target VMs.
+                                  properties:
+                                    clusterId:
+                                      description: ClusterID defines the cluster the
+                                        host belongs to.
+                                      type: string
+                                    hypervisor:
+                                      description: Hypervisor defines the target hypervisor.
+                                      type: string
+                                    id:
+                                      description: ID defines the ID of the host.
+                                      type: string
+                                    keyword:
+                                      description: Keyword defines the keyword to
+                                        list the VMs by.
+                                      type: string
+                                    name:
+                                      description: Name defines the name of the host
+                                      type: string
+                                    zoneId:
+                                      description: ZoneID defines the availability
+                                        zone the host belongs to.
+                                      type: string
+                                  type: object
+                              required:
+                              - action
+                              - apiConfig
+                              - selector
+                              type: object
+                            cloudstackvmChaos:
+                              description: CloudStackVMChaosSpec is the content of
+                                the specification for a CloudStackChaos.
+                              properties:
+                                action:
+                                  description: |-
+                                    Action defines the specific cloudstack chaos action.
+                                    Supported action: vm-stop / vm-restart
+                                    Default action: vm-stop
+                                  enum:
+                                  - vm-stop
+                                  - vm-restart
+                                  type: string
+                                apiConfig:
+                                  description: APIConfig defines the configuration
+                                    ncessary to connect to the CloudStack API.
+                                  properties:
+                                    address:
+                                      description: Address defines the address of
+                                        the CloudStack instsance.
+                                      type: string
+                                    apiKeyField:
+                                      description: APIKeyField defines the key under
+                                        which the value for API key is stored inside
+                                        the secret.
+                                      type: string
+                                    apiSecretField:
+                                      description: APISecretField defines the key
+                                        under which the value for API secret is stored
+                                        inside the secret.
+                                      type: string
+                                    secretName:
+                                      description: SecretName defines the name of
+                                        the secret where the API credentials are stored.
+                                      type: string
+                                    verifySSL:
+                                      description: VerifySSL defines whether certificates
+                                        should be verified when connecting to the
+                                        API.
+                                      type: boolean
+                                  required:
+                                  - address
+                                  - secretName
+                                  type: object
+                                dryRun:
+                                  description: DryRun defines whether the chaos should
+                                    run a dry-run mode.
+                                  type: boolean
+                                duration:
+                                  description: Duration represents the duration of
+                                    the chaos action.
+                                  type: string
+                                remoteCluster:
+                                  description: RemoteCluster represents the remote
+                                    cluster where the chaos will be deployed
+                                  type: string
+                                selector:
+                                  description: Selector defines the parameters that
+                                    can be used to select target VMs.
+                                  properties:
+                                    account:
+                                      description: Account defines account to list
+                                        resources by. Must be used with the domainId
+                                        parameter.
+                                      type: string
+                                    affinityGroupId:
+                                      description: AffinityGroupID defines affinity
+                                        group to list the VMs by.
+                                      type: string
+                                    displayVm:
+                                      description: DisplayVM defines a flag that indicates
+                                        whether to list VMs by the display flag.
+                                      type: boolean
+                                    domainId:
+                                      description: DomainID defines domain ID the
+                                        VMs belong to.
+                                      type: string
+                                    groupId:
+                                      description: GroupID defines the ID of the group
+                                        the VMs belong to.
+                                      type: string
+                                    hostId:
+                                      description: HostID defines the ID of the host
+                                        the VMs belong to.
+                                      type: string
+                                    hypervisor:
+                                      description: Hypervisor defines the target hypervisor.
+                                      type: string
+                                    id:
+                                      description: ID defines the ID of the VM.
+                                      type: string
+                                    ids:
+                                      description: IDs defines a list of VM IDs, mutually
+                                        exclusive with ID.
+                                      items:
+                                        type: string
+                                      type: array
+                                    isRecursive:
+                                      description: IsRecursive defines whether VMs
+                                        should be listed recursively from parent specified
+                                        by DomainID.
+                                      type: boolean
+                                    isoid:
+                                      description: ISOID defines the ISO ID to list
+                                        the VMs by.
+                                      type: string
+                                    keyPair:
+                                      description: KeyPair defines the SSH keypair
+                                        name to list the VMs by.
+                                      type: string
+                                    keyword:
+                                      description: Keyword defines the keyword to
+                                        list the VMs by.
+                                      type: string
+                                    listAll:
+                                      description: |-
+                                        ListAll defines whether to list just the resources that belong to the caller or all the resources the caller is
+                                        authorised to see.
+                                      type: boolean
+                                    name:
+                                      description: Name defines the name of the VM
+                                        instance.
+                                      type: string
+                                    networkId:
+                                      description: NetworkID defines the ID of the
+                                        network to list the VMs by.
+                                      type: string
+                                    projectId:
+                                      description: ProjectID defines the project ID
+                                        to list the VMs by.
+                                      type: string
+                                    serviceOffering:
+                                      description: ServiceOffering defines the service
+                                        offering to list the VMs by.
+                                      type: string
+                                    state:
+                                      description: State defines the state of the
+                                        VM that should match.
+                                      enum:
+                                      - Running
+                                      - Stopped
+                                      - Present
+                                      - Destroyed
+                                      - Expunged
+                                      type: string
+                                    storageId:
+                                      description: StorageID defines the ID the storage
+                                        where VM's volumes belong to.
+                                      type: string
+                                    tags:
+                                      additionalProperties:
+                                        type: string
+                                      description: Tags defines key/value pairs that
+                                        should match the tags of the VMs.
+                                      type: object
+                                    templateId:
+                                      description: TemplateID defines the ID of the
+                                        template that was used to create the VMs.
+                                      type: string
+                                    userId:
+                                      description: UserID defines the user ID that
+                                        created the VM and is under the account that
+                                        owns the VM.
+                                      type: string
+                                    vpcId:
+                                      description: VPCID defines the ID of the VPC
+                                        the VM belongs to.
+                                      type: string
+                                    zoneId:
+                                      description: ZoneID defines the availability
+                                        zone the VM belongs to.
+                                      type: string
+                                  type: object
+                              required:
+                              - action
+                              - apiConfig
+                              - selector
+                              type: object
                             conditionalBranches:
                               description: ConditionalBranches describes the conditional
                                 branches of custom tasks. Only used when Type is TypeTask.
@@ -10225,27 +11565,25 @@ spec:
                                 that a user creates on a chaos experiment about pods.
                               properties:
                                 duration:
-                                  description: Duration represents the duration of
-                                    the chaos action. It is required when the action
-                                    is `PodFailureAction`. A duration string is a
-                                    possibly signed sequence of decimal numbers, each
-                                    with optional fraction and a unit suffix, such
-                                    as "300ms", "-1.5h" or "2h45m". Valid time units
-                                    are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                  description: |-
+                                    Duration represents the duration of the chaos action.
+                                    It is required when the action is `PodFailureAction`.
+                                    A duration string is a possibly signed sequence of
+                                    decimal numbers, each with optional fraction and a unit suffix,
+                                    such as "300ms", "-1.5h" or "2h45m".
+                                    Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                                   type: string
                                 gracePeriod:
-                                  description: GracePeriod is used in pod-kill action.
-                                    It represents the duration in seconds before the
-                                    pod should be deleted. Value must be non-negative
-                                    integer. The default value is zero that indicates
-                                    delete immediately.
+                                  description: |-
+                                    GracePeriod is used in pod-kill action. It represents the duration in seconds before the pod should be deleted.
+                                    Value must be non-negative integer. The default value is zero that indicates delete immediately.
                                   format: int64
                                   minimum: 0
                                   type: integer
                                 mode:
-                                  description: 'Mode defines the mode to run chaos
-                                    action. Supported mode: one / all / fixed / fixed-percent
-                                    / random-max-percent'
+                                  description: |-
+                                    Mode defines the mode to run chaos action.
+                                    Supported mode: one / all / fixed / fixed-percent / random-max-percent
                                   enum:
                                   - one
                                   - all
@@ -10264,41 +11602,38 @@ spec:
                                     annotationSelectors:
                                       additionalProperties:
                                         type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on annotations.
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on annotations.
                                       type: object
                                     expressionSelectors:
-                                      description: a slice of label selector expressions
-                                        that can be used to select objects. A list
-                                        of selectors based on set-based label expressions.
+                                      description: |-
+                                        a slice of label selector expressions that can be used to select objects.
+                                        A list of selectors based on set-based label expressions.
                                       items:
-                                        description: A label selector requirement
-                                          is a selector that contains values, a key,
-                                          and an operator that relates the key and
-                                          values.
+                                        description: |-
+                                          A label selector requirement is a selector that contains values, a key, and an operator that
+                                          relates the key and values.
                                         properties:
                                           key:
                                             description: key is the label key that
                                               the selector applies to.
                                             type: string
                                           operator:
-                                            description: operator represents a key's
-                                              relationship to a set of values. Valid
-                                              operators are In, NotIn, Exists and
-                                              DoesNotExist.
+                                            description: |-
+                                              operator represents a key's relationship to a set of values.
+                                              Valid operators are In, NotIn, Exists and DoesNotExist.
                                             type: string
                                           values:
-                                            description: values is an array of string
-                                              values. If the operator is In or NotIn,
-                                              the values array must be non-empty.
-                                              If the operator is Exists or DoesNotExist,
-                                              the values array must be empty. This
-                                              array is replaced during a strategic
+                                            description: |-
+                                              values is an array of string values. If the operator is In or NotIn,
+                                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This array is replaced during a strategic
                                               merge patch.
                                             items:
                                               type: string
                                             type: array
+                                            x-kubernetes-list-type: atomic
                                         required:
                                         - key
                                         - operator
@@ -10307,16 +11642,16 @@ spec:
                                     fieldSelectors:
                                       additionalProperties:
                                         type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on fields.
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on fields.
                                       type: object
                                     labelSelectors:
                                       additionalProperties:
                                         type: string
-                                      description: Map of string keys and values that
-                                        can be used to select objects. A selector
-                                        based on labels.
+                                      description: |-
+                                        Map of string keys and values that can be used to select objects.
+                                        A selector based on labels.
                                       type: object
                                     namespaces:
                                       description: Namespaces is a set of namespace
@@ -10327,10 +11662,10 @@ spec:
                                     nodeSelectors:
                                       additionalProperties:
                                         type: string
-                                      description: Map of string keys and values that
-                                        can be used to select nodes. Selector which
-                                        must match a node's labels, and objects must
-                                        belong to these selected nodes.
+                                      description: |-
+                                        Map of string keys and values that can be used to select nodes.
+                                        Selector which must match a node's labels,
+                                        and objects must belong to these selected nodes.
                                       type: object
                                     nodes:
                                       description: Nodes is a set of node name and
@@ -10339,10 +11674,9 @@ spec:
                                         type: string
                                       type: array
                                     podPhaseSelectors:
-                                      description: 'PodPhaseSelectors is a set of
-                                        condition of a pod at the current time. supported
-                                        value: Pending / Running / Succeeded / Failed
-                                        / Unknown'
+                                      description: |-
+                                        PodPhaseSelectors is a set of condition of a pod at the current time.
+                                        supported value: Pending / Running / Succeeded / Failed / Unknown
                                       items:
                                         type: string
                                       type: array
@@ -10351,21 +11685,18 @@ spec:
                                         items:
                                           type: string
                                         type: array
-                                      description: Pods is a map of string keys and
-                                        a set values that used to select pods. The
-                                        key defines the namespace which pods belong,
+                                      description: |-
+                                        Pods is a map of string keys and a set values that used to select pods.
+                                        The key defines the namespace which pods belong,
                                         and the each values is a set of pod names.
                                       type: object
                                   type: object
                                 value:
-                                  description: Value is required when the mode is
-                                    set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
-                                    If `FixedMode`, provide an integer of pods to
-                                    do chaos action. If `FixedPercentMode`, provide
-                                    a number from 0-100 to specify the percent of
-                                    pods the server can do chaos action. IF `RandomMaxPercentMode`,  provide
-                                    a number from 0-100 to specify the max percent
-                                    of pods to do chaos action
+                                  description: |-
+                                    Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                    If `FixedMode`, provide an integer of pods to do chaos action.
+                                    If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                    IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                                   type: string
                                 volumeName:
                                   description: VolumeName defines the name of the
@@ -10430,9 +11761,9 @@ spec:
                                     cluster where the chaos will be deployed
                                   type: string
                                 resourceType:
-                                  description: 'ResourceType defines the specific
-                                    resource type to restart Supported resource types:
-                                    daemonset / deployment / statefulset'
+                                  description: |-
+                                    ResourceType defines the specific resource type to restart
+                                    Supported resource types: daemonset / deployment / statefulset
                                   enum:
                                   - daemonset
                                   - deployment
@@ -10480,13 +11811,11 @@ spec:
                                         of the aws server. Just used it in test now.
                                       type: string
                                     filters:
-                                      description: 'Filters defines the filters to
-                                        pass to the AWS api to query the list of instances.
-                                        Can be specified instead of Ec2Instance, in
-                                        order to specify instances by tag or other
-                                        attributes Any parameter supported by AWS
-                                        DescribeInstances method can be used. For
-                                        details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html'
+                                      description: |-
+                                        Filters defines the filters to pass to the AWS api to query the list of instances.
+                                        Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+                                        Any parameter supported by AWS DescribeInstances method can be used.
+                                        For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                                       items:
                                         properties:
                                           name:
@@ -10501,10 +11830,10 @@ spec:
                                         type: object
                                       type: array
                                     mode:
-                                      description: 'Mode defines the mode to run chaos
-                                        action. Used only if Filters is specified.
-                                        Supported mode: one / all / fixed / fixed-percent
-                                        / random-max-percent'
+                                      description: |-
+                                        Mode defines the mode to run chaos action.
+                                        Used only if Filters is specified.
+                                        Supported mode: one / all / fixed / fixed-percent / random-max-percent
                                       enum:
                                       - one
                                       - all
@@ -10521,15 +11850,11 @@ spec:
                                         kubernetes secret.
                                       type: string
                                     value:
-                                      description: Value is required when the mode
-                                        is set to `FixedMode` / `FixedPercentMode`
-                                        / `RandomMaxPercentMode`. If `FixedMode`,
-                                        provide an integer of pods to do chaos action.
-                                        If `FixedPercentMode`, provide a number from
-                                        0-100 to specify the percent of pods the server
-                                        can do chaos action. IF `RandomMaxPercentMode`,  provide
-                                        a number from 0-100 to specify the max percent
-                                        of pods to do chaos action
+                                      description: |-
+                                        Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                        If `FixedMode`, provide an integer of pods to do chaos action.
+                                        If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                        IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                                       type: string
                                     volumeID:
                                       description: |-
@@ -10754,6 +12079,470 @@ spec:
                                   - mode
                                   - selector
                                   - volumeName
+                                  type: object
+                                certificateChaos:
+                                  description: CertificateChaosSpec defines the attributes
+                                    that a user creates on a chaos experiment about
+                                    pods.
+                                  properties:
+                                    certificateExpiry:
+                                      description: |-
+                                        CertificateExpiry represents the expiry period for the requested certificate.
+                                        Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                      type: string
+                                    duration:
+                                      description: |-
+                                        Duration represents the duration of the chaos action.
+                                        Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                    renewBefore:
+                                      description: |-
+                                        RenewBefore represents when the cert-manager should rotate the certificate.
+                                        Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+                                      type: string
+                                    selector:
+                                      properties:
+                                        annotationSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on annotations.
+                                          type: object
+                                        expressionSelectors:
+                                          description: |-
+                                            a slice of label selector expressions that can be used to select objects.
+                                            A list of selectors based on set-based label expressions.
+                                          items:
+                                            description: |-
+                                              A label selector requirement is a selector that contains values, a key, and an operator that
+                                              relates the key and values.
+                                            properties:
+                                              key:
+                                                description: key is the label key
+                                                  that the selector applies to.
+                                                type: string
+                                              operator:
+                                                description: |-
+                                                  operator represents a key's relationship to a set of values.
+                                                  Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                type: string
+                                              values:
+                                                description: |-
+                                                  values is an array of string values. If the operator is In or NotIn,
+                                                  the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                  the values array must be empty. This array is replaced during a strategic
+                                                  merge patch.
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                        fieldSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on fields.
+                                          type: object
+                                        labelSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on labels.
+                                          type: object
+                                        namespaces:
+                                          description: Namespaces is a set of namespace
+                                            to which objects belong.
+                                          items:
+                                            type: string
+                                          type: array
+                                      type: object
+                                  required:
+                                  - certificateExpiry
+                                  - renewBefore
+                                  - selector
+                                  type: object
+                                ciliumChaos:
+                                  description: CiliumChaosSpec defines the attributes
+                                    that a user creates on a chaos experiment affecting
+                                    cilium CNI.
+                                  properties:
+                                    ciliumPodSelector:
+                                      description: |-
+                                        CiliumPodSelector provides a custom selector to find the cilium-agent pod for the node.
+
+                                        If not specified, it will default to selecting pods from the `kube-system` namespace with labels
+                                        `app.kubernetes.io/name=cilium-agent` and `app.kubernetes.io/part-of=cilium` (which are used by default by the cilium
+                                        helm chart)
+                                      properties:
+                                        labelSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: Map of label selector expressions
+                                            that can be used to select the cilium-agent
+                                            pods..
+                                          type: object
+                                        namespace:
+                                          description: Namespace to restrict cilium-agent
+                                            pod selection to
+                                          type: string
+                                      type: object
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action.
+                                      type: string
+                                    mode:
+                                      description: |-
+                                        Mode defines the mode to run chaos action.
+                                        Supported mode: one / all / fixed / fixed-percent / random-max-percent
+                                      enum:
+                                      - one
+                                      - all
+                                      - fixed
+                                      - fixed-percent
+                                      - random-max-percent
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                    selector:
+                                      description: Selector is used to select nodes
+                                        into which to inject chaos.
+                                      properties:
+                                        expressionSelectors:
+                                          description: |-
+                                            a slice of label selector expressions that can be used to select objects.
+                                            A list of selectors based on set-based label expressions.
+                                          items:
+                                            description: |-
+                                              A label selector requirement is a selector that contains values, a key, and an operator that
+                                              relates the key and values.
+                                            properties:
+                                              key:
+                                                description: key is the label key
+                                                  that the selector applies to.
+                                                type: string
+                                              operator:
+                                                description: |-
+                                                  operator represents a key's relationship to a set of values.
+                                                  Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                type: string
+                                              values:
+                                                description: |-
+                                                  values is an array of string values. If the operator is In or NotIn,
+                                                  the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                  the values array must be empty. This array is replaced during a strategic
+                                                  merge patch.
+                                                items:
+                                                  type: string
+                                                type: array
+                                                x-kubernetes-list-type: atomic
+                                            required:
+                                            - key
+                                            - operator
+                                            type: object
+                                          type: array
+                                        labelSelectors:
+                                          additionalProperties:
+                                            type: string
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on labels.
+                                          type: object
+                                      type: object
+                                    value:
+                                      description: |-
+                                        Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                        If `FixedMode`, provide an integer of pods to do chaos action.
+                                        If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                        IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
+                                      type: string
+                                  required:
+                                  - ciliumPodSelector
+                                  - mode
+                                  - selector
+                                  type: object
+                                cloudstackhostChaos:
+                                  description: CloudStackHostChaosSpec is the content
+                                    of the specification for a CloudStackChaos.
+                                  properties:
+                                    action:
+                                      description: |-
+                                        Action defines the specific cloudstack chaos action.
+                                        Supported action: host-stop
+                                        Default action: host-stop
+                                      enum:
+                                      - host-stop
+                                      type: string
+                                    apiConfig:
+                                      description: APIConfig defines the configuration
+                                        ncessary to connect to the CloudStack API.
+                                      properties:
+                                        address:
+                                          description: Address defines the address
+                                            of the CloudStack instsance.
+                                          type: string
+                                        apiKeyField:
+                                          description: APIKeyField defines the key
+                                            under which the value for API key is stored
+                                            inside the secret.
+                                          type: string
+                                        apiSecretField:
+                                          description: APISecretField defines the
+                                            key under which the value for API secret
+                                            is stored inside the secret.
+                                          type: string
+                                        secretName:
+                                          description: SecretName defines the name
+                                            of the secret where the API credentials
+                                            are stored.
+                                          type: string
+                                        verifySSL:
+                                          description: VerifySSL defines whether certificates
+                                            should be verified when connecting to
+                                            the API.
+                                          type: boolean
+                                      required:
+                                      - address
+                                      - secretName
+                                      type: object
+                                    dryRun:
+                                      description: DryRun defines whether the chaos
+                                        should run a dry-run mode.
+                                      type: boolean
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action.
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                    selector:
+                                      description: Selector defines the parameters
+                                        that can be used to select target VMs.
+                                      properties:
+                                        clusterId:
+                                          description: ClusterID defines the cluster
+                                            the host belongs to.
+                                          type: string
+                                        hypervisor:
+                                          description: Hypervisor defines the target
+                                            hypervisor.
+                                          type: string
+                                        id:
+                                          description: ID defines the ID of the host.
+                                          type: string
+                                        keyword:
+                                          description: Keyword defines the keyword
+                                            to list the VMs by.
+                                          type: string
+                                        name:
+                                          description: Name defines the name of the
+                                            host
+                                          type: string
+                                        zoneId:
+                                          description: ZoneID defines the availability
+                                            zone the host belongs to.
+                                          type: string
+                                      type: object
+                                  required:
+                                  - action
+                                  - apiConfig
+                                  - selector
+                                  type: object
+                                cloudstackvmChaos:
+                                  description: CloudStackVMChaosSpec is the content
+                                    of the specification for a CloudStackChaos.
+                                  properties:
+                                    action:
+                                      description: |-
+                                        Action defines the specific cloudstack chaos action.
+                                        Supported action: vm-stop / vm-restart
+                                        Default action: vm-stop
+                                      enum:
+                                      - vm-stop
+                                      - vm-restart
+                                      type: string
+                                    apiConfig:
+                                      description: APIConfig defines the configuration
+                                        ncessary to connect to the CloudStack API.
+                                      properties:
+                                        address:
+                                          description: Address defines the address
+                                            of the CloudStack instsance.
+                                          type: string
+                                        apiKeyField:
+                                          description: APIKeyField defines the key
+                                            under which the value for API key is stored
+                                            inside the secret.
+                                          type: string
+                                        apiSecretField:
+                                          description: APISecretField defines the
+                                            key under which the value for API secret
+                                            is stored inside the secret.
+                                          type: string
+                                        secretName:
+                                          description: SecretName defines the name
+                                            of the secret where the API credentials
+                                            are stored.
+                                          type: string
+                                        verifySSL:
+                                          description: VerifySSL defines whether certificates
+                                            should be verified when connecting to
+                                            the API.
+                                          type: boolean
+                                      required:
+                                      - address
+                                      - secretName
+                                      type: object
+                                    dryRun:
+                                      description: DryRun defines whether the chaos
+                                        should run a dry-run mode.
+                                      type: boolean
+                                    duration:
+                                      description: Duration represents the duration
+                                        of the chaos action.
+                                      type: string
+                                    remoteCluster:
+                                      description: RemoteCluster represents the remote
+                                        cluster where the chaos will be deployed
+                                      type: string
+                                    selector:
+                                      description: Selector defines the parameters
+                                        that can be used to select target VMs.
+                                      properties:
+                                        account:
+                                          description: Account defines account to
+                                            list resources by. Must be used with the
+                                            domainId parameter.
+                                          type: string
+                                        affinityGroupId:
+                                          description: AffinityGroupID defines affinity
+                                            group to list the VMs by.
+                                          type: string
+                                        displayVm:
+                                          description: DisplayVM defines a flag that
+                                            indicates whether to list VMs by the display
+                                            flag.
+                                          type: boolean
+                                        domainId:
+                                          description: DomainID defines domain ID
+                                            the VMs belong to.
+                                          type: string
+                                        groupId:
+                                          description: GroupID defines the ID of the
+                                            group the VMs belong to.
+                                          type: string
+                                        hostId:
+                                          description: HostID defines the ID of the
+                                            host the VMs belong to.
+                                          type: string
+                                        hypervisor:
+                                          description: Hypervisor defines the target
+                                            hypervisor.
+                                          type: string
+                                        id:
+                                          description: ID defines the ID of the VM.
+                                          type: string
+                                        ids:
+                                          description: IDs defines a list of VM IDs,
+                                            mutually exclusive with ID.
+                                          items:
+                                            type: string
+                                          type: array
+                                        isRecursive:
+                                          description: IsRecursive defines whether
+                                            VMs should be listed recursively from
+                                            parent specified by DomainID.
+                                          type: boolean
+                                        isoid:
+                                          description: ISOID defines the ISO ID to
+                                            list the VMs by.
+                                          type: string
+                                        keyPair:
+                                          description: KeyPair defines the SSH keypair
+                                            name to list the VMs by.
+                                          type: string
+                                        keyword:
+                                          description: Keyword defines the keyword
+                                            to list the VMs by.
+                                          type: string
+                                        listAll:
+                                          description: |-
+                                            ListAll defines whether to list just the resources that belong to the caller or all the resources the caller is
+                                            authorised to see.
+                                          type: boolean
+                                        name:
+                                          description: Name defines the name of the
+                                            VM instance.
+                                          type: string
+                                        networkId:
+                                          description: NetworkID defines the ID of
+                                            the network to list the VMs by.
+                                          type: string
+                                        projectId:
+                                          description: ProjectID defines the project
+                                            ID to list the VMs by.
+                                          type: string
+                                        serviceOffering:
+                                          description: ServiceOffering defines the
+                                            service offering to list the VMs by.
+                                          type: string
+                                        state:
+                                          description: State defines the state of
+                                            the VM that should match.
+                                          enum:
+                                          - Running
+                                          - Stopped
+                                          - Present
+                                          - Destroyed
+                                          - Expunged
+                                          type: string
+                                        storageId:
+                                          description: StorageID defines the ID the
+                                            storage where VM's volumes belong to.
+                                          type: string
+                                        tags:
+                                          additionalProperties:
+                                            type: string
+                                          description: Tags defines key/value pairs
+                                            that should match the tags of the VMs.
+                                          type: object
+                                        templateId:
+                                          description: TemplateID defines the ID of
+                                            the template that was used to create the
+                                            VMs.
+                                          type: string
+                                        userId:
+                                          description: UserID defines the user ID
+                                            that created the VM and is under the account
+                                            that owns the VM.
+                                          type: string
+                                        vpcId:
+                                          description: VPCID defines the ID of the
+                                            VPC the VM belongs to.
+                                          type: string
+                                        zoneId:
+                                          description: ZoneID defines the availability
+                                            zone the VM belongs to.
+                                          type: string
+                                      type: object
+                                  required:
+                                  - action
+                                  - apiConfig
+                                  - selector
                                   type: object
                                 concurrencyPolicy:
                                   enum:
@@ -13673,28 +15462,25 @@ spec:
                                     pods.
                                   properties:
                                     duration:
-                                      description: Duration represents the duration
-                                        of the chaos action. It is required when the
-                                        action is `PodFailureAction`. A duration string
-                                        is a possibly signed sequence of decimal numbers,
-                                        each with optional fraction and a unit suffix,
-                                        such as "300ms", "-1.5h" or "2h45m". Valid
-                                        time units are "ns", "us" (or "µs"), "ms",
-                                        "s", "m", "h".
+                                      description: |-
+                                        Duration represents the duration of the chaos action.
+                                        It is required when the action is `PodFailureAction`.
+                                        A duration string is a possibly signed sequence of
+                                        decimal numbers, each with optional fraction and a unit suffix,
+                                        such as "300ms", "-1.5h" or "2h45m".
+                                        Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
                                       type: string
                                     gracePeriod:
-                                      description: GracePeriod is used in pod-kill
-                                        action. It represents the duration in seconds
-                                        before the pod should be deleted. Value must
-                                        be non-negative integer. The default value
-                                        is zero that indicates delete immediately.
+                                      description: |-
+                                        GracePeriod is used in pod-kill action. It represents the duration in seconds before the pod should be deleted.
+                                        Value must be non-negative integer. The default value is zero that indicates delete immediately.
                                       format: int64
                                       minimum: 0
                                       type: integer
                                     mode:
-                                      description: 'Mode defines the mode to run chaos
-                                        action. Supported mode: one / all / fixed
-                                        / fixed-percent / random-max-percent'
+                                      description: |-
+                                        Mode defines the mode to run chaos action.
+                                        Supported mode: one / all / fixed / fixed-percent / random-max-percent
                                       enum:
                                       - one
                                       - all
@@ -13713,43 +15499,38 @@ spec:
                                         annotationSelectors:
                                           additionalProperties:
                                             type: string
-                                          description: Map of string keys and values
-                                            that can be used to select objects. A
-                                            selector based on annotations.
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on annotations.
                                           type: object
                                         expressionSelectors:
-                                          description: a slice of label selector expressions
-                                            that can be used to select objects. A
-                                            list of selectors based on set-based label
-                                            expressions.
+                                          description: |-
+                                            a slice of label selector expressions that can be used to select objects.
+                                            A list of selectors based on set-based label expressions.
                                           items:
-                                            description: A label selector requirement
-                                              is a selector that contains values,
-                                              a key, and an operator that relates
-                                              the key and values.
+                                            description: |-
+                                              A label selector requirement is a selector that contains values, a key, and an operator that
+                                              relates the key and values.
                                             properties:
                                               key:
                                                 description: key is the label key
                                                   that the selector applies to.
                                                 type: string
                                               operator:
-                                                description: operator represents a
-                                                  key's relationship to a set of values.
-                                                  Valid operators are In, NotIn, Exists
-                                                  and DoesNotExist.
+                                                description: |-
+                                                  operator represents a key's relationship to a set of values.
+                                                  Valid operators are In, NotIn, Exists and DoesNotExist.
                                                 type: string
                                               values:
-                                                description: values is an array of
-                                                  string values. If the operator is
-                                                  In or NotIn, the values array must
-                                                  be non-empty. If the operator is
-                                                  Exists or DoesNotExist, the values
-                                                  array must be empty. This array
-                                                  is replaced during a strategic merge
-                                                  patch.
+                                                description: |-
+                                                  values is an array of string values. If the operator is In or NotIn,
+                                                  the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                  the values array must be empty. This array is replaced during a strategic
+                                                  merge patch.
                                                 items:
                                                   type: string
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                             required:
                                             - key
                                             - operator
@@ -13758,16 +15539,16 @@ spec:
                                         fieldSelectors:
                                           additionalProperties:
                                             type: string
-                                          description: Map of string keys and values
-                                            that can be used to select objects. A
-                                            selector based on fields.
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on fields.
                                           type: object
                                         labelSelectors:
                                           additionalProperties:
                                             type: string
-                                          description: Map of string keys and values
-                                            that can be used to select objects. A
-                                            selector based on labels.
+                                          description: |-
+                                            Map of string keys and values that can be used to select objects.
+                                            A selector based on labels.
                                           type: object
                                         namespaces:
                                           description: Namespaces is a set of namespace
@@ -13778,11 +15559,10 @@ spec:
                                         nodeSelectors:
                                           additionalProperties:
                                             type: string
-                                          description: Map of string keys and values
-                                            that can be used to select nodes. Selector
-                                            which must match a node's labels, and
-                                            objects must belong to these selected
-                                            nodes.
+                                          description: |-
+                                            Map of string keys and values that can be used to select nodes.
+                                            Selector which must match a node's labels,
+                                            and objects must belong to these selected nodes.
                                           type: object
                                         nodes:
                                           description: Nodes is a set of node name
@@ -13791,10 +15571,9 @@ spec:
                                             type: string
                                           type: array
                                         podPhaseSelectors:
-                                          description: 'PodPhaseSelectors is a set
-                                            of condition of a pod at the current time.
-                                            supported value: Pending / Running / Succeeded
-                                            / Failed / Unknown'
+                                          description: |-
+                                            PodPhaseSelectors is a set of condition of a pod at the current time.
+                                            supported value: Pending / Running / Succeeded / Failed / Unknown
                                           items:
                                             type: string
                                           type: array
@@ -13803,23 +15582,18 @@ spec:
                                             items:
                                               type: string
                                             type: array
-                                          description: Pods is a map of string keys
-                                            and a set values that used to select pods.
-                                            The key defines the namespace which pods
-                                            belong, and the each values is a set of
-                                            pod names.
+                                          description: |-
+                                            Pods is a map of string keys and a set values that used to select pods.
+                                            The key defines the namespace which pods belong,
+                                            and the each values is a set of pod names.
                                           type: object
                                       type: object
                                     value:
-                                      description: Value is required when the mode
-                                        is set to `FixedMode` / `FixedPercentMode`
-                                        / `RandomMaxPercentMode`. If `FixedMode`,
-                                        provide an integer of pods to do chaos action.
-                                        If `FixedPercentMode`, provide a number from
-                                        0-100 to specify the percent of pods the server
-                                        can do chaos action. IF `RandomMaxPercentMode`,  provide
-                                        a number from 0-100 to specify the max percent
-                                        of pods to do chaos action
+                                      description: |-
+                                        Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                                        If `FixedMode`, provide an integer of pods to do chaos action.
+                                        If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                                        IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                                       type: string
                                     volumeName:
                                       description: VolumeName defines the name of
@@ -13885,9 +15659,9 @@ spec:
                                         cluster where the chaos will be deployed
                                       type: string
                                     resourceType:
-                                      description: 'ResourceType defines the specific
-                                        resource type to restart Supported resource
-                                        types: daemonset / deployment / statefulset'
+                                      description: |-
+                                        ResourceType defines the specific resource type to restart
+                                        Supported resource types: daemonset / deployment / statefulset
                                       enum:
                                       - daemonset
                                       - deployment

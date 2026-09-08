@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: awschaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -75,11 +75,11 @@ spec:
                   used it in test now.
                 type: string
               filters:
-                description: 'Filters defines the filters to pass to the AWS api to
-                  query the list of instances. Can be specified instead of Ec2Instance,
-                  in order to specify instances by tag or other attributes Any parameter
-                  supported by AWS DescribeInstances method can be used. For details
-                  see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html'
+                description: |-
+                  Filters defines the filters to pass to the AWS api to query the list of instances.
+                  Can be specified instead of Ec2Instance, in order to specify instances by tag or other attributes
+                  Any parameter supported by AWS DescribeInstances method can be used.
+                  For details see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
                 items:
                   properties:
                     name:
@@ -94,9 +94,10 @@ spec:
                   type: object
                 type: array
               mode:
-                description: 'Mode defines the mode to run chaos action. Used only
-                  if Filters is specified. Supported mode: one / all / fixed / fixed-percent
-                  / random-max-percent'
+                description: |-
+                  Mode defines the mode to run chaos action.
+                  Used only if Filters is specified.
+                  Supported mode: one / all / fixed / fixed-percent / random-max-percent
                 enum:
                 - one
                 - all
@@ -112,12 +113,11 @@ spec:
                 description: SecretName defines the name of kubernetes secret.
                 type: string
               value:
-                description: Value is required when the mode is set to `FixedMode`
-                  / `FixedPercentMode` / `RandomMaxPercentMode`. If `FixedMode`, provide
-                  an integer of pods to do chaos action. If `FixedPercentMode`, provide
-                  a number from 0-100 to specify the percent of pods the server can
-                  do chaos action. IF `RandomMaxPercentMode`,  provide a number from
-                  0-100 to specify the max percent of pods to do chaos action
+                description: |-
+                  Value is required when the mode is set to `FixedMode` / `FixedPercentMode` / `RandomMaxPercentMode`.
+                  If `FixedMode`, provide an integer of pods to do chaos action.
+                  If `FixedPercentMode`, provide a number from 0-100 to specify the percent of pods the server can do chaos action.
+                  IF `RandomMaxPercentMode`,  provide a number from 0-100 to specify the max percent of pods to do chaos action
                 type: string
               volumeID:
                 description: |-
