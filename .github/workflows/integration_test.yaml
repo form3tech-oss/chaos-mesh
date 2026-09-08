@@ -67,10 +67,12 @@ jobs:
 
       - name: Install localstack && aws client
         run: |
-          helm repo add localstack-repo http://helm.localstack.cloud
-          helm upgrade --install localstack localstack-repo/localstack --version 0.6.10
+          helm repo add localstack https://localstack.github.io/helm-charts
+          helm upgrade --install localstack localstack/localstack \
+            --version 0.6.27 \
+            --set image.tag=4.14.0
           pip install awscli
-          kubectl wait --timeout=120s --for=condition=ready --all pod
+          kubectl wait --timeout=180s --for=condition=ready pod -l app.kubernetes.io/name=localstack
 
       - name: Run integration test
         run: |

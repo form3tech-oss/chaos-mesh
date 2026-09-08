@@ -21,9 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes-version:
-          - v1.20.15
-          - v1.23.4
-          - v1.25.1
+          - v1.35.2
+          - v1.34.5
+          - v1.33.9
         focus:
           - "[Graceful-Shutdown] [IOChaos]"
           - "[Graceful-Shutdown] [HTTPChaos]"
@@ -61,14 +61,16 @@ jobs:
 
       - name: Setup minikube
         run: |
-          curl -fsSL "https://storage.googleapis.com/minikube/releases/v1.35.0/minikube-linux-amd64" -o /usr/local/bin/minikube
-          chmod +x /usr/local/bin/minikube
+          mkdir -p "${HOME}/.local/bin"
+          curl -fsSL "https://storage.googleapis.com/minikube/releases/v1.38.1/minikube-linux-amd64" -o "${HOME}/.local/bin/minikube"
+          chmod +x "${HOME}/.local/bin/minikube"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
           minikube start \
             --driver=docker \
             --kubernetes-version="${{ matrix.kubernetes-version }}" \
             --cni=calico \
             --cpus=2 \
-            --memory=4096
+            --memory=6144
 
       - name: load image into minikube
         run: |
