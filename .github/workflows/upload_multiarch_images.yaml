@@ -34,11 +34,22 @@ jobs:
           [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
     outputs:
       image_tag: ${{ steps.image_tag.outputs.image_tag }}
-    runs-on: ${{ fromJSON('{"amd64":"ubuntu-22.04", "arm64":"github-arm64-2c-8gb"}')[matrix.arch] }}
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+
+      - name: Set up buildx
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            docker run --privileged --rm tonistiigi/binfmt --install all
+          fi
+          docker buildx rm chaos-mesh-builder 2>/dev/null || true
+          docker buildx create --use --name chaos-mesh-builder
+          docker buildx inspect --bootstrap
 
       - name: Extract image tag
         id: image_tag
@@ -64,6 +75,7 @@ jobs:
           ARCH: ${{ matrix.arch }}
           IMAGE: ${{ matrix.image }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
           if [ "${IMAGE}" = "chaos-dashboard" ]; then
             UI=1
