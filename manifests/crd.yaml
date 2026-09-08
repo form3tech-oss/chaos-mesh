@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: awschaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -223,7 +223,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: azurechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -408,7 +408,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: blockchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -707,7 +707,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: certificatechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -961,7 +961,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: ciliumchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -1185,7 +1185,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: cloudstackhostchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -1413,7 +1413,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: cloudstackvmchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -1714,7 +1714,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: dnschaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -2006,7 +2006,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: gcpchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -2194,7 +2194,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: httpchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -2604,7 +2604,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: iochaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -3022,7 +3022,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: jvmchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -3365,7 +3365,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: k8schaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -3522,7 +3522,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: kernelchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -3866,7 +3866,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: networkchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -4407,7 +4407,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: nodeselectorchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -4565,7 +4565,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: physicalmachinechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -5658,7 +5658,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: physicalmachines.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -5710,7 +5710,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: podchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -5997,7 +5997,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: podhttpchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -6241,7 +6241,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: podiochaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -6450,7 +6450,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: podnetworkchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -6725,7 +6725,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: podpvcchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -6998,7 +6998,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: remoteclusters.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -7104,7 +7104,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: resourcescalechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -7268,7 +7268,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: rollingrestartchaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -7422,7 +7422,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: schedules.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -23643,7 +23643,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: statuschecks.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -23852,7 +23852,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: stresschaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -24211,7 +24211,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: timechaos.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -24494,7 +24494,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: workflownodes.chaos-mesh.org
 spec:
   group: chaos-mesh.org
@@ -48601,7 +48601,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: workflows.chaos-mesh.org
 spec:
   group: chaos-mesh.org
