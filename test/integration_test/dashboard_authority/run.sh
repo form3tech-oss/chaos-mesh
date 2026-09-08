@@ -90,6 +90,17 @@ echo "only manager can create experiments success"
 # here just use busybox manager because experiment can be created only one time
 REQUEST BUSYBOX_MANAGER_TOKEN_LIST[@] "POST" "/api/experiments" "create_exp.out" '"name":"ci-test"'
 
+# chaos-dashboard persists experiments asynchronously; allow the collector to sync
+# before pause/delete flows that eventually archive the experiment.
+echo "wait for chaos dashboard collector to sync experiment"
+for ((k=0; k<30; k++)); do
+    if kubectl get networkchaos ci-test -n busybox > /dev/null 2>&1; then
+        sleep 2
+        break
+    fi
+    sleep 1
+done
+
 
 echo "***** list chaos experiments *****"
 
@@ -191,6 +202,17 @@ REQUEST CLUSTER_VIEW_FORBIDDEN_TOKEN_LIST[@] "GET" "/api/events/$EVENT_ID?namesp
 
 
 echo "***** list archive chaos experiments *****"
+
+# archiving happens asynchronously after the CR is deleted.
+echo "wait for experiment to be archived"
+for ((k=0; k<30; k++)); do
+    curl -sf -X GET "localhost:2333/api/archives?namespace=busybox" \
+        -H "Authorization: Bearer ${CLUSTER_MANAGER_TOKEN}" > list_archives.out || true
+    if grep -Fq '"name":"ci-test"' list_archives.out; then
+        break
+    fi
+    sleep 1
+done
 
 echo "all token can list archive experiments under namespace busybox"
 REQUEST BUSYBOX_VIEW_TOKEN_LIST[@] "GET" "/api/archives?namespace=busybox" "list_archives.out" '"name":"ci-test"'
