@@ -36,8 +36,9 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@4c7909140acfc81a05fc96fed8fea6673ba8ce80
         with:
-          version: v0.26.6
+          version: v0.26.0
           kubectl_version: v1.30.4
+          node_image: kindest/node:v1.30.4
 
       - name: Restrict access to kubeconfig # https://github.com/helm/helm/issues/9115
         run: chmod 600 ~/.kube/config
