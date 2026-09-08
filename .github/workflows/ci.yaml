@@ -79,7 +79,7 @@ jobs:
 
   publish-multiarch:
     needs: [calculate-tag]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
     uses: ./.github/workflows/upload_multiarch_images.yaml
     with:
       image_tag: ${{ needs.calculate-tag.outputs.tag }}
