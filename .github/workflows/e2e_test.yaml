@@ -93,9 +93,7 @@ jobs:
             --namespace=chaos-mesh \
             --set images.tag=latest \
             --set chaosDaemon.runtime=containerd \
-            --set chaosDaemon.socketPath=/run/containerd/containerd.sock \
-            --set dnsServer.create=true \
-            --set dnsServer.image=ghcr.io/chaos-mesh/chaos-coredns:v0.2.8
+            --set chaosDaemon.socketPath=/run/containerd/containerd.sock
       - name: e2e tests
         env:
           FOCUS: ${{ matrix.focus }}
