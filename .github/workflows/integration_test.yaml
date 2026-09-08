@@ -59,11 +59,15 @@ jobs:
 
       - name: Install Chaos Mesh
         run: |
+          # kind nodes use containerd; default helm values target docker and can leave
+          # chaos CRs stuck in deletion, so the dashboard collector never archives them.
           helm install --wait --create-namespace chaos-mesh helm/chaos-mesh \
-            -n=chaos-mesh --set images.tag=latest
-          kubectl set env deployment/chaos-dashboard SECURITY_MODE=true -n chaos-mesh
-          kubectl set env deployment/chaos-controller-manager SECURITY_MODE=true -n chaos-mesh
-          sleep 5
+            -n=chaos-mesh \
+            --set images.tag=latest \
+            --set chaosDaemon.runtime=containerd \
+            --set chaosDaemon.socketPath=/run/containerd/containerd.sock
+          kubectl rollout status deployment/chaos-dashboard -n chaos-mesh --timeout=180s
+          kubectl rollout status deployment/chaos-controller-manager -n chaos-mesh --timeout=180s
           kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333 &
 
       - name: Install localstack && aws client
