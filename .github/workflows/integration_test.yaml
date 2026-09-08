@@ -65,7 +65,8 @@ jobs:
             -n=chaos-mesh \
             --set images.tag=latest \
             --set chaosDaemon.runtime=containerd \
-            --set chaosDaemon.socketPath=/run/containerd/containerd.sock
+            --set chaosDaemon.socketPath=/run/containerd/containerd.sock \
+            --set controllerManager.chaosdSecurityMode=false
           kubectl rollout status deployment/chaos-dashboard -n chaos-mesh --timeout=180s
           kubectl rollout status deployment/chaos-controller-manager -n chaos-mesh --timeout=180s
           kubectl port-forward -n chaos-mesh svc/chaos-dashboard 2333:2333 &
