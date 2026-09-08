@@ -21,6 +21,11 @@ cd $cur
 
 kubectl apply -f ./rbac.yaml
 
+if ! kubectl create token fake-sa >/dev/null 2>&1; then
+    echo "kubectl create token is not supported; cluster must run Kubernetes 1.24+"
+    exit 1
+fi
+
 kubectl config set-credentials fake-sa --token "$(kubectl create token fake-sa)"
 
 CURRENT_CONTEXT=$(kubectl config current-context)
