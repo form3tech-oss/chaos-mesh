@@ -88,12 +88,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Chaos Mesh
+        # Minikube docker driver uses cri-dockerd (docker:// container IDs). Do not pin
+        # DOCKER_API_VERSION=1.41; newer Docker daemons require API 1.44+.
         run: |
           helm install --wait --create-namespace chaos-mesh helm/chaos-mesh \
             --namespace=chaos-mesh \
-            --set images.tag=latest \
-            --set chaosDaemon.runtime=containerd \
-            --set chaosDaemon.socketPath=/run/containerd/containerd.sock
+            --set images.tag=latest
       - name: e2e tests
         env:
           FOCUS: ${{ matrix.focus }}
