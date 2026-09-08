@@ -133,7 +133,7 @@ swagger_spec: images/dev-env/.dockerbuilt ## Generate OpenAPI/Swagger spec for f
 
 ##@ Linters, formatters and others
 
-check: generate vet lint fmt tidy helm-values-schema ## Run prerequisite checks for PR
+check: manifests/crd.yaml generate-deepcopy chaos-build vet lint fmt tidy helm-values-schema ## Run prerequisite checks for PR
 
 fmt: SHELL:=$(RUN_IN_DEV_SHELL)
 fmt: images/dev-env/.dockerbuilt ## Reformat go files with goimports
