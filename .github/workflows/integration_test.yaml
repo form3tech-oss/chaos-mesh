@@ -44,15 +44,17 @@ jobs:
 
       - name: Setup Helm
         uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@e9aba2c848f5ebd159c070c61ea2c4e2b122355e # v2
 
       - name: Load images into kind
         run: |
-          kind load docker-image ghcr.io/chaos-mesh/chaos-dashboard:latest
-          kind load docker-image ghcr.io/chaos-mesh/chaos-daemon:latest
-          kind load docker-image ghcr.io/chaos-mesh/chaos-mesh:latest
+          kind load docker-image --name chart-testing ghcr.io/chaos-mesh/chaos-dashboard:latest
+          kind load docker-image --name chart-testing ghcr.io/chaos-mesh/chaos-daemon:latest
+          kind load docker-image --name chart-testing ghcr.io/chaos-mesh/chaos-mesh:latest
 
       - name: Install Chaos Mesh
         run: |

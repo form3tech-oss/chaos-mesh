@@ -86,7 +86,10 @@ jobs:
           IMAGE: ${{ matrix.image }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
-          docker push ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-$ARCH
+          SRC_IMAGE=ghcr.io/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${ARCH}
+          DST_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${ARCH}
+          docker tag "${SRC_IMAGE}" "${DST_IMAGE}"
+          docker push "${DST_IMAGE}"
 
   upload-manifest:
     needs: build-specific-architecture
@@ -113,6 +116,6 @@ jobs:
         env:
           IMAGE: ${{ matrix.image }}
         run: |
-          docker buildx imagetools create -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG \
-            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-amd64 \
-            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/$IMAGE:$IMAGE_TAG-arm64
+          docker buildx imagetools create -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG \
+            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG-amd64 \
+            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG-arm64

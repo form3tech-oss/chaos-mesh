@@ -16,7 +16,7 @@ permissions: read-all
 
 jobs:
   e2e-test-matrix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -60,13 +60,15 @@ jobs:
           chmod +x ./e2e-test/image/e2e/bin/e2e.test
 
       - name: Setup minikube
-        uses: manusa/actions-setup-minikube@f6ceea1a32df47f602b1345bd8ad7da7c5824cbf # v2.4.3
-        with:
-          driver: docker
-          minikube version: v1.27.0
-          kubernetes version: ${{ matrix.kubernetes-version }}
-          start args: --cni calico
-          github token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -fsSL "https://storage.googleapis.com/minikube/releases/v1.35.0/minikube-linux-amd64" -o /usr/local/bin/minikube
+          chmod +x /usr/local/bin/minikube
+          minikube start \
+            --driver=docker \
+            --kubernetes-version="${{ matrix.kubernetes-version }}" \
+            --cni=calico \
+            --cpus=2 \
+            --memory=4096
 
       - name: load image into minikube
         run: |

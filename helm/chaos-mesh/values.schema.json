@@ -50,6 +50,9 @@
                         }
                     }
                 },
+                "create": {
+                    "type": "boolean"
+                },
                 "env": {
                     "type": "object"
                 },
@@ -208,21 +211,7 @@
                     }
                 },
                 "extraCATrust": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "secret": {
-                                "type": "string"
-                            },
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+                    "type": "array"
                 },
                 "hostNetwork": {
                     "type": "boolean"
@@ -353,6 +342,9 @@
                     "type": "string"
                 },
                 "tolerations": {
+                    "type": "array"
+                },
+                "topologySpreadConstraints": {
                     "type": "array"
                 }
             }
@@ -569,6 +561,9 @@
                 },
                 "tolerations": {
                     "type": "array"
+                },
+                "topologySpreadConstraints": {
+                    "type": "array"
                 }
             }
         },
@@ -731,28 +726,20 @@
         "logging": {
             "type": "object",
             "properties": {
+                "fieldKeys": {
+                    "type": "object"
+                },
                 "format": {
                     "type": "string"
                 },
                 "level": {
                     "type": "string"
                 },
+                "maxFieldSize": {
+                    "type": "null"
+                },
                 "timestampFormat": {
                     "type": "string"
-                },
-                "fieldKeys": {
-                    "type": "object",
-                    "properties": {
-                        "message": {
-                            "type": "string"
-                        },
-                        "timestamp": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "maxFieldSize": {
-                    "type": ["number", "null"]
                 }
             }
         },
