@@ -103,53 +103,25 @@ jobs:
           name: ${{ needs.build-targets.outputs.chart-artifact-name }}
           path: ./output/${{ needs.build-targets.outputs.chart-artifact-name }}
 
-      - name: Login to GitHub Container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+      - name: Download per-arch images
+        id: download-release-images
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Export published multi-arch images for release
-        env:
-          IMAGE_TAG: ${{ needs.calculate-tag.outputs.tag }}
-          REGISTRY: ghcr.io/form3tech-oss/chaos-mesh
-        run: |
-          set -euo pipefail
-          mkdir -p ./output/release-images
-          images=(chaos-daemon chaos-mesh chaos-dashboard chaos-kernel chaos-dlv)
-          for image in "${images[@]}"; do
-            for arch in amd64 arm64; do
-              docker pull --platform "linux/${arch}" "${REGISTRY}/${image}:${IMAGE_TAG}"
-              docker save "${REGISTRY}/${image}:${IMAGE_TAG}" \
-                -o "./output/release-images/${image}-${arch}.tgz"
-            done
-          done
+          pattern: release-images-*
+          merge-multiple: true
+          path: ./output/release-images
 
       - name: Create GH release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         id: release
         with:
           generate_release_notes: true
-          append_body: true
           target_commitish: "${{ github.base_ref }}"
           tag_name: ${{ needs.calculate-tag.outputs.tag }}
           prerelease: "${{ github.event_name == 'pull_request' }}"
-          body: |
-            ## Container images (multi-arch)
-
-            Multi-arch manifests are published to GitHub Container Registry:
-
-            - `ghcr.io/form3tech-oss/chaos-mesh/chaos-daemon:${{ needs.calculate-tag.outputs.tag }}`
-            - `ghcr.io/form3tech-oss/chaos-mesh/chaos-mesh:${{ needs.calculate-tag.outputs.tag }}`
-            - `ghcr.io/form3tech-oss/chaos-mesh/chaos-dashboard:${{ needs.calculate-tag.outputs.tag }}`
-            - `ghcr.io/form3tech-oss/chaos-mesh/chaos-kernel:${{ needs.calculate-tag.outputs.tag }}`
-            - `ghcr.io/form3tech-oss/chaos-mesh/chaos-dlv:${{ needs.calculate-tag.outputs.tag }}`
-
-            Release assets include per-architecture `docker save` tarballs (`*-amd64.tgz`, `*-arm64.tgz`). The internal sync workflow publishes these images and creates the canonical multi-arch tags in each Form3 registry.
           files: |
+            ./output/${{ needs.build-targets.outputs.images-artifact-name }}/*
             ./output/release-images/*
-            ./output/${{ needs.build-targets.outputs.images-artifact-name }}/e2e-helper.tgz
             ./output/${{ needs.build-targets.outputs.chart-artifact-name }}/*
 
       - name: Comment release
