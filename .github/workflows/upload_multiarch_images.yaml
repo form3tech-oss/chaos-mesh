@@ -1,7 +1,7 @@
 name: Upload multi-arch images
 
-# Ported from upstream upload_image.yml: per-arch build + manifest list publish.
-# Form3 fork CI (ci.yaml / build_targets.yaml) keeps amd64 artifacts for tests.
+# Builds per-platform images internally, then publishes a single multi-arch
+# manifest per component (no long-lived -amd64/-arm64 tags on ghcr.io).
 
 on:
   workflow_call:
@@ -23,33 +23,25 @@ on:
 permissions: read-all
 
 jobs:
-  build-specific-architecture:
+  publish:
     if: github.repository_owner == 'form3tech-oss'
     permissions:
       packages: write
     strategy:
       matrix:
-        arch: [amd64, arm64]
         image:
           [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
-    outputs:
-      image_tag: ${{ steps.image_tag.outputs.image_tag }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
-      - name: Set up buildx
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
-        run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            docker run --privileged --rm tonistiigi/binfmt --install all
-          fi
-          docker buildx rm chaos-mesh-builder 2>/dev/null || true
-          docker buildx create --use --name chaos-mesh-builder
-          docker buildx inspect --bootstrap
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
       - name: Extract image tag
         id: image_tag
@@ -69,65 +61,50 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Chaos Mesh
+      - name: Build and push multi-arch image
         env:
           IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
-          ARCH: ${{ matrix.arch }}
           IMAGE: ${{ matrix.image }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
           DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
+          set -euo pipefail
+
           if [ "${IMAGE}" = "chaos-dashboard" ]; then
             UI=1
           else
             UI=0
           fi
 
-          make -B \
-            TARGET_PLATFORM=$ARCH \
-            IMAGE_TAG=$IMAGE_TAG-$ARCH \
-            IMAGE_DEV_ENV_BUILD=1 \
-            IMAGE_BUILD_ENV_BUILD=1 \
-            UI=$UI \
-            image-$IMAGE
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REGISTRY="ghcr.io/${OWNER}/chaos-mesh"
+          ARCH_TAG_AMD64="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-amd64"
+          ARCH_TAG_ARM64="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-arm64"
+          MULTIARCH_TAG="${REGISTRY}/${IMAGE}:${IMAGE_TAG}"
 
-      - name: Push image
-        env:
-          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
-          ARCH: ${{ matrix.arch }}
-          IMAGE: ${{ matrix.image }}
-          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        run: |
-          SRC_IMAGE=ghcr.io/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${ARCH}
-          DST_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${ARCH}
-          docker tag "${SRC_IMAGE}" "${DST_IMAGE}"
-          docker push "${DST_IMAGE}"
+          build_and_push() {
+            local arch="$1"
+            make -B \
+              TARGET_PLATFORM="${arch}" \
+              IMAGE_TAG="${IMAGE_TAG}-${arch}" \
+              IMAGE_DEV_ENV_BUILD=1 \
+              IMAGE_BUILD_ENV_BUILD=1 \
+              UI="${UI}" \
+              "image-${IMAGE}"
 
-  upload-manifest:
-    needs: build-specific-architecture
-    if: github.repository_owner == 'form3tech-oss'
-    runs-on: ubuntu-22.04
-    permissions:
-      packages: write
-    strategy:
-      matrix:
-        image:
-          [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
-    env:
-      IMAGE_TAG: ${{ needs.build-specific-architecture.outputs.image_tag }}
-      GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-    steps:
-      - name: Login to GitHub Container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+            local src_image="ghcr.io/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${arch}"
+            local dst_image="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-${arch}"
+            docker tag "${src_image}" "${dst_image}"
+            docker push "${dst_image}"
+          }
 
-      - name: Create and push manifest list
-        env:
-          IMAGE: ${{ matrix.image }}
-        run: |
-          docker buildx imagetools create -t ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG \
-            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG-amd64 \
-            ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/chaos-mesh/$IMAGE:$IMAGE_TAG-arm64
+          build_and_push amd64
+          build_and_push arm64
+
+          docker buildx imagetools create -t "${MULTIARCH_TAG}" \
+            "${ARCH_TAG_AMD64}" \
+            "${ARCH_TAG_ARM64}"
+
+          docker buildx imagetools rm -f "${ARCH_TAG_AMD64}" "${ARCH_TAG_ARM64}"
+
+          echo "Published multi-arch image ${MULTIARCH_TAG}"
