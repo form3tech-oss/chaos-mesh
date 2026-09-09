@@ -108,3 +108,29 @@ jobs:
             "${ARCH_TAG_ARM64}"
 
           echo "Published multi-arch image ${MULTIARCH_TAG}"
+
+      - name: Save per-arch images
+        if: contains(fromJSON('["chaos-daemon", "chaos-mesh", "chaos-dashboard"]'), matrix.image)
+        env:
+          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
+          IMAGE: ${{ matrix.image }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REGISTRY="ghcr.io/${OWNER}/chaos-mesh"
+          mkdir -p ./output/release-images
+
+          for arch in amd64 arm64; do
+            docker image save "${REGISTRY}/${IMAGE}:${IMAGE_TAG}-${arch}" \
+              -o "./output/release-images/${IMAGE}-${arch}.tgz"
+          done
+
+      - name: Upload per-arch images
+        if: contains(fromJSON('["chaos-daemon", "chaos-mesh", "chaos-dashboard"]'), matrix.image)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-images-${{ matrix.image }}
+          path: ./output/release-images
+          retention-days: 7
