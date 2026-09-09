@@ -26,7 +26,10 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	v1 "k8s.io/cri-api/pkg/apis/runtime/v1"
+
+	crerrors "github.com/chaos-mesh/chaos-mesh/pkg/chaosdaemon/crclients/errors"
 )
 
 const (
@@ -126,9 +129,14 @@ func (c CrioClient) GetLabelsFromContainerID(ctx context.Context, containerID st
 	return container.Status.Labels, nil
 }
 
+// GetSandboxPidFromPodUID is not supported for CRI-O runtime.
+func (c CrioClient) GetSandboxPidFromPodUID(ctx context.Context, podUID string) (uint32, error) {
+	return 0, crerrors.ErrNotSupported
+}
+
 func buildRuntimeServiceClient(endpoint string) (v1.RuntimeServiceClient, error) {
 	addr := fmt.Sprintf("unix://%s", endpoint)
-	conn, err := grpc.Dial(addr, grpc.WithBlock(), grpc.WithInsecure())
+	conn, err := grpc.Dial(addr, grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

@@ -26,6 +26,7 @@ import (
 // +kubebuilder:subresource:status
 // +chaos-mesh:base
 // +chaos-mesh:webhook:enableUpdate
+// +genclient
 
 // PodNetworkChaos is the Schema for the PodNetworkChaos API
 type PodNetworkChaos struct {
@@ -186,6 +187,11 @@ type TcParameter struct {
 	// +ui:form:when=action=='bandwidth'
 	// +optional
 	Bandwidth *BandwidthSpec `json:"bandwidth,omitempty"`
+
+	// Rate represents the detail about rate control action
+	// +ui:form:ignore
+	// +optional
+	Rate *RateSpec `json:"rate,omitempty"`
 }
 
 // RawRuleSource represents the name and namespace of the source network chaos

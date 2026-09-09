@@ -1,0 +1,136 @@
+name: Upload multi-arch images
+
+# Builds per-platform images internally, then publishes a multi-arch manifest
+# per component at :<tag>. Per-arch :<tag>-amd64/:<tag>-arm64 tags are also
+# pushed (required as imagetools inputs; buildx imagetools rm is unavailable
+# on GitHub-hosted runners).
+
+on:
+  workflow_call:
+    inputs:
+      image_tag:
+        description: "Image tag to publish (without arch suffix)"
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to publish"
+        required: true
+        type: string
+  push:
+    tags:
+      - "v*-f3-*"
+
+permissions: read-all
+
+jobs:
+  publish:
+    if: github.repository_owner == 'form3tech-oss'
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        image:
+          [chaos-daemon, chaos-mesh, chaos-dashboard, chaos-kernel, chaos-dlv]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
+
+      - name: Extract image tag
+        id: image_tag
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            IMAGE_TAG="${{ inputs.image_tag }}"
+          else
+            IMAGE_TAG=${GITHUB_REF#refs/tags/}
+          fi
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push multi-arch image
+        env:
+          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
+          IMAGE: ${{ matrix.image }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          set -euo pipefail
+
+          if [ "${IMAGE}" = "chaos-dashboard" ]; then
+            UI=1
+          else
+            UI=0
+          fi
+
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REGISTRY="ghcr.io/${OWNER}/chaos-mesh"
+          ARCH_TAG_AMD64="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-amd64"
+          ARCH_TAG_ARM64="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-arm64"
+          MULTIARCH_TAG="${REGISTRY}/${IMAGE}:${IMAGE_TAG}"
+
+          build_and_push() {
+            local arch="$1"
+            make -B \
+              TARGET_PLATFORM="${arch}" \
+              IMAGE_TAG="${IMAGE_TAG}-${arch}" \
+              IMAGE_DEV_ENV_BUILD=1 \
+              IMAGE_BUILD_ENV_BUILD=1 \
+              UI="${UI}" \
+              "image-${IMAGE}"
+
+            local src_image="ghcr.io/chaos-mesh/${IMAGE}:${IMAGE_TAG}-${arch}"
+            local dst_image="${REGISTRY}/${IMAGE}:${IMAGE_TAG}-${arch}"
+            docker tag "${src_image}" "${dst_image}"
+            docker push "${dst_image}"
+          }
+
+          build_and_push amd64
+          build_and_push arm64
+
+          docker buildx imagetools create -t "${MULTIARCH_TAG}" \
+            "${ARCH_TAG_AMD64}" \
+            "${ARCH_TAG_ARM64}"
+
+          echo "Published multi-arch image ${MULTIARCH_TAG}"
+
+      - name: Save per-arch images
+        if: contains(fromJSON('["chaos-daemon", "chaos-mesh", "chaos-dashboard"]'), matrix.image)
+        env:
+          IMAGE_TAG: ${{ steps.image_tag.outputs.image_tag }}
+          IMAGE: ${{ matrix.image }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REGISTRY="ghcr.io/${OWNER}/chaos-mesh"
+          mkdir -p ./output/release-images
+
+          for arch in amd64 arm64; do
+            docker image save "${REGISTRY}/${IMAGE}:${IMAGE_TAG}-${arch}" \
+              -o "./output/release-images/${IMAGE}-${arch}.tgz"
+          done
+
+      - name: Upload per-arch images
+        if: contains(fromJSON('["chaos-daemon", "chaos-mesh", "chaos-dashboard"]'), matrix.image)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-images-${{ matrix.image }}
+          path: ./output/release-images
+          retention-days: 7

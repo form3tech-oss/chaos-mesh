@@ -79,15 +79,6 @@ type WorkflowCondition struct {
 
 type TemplateType string
 
-const (
-	TypeTask        TemplateType = "Task"
-	TypeSerial      TemplateType = "Serial"
-	TypeParallel    TemplateType = "Parallel"
-	TypeSuspend     TemplateType = "Suspend"
-	TypeSchedule    TemplateType = "Schedule"
-	TypeStatusCheck TemplateType = "StatusCheck"
-)
-
 func IsChaosTemplateType(target TemplateType) bool {
 	return contains(allChaosTemplateType, target)
 }
@@ -157,63 +148,14 @@ type Task struct {
 	// Container is the main container image to run in the pod
 	Container *corev1.Container `json:"container,omitempty"`
 
-	// +optional
-	// +patchMergeKey=name
-	// +patchStrategy=merge,retainKeys
-	Volumes []corev1.Volume `json:"volumes,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
-
-	// +optional
-	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
-
-	// +optional
-	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
-
-	// +optional
-	// +mapType=atomic
-	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
-
-	// +optional
-	ServiceAccountName string `json:"serviceAccountName,omitempty"`
-
-	// +optional
-	AutomountServiceAccountToken *bool `json:"automountServiceAccountToken,omitempty"`
-
-	// +optional
-	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
-
-	// +optional
-	// +patchMergeKey=name
+	// Volumes is a list of volumes that can be mounted by containers in a template.
 	// +patchStrategy=merge
-	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty" patchStrategy:"merge" patchMergeKey:"name"`
+	// +patchMergeKey=name
+	Volumes []corev1.Volume `json:"volumes,omitempty" patchStrategy:"merge" patchMergeKey:"name"`
 
-	// +optional
-	Affinity *corev1.Affinity `json:"affinity,omitempty"`
+	Labels map[string]string `json:"labels,omitempty"`
 
-	// +optional
-	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
-
-	// +optional
-	// +patchMergeKey=topologyKey
-	// +patchStrategy=merge
-	// +listType=map
-	// +listMapKey=topologyKey
-	// +listMapKey=whenUnsatisfiable
-	TopologySpreadConstraints []corev1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey"`
-}
-
-func (t *Task) PodSpec() corev1.PodSpec {
-	return corev1.PodSpec{
-		Volumes:                       t.Volumes,
-		TerminationGracePeriodSeconds: t.TerminationGracePeriodSeconds,
-		ActiveDeadlineSeconds:         t.ActiveDeadlineSeconds,
-		NodeSelector:                  t.NodeSelector,
-		ServiceAccountName:            t.ServiceAccountName,
-		AutomountServiceAccountToken:  t.AutomountServiceAccountToken,
-		SecurityContext:               t.SecurityContext,
-		ImagePullSecrets:              t.ImagePullSecrets,
-		Affinity:                      t.Affinity,
-		TopologySpreadConstraints:     t.TopologySpreadConstraints,
-	}
+	// TODO: maybe we could specify parameters in other ways, like loading context from file
 }
 
 // +kubebuilder:object:root=true

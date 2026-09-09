@@ -94,8 +94,6 @@ func (r *ScheduleCollector) setUnarchivedSchedule(req ctrl.Request, schedule v1a
 		archive.Action = string(schedule.Spec.ScheduleItem.NetworkChaos.Action)
 	case v1alpha1.ScheduleTypeIOChaos:
 		archive.Action = string(schedule.Spec.ScheduleItem.IOChaos.Action)
-	case v1alpha1.ScheduleTypeTimeChaos, v1alpha1.ScheduleTypeKernelChaos, v1alpha1.ScheduleTypeStressChaos, v1alpha1.ScheduleTypeHTTPChaos:
-		archive.Action = ""
 	case v1alpha1.ScheduleTypeDNSChaos:
 		archive.Action = string(schedule.Spec.ScheduleItem.DNSChaos.Action)
 	case v1alpha1.ScheduleTypeAWSChaos:
@@ -106,13 +104,19 @@ func (r *ScheduleCollector) setUnarchivedSchedule(req ctrl.Request, schedule v1a
 		archive.Action = string(schedule.Spec.ScheduleItem.JVMChaos.Action)
 	case v1alpha1.ScheduleTypePhysicalMachineChaos:
 		archive.Action = string(schedule.Spec.ScheduleItem.PhysicalMachineChaos.Action)
-	case v1alpha1.ScheduleTypeCloudStackVMChaos:
-		archive.Action = ""
-	case v1alpha1.ScheduleTypeCiliumChaos:
+	case v1alpha1.ScheduleTypeAzureChaos:
+		archive.Action = string(schedule.Spec.ScheduleItem.AzureChaos.Action)
+	case v1alpha1.ScheduleTypeBlockChaos:
+		archive.Action = string(schedule.Spec.ScheduleItem.BlockChaos.Action)
+	case v1alpha1.ScheduleTypeTimeChaos, v1alpha1.ScheduleTypeKernelChaos, v1alpha1.ScheduleTypeStressChaos, v1alpha1.ScheduleTypeHTTPChaos, v1alpha1.ScheduleTypeWorkflow:
 		archive.Action = ""
 	case v1alpha1.ScheduleTypeResourceScaleChaos:
 		archive.Action = ""
 	case v1alpha1.ScheduleTypeRollingRestartChaos:
+		archive.Action = ""
+	case v1alpha1.ScheduleTypeCloudStackVMChaos, v1alpha1.ScheduleTypeCloudStackHostChaos:
+		archive.Action = ""
+	case v1alpha1.ScheduleTypeCiliumChaos, v1alpha1.ScheduleTypeCertificateChaos:
 		archive.Action = ""
 	default:
 		return errors.New("unsupported chaos type " + string(schedule.Spec.Type))

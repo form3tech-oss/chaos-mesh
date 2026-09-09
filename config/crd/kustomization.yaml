@@ -27,14 +27,14 @@ resources:
 - bases/chaos-mesh.org_blockchaos.yaml
 - bases/chaos-mesh.org_statuschecks.yaml
 - bases/chaos-mesh.org_remoteclusters.yaml
-- bases/chaos-mesh.org_ciliumchaos.yaml
-- bases/chaos-mesh.org_cloudstackvmchaos.yaml
-- bases/chaos-mesh.org_cloudstackhostchaos.yaml
 - bases/chaos-mesh.org_k8schaos.yaml
 - bases/chaos-mesh.org_resourcescalechaos.yaml
 - bases/chaos-mesh.org_podpvcchaos.yaml
-- bases/chaos-mesh.org_certificatechaos.yaml
 - bases/chaos-mesh.org_nodeselectorchaos.yaml
+- bases/chaos-mesh.org_ciliumchaos.yaml
+- bases/chaos-mesh.org_cloudstackvmchaos.yaml
+- bases/chaos-mesh.org_cloudstackhostchaos.yaml
+- bases/chaos-mesh.org_certificatechaos.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

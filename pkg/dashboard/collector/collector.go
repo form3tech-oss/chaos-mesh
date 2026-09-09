@@ -188,12 +188,6 @@ func convertInnerObjectToExperiment(obj v1alpha1.InnerObject) (*core.Experiment,
 		archive.Action = string(chaos.Spec.Action)
 	case *v1alpha1.BlockChaos:
 		archive.Action = string(chaos.Spec.Action)
-	case *v1alpha1.CiliumChaos:
-		archive.Action = ""
-	case *v1alpha1.CloudStackVMChaos:
-		archive.Action = ""
-	case *v1alpha1.CloudStackHostChaos:
-		archive.Action = ""
 	case *v1alpha1.K8SChaos:
 		archive.Action = ""
 	case *v1alpha1.ResourceScaleChaos:
@@ -201,6 +195,16 @@ func convertInnerObjectToExperiment(obj v1alpha1.InnerObject) (*core.Experiment,
 	case *v1alpha1.RollingRestartChaos:
 		archive.Action = ""
 	case *v1alpha1.PodPVCChaos:
+		archive.Action = ""
+	case *v1alpha1.NodeSelectorChaos:
+		archive.Action = ""
+	case *v1alpha1.CiliumChaos:
+		archive.Action = ""
+	case *v1alpha1.CloudStackVMChaos:
+		archive.Action = string(chaos.Spec.Action)
+	case *v1alpha1.CloudStackHostChaos:
+		archive.Action = string(chaos.Spec.Action)
+	case *v1alpha1.CertificateChaos:
 		archive.Action = ""
 	default:
 		return nil, errors.New("unsupported chaos type " + archive.Kind)

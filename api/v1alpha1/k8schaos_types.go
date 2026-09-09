@@ -46,8 +46,7 @@ var (
 // K8SChaosSpec defines the desired state of K8SChaos
 type K8SChaosSpec struct {
 	// Duration represents the duration of the chaos action
-	// +optional
-	Duration *string `json:"duration,omitempty" webhook:"Duration"`
+	Duration *string `json:"duration" webhook:"Duration"`
 
 	// +kubebuilder:validation:Required
 	APIObjects *K8SChaosAPIObjects `json:"apiObjects"`

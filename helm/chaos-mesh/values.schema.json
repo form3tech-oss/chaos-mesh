@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
         "bpfki": {
@@ -49,6 +49,9 @@
                             }
                         }
                     }
+                },
+                "create": {
+                    "type": "boolean"
                 },
                 "env": {
                     "type": "object"
@@ -106,8 +109,23 @@
                     "type": "object"
                 },
                 "runtime": {
-                    "type": "string",
-                    "enum": ["docker", "containerd", "CRI-O"]
+                    "type": "string"
+                },
+                "securityContext": {
+                    "type": "object"
+                },
+                "service": {
+                    "type": "object",
+                    "properties": {
+                        "scrape": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
                 },
                 "serviceAccount": {
                     "type": "string"
@@ -193,21 +211,7 @@
                     }
                 },
                 "extraCATrust": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "secret": {
-                                "type": "string"
-                            },
-                            "items": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+                    "type": "array"
                 },
                 "hostNetwork": {
                     "type": "boolean"
@@ -331,13 +335,16 @@
                 "serviceAccountAnnotations": {
                     "type": "object"
                 },
+                "serviceAccountCreate": {
+                    "type": "boolean"
+                },
                 "targetNamespace": {
                     "type": "string"
                 },
-                "test": {
-                    "type": "integer"
-                },
                 "tolerations": {
+                    "type": "array"
+                },
+                "topologySpreadConstraints": {
                     "type": "array"
                 }
             }
@@ -354,6 +361,9 @@
                 "create": {
                     "type": "boolean"
                 },
+                "databaseSecretName": {
+                    "type": "string"
+                },
                 "env": {
                     "type": "object",
                     "properties": {
@@ -364,8 +374,7 @@
                             "type": "string"
                         },
                         "DATABASE_DRIVER": {
-                            "type": "string",
-                            "enum": ["sqlite3", "mysql"]
+                            "type": "string"
                         },
                         "LISTEN_HOST": {
                             "type": "string"
@@ -396,14 +405,22 @@
                 "extraContainers": {
                     "type": "array"
                 },
-                "gcpClientId": {
-                    "type": "string"
-                },
-                "gcpClientSecret": {
-                    "type": "string"
-                },
                 "gcpSecurityMode": {
-                    "type": "boolean"
+                    "type": "object",
+                    "properties": {
+                        "clientId": {
+                            "type": "string"
+                        },
+                        "clientSecret": {
+                            "type": "string"
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "existingSecret": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "hostNetwork": {
                     "type": "boolean"
@@ -544,12 +561,69 @@
                 },
                 "tolerations": {
                     "type": "array"
+                },
+                "topologySpreadConstraints": {
+                    "type": "array"
                 }
             }
         },
         "dnsServer": {
             "type": "object",
             "properties": {
+                "affinity": {
+                    "type": "object",
+                    "properties": {
+                        "podAntiAffinity": {
+                            "type": "object",
+                            "properties": {
+                                "preferredDuringSchedulingIgnoredDuringExecution": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "podAffinityTerm": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "labelSelector": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "matchExpressions": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "key": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "operator": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "values": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "topologyKey": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "weight": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "create": {
                     "type": "boolean"
                 },
@@ -626,11 +700,11 @@
                 }
             }
         },
-        "enableCtrlServer": {
-            "type": "boolean"
-        },
         "enableProfiling": {
             "type": "boolean"
+        },
+        "extraObjects": {
+            "type": "array"
         },
         "fullnameOverride": {
             "type": "string"
@@ -652,28 +726,20 @@
         "logging": {
             "type": "object",
             "properties": {
+                "fieldKeys": {
+                    "type": "object"
+                },
                 "format": {
                     "type": "string"
                 },
                 "level": {
                     "type": "string"
                 },
+                "maxFieldSize": {
+                    "type": "null"
+                },
                 "timestampFormat": {
                     "type": "string"
-                },
-                "fieldKeys": {
-                    "type": "object",
-                    "properties": {
-                        "message": {
-                            "type": "string"
-                        },
-                        "timestamp": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "maxFieldSize": {
-                    "type": ["number", "null"]
                 }
             }
         },
@@ -685,6 +751,14 @@
             "properties": {
                 "affinity": {
                     "type": "object"
+                },
+                "busybox": {
+                    "type": "object",
+                    "properties": {
+                        "image": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "create": {
                     "type": "boolean"

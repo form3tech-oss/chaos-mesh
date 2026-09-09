@@ -33,12 +33,21 @@ func SpawnPodForTask(task v1alpha1.Task) (corev1.PodSpec, error) {
 		deepCopiedContainer.Resources.Limits.Cpu().SetMilli(1000)
 		deepCopiedContainer.Resources.Limits.Memory().Set(1000)
 	}
-
-	spec := task.PodSpec()
-	spec.RestartPolicy = corev1.RestartPolicyNever
-	spec.Containers = []corev1.Container{
-		*deepCopiedContainer,
+	result := corev1.PodSpec{
+		RestartPolicy: corev1.RestartPolicyNever,
+		Volumes:       attachVolumes(task),
+		Containers: []corev1.Container{
+			*deepCopiedContainer,
+		},
 	}
+	return result, nil
+}
 
-	return spec, nil
+func attachVolumes(task v1alpha1.Task) []corev1.Volume {
+	var result []corev1.Volume
+
+	// TODO: downwards API and configmaps
+
+	result = append(result, task.Volumes...)
+	return result
 }
