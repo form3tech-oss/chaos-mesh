@@ -1,7 +1,9 @@
 name: Upload multi-arch images
 
-# Builds per-platform images internally, then publishes a single multi-arch
-# manifest per component (no long-lived -amd64/-arm64 tags on ghcr.io).
+# Builds per-platform images internally, then publishes a multi-arch manifest
+# per component at :<tag>. Per-arch :<tag>-amd64/:<tag>-arm64 tags are also
+# pushed (required as imagetools inputs; buildx imagetools rm is unavailable
+# on GitHub-hosted runners).
 
 on:
   workflow_call:
@@ -104,7 +106,5 @@ jobs:
           docker buildx imagetools create -t "${MULTIARCH_TAG}" \
             "${ARCH_TAG_AMD64}" \
             "${ARCH_TAG_ARM64}"
-
-          docker buildx imagetools rm "${ARCH_TAG_AMD64}" "${ARCH_TAG_ARM64}"
 
           echo "Published multi-arch image ${MULTIARCH_TAG}"
