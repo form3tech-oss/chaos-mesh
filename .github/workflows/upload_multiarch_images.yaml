@@ -105,6 +105,6 @@ jobs:
             "${ARCH_TAG_AMD64}" \
             "${ARCH_TAG_ARM64}"
 
-          docker buildx imagetools rm -f "${ARCH_TAG_AMD64}" "${ARCH_TAG_ARM64}"
+          docker buildx imagetools rm "${ARCH_TAG_AMD64}" "${ARCH_TAG_ARM64}"
 
           echo "Published multi-arch image ${MULTIARCH_TAG}"
