@@ -67,7 +67,7 @@ func (m *MockClient) LoadContainer(ctx context.Context, id string) (containerd.C
 	return &MockContainer{}, nil
 }
 
-func (m *MockClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
+func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
 	if err := mock.On("ContainerListError"); err != nil {
 		return nil, err.(error)
 	}
@@ -83,6 +83,10 @@ func (m *MockClient) ContainerList(ctx context.Context, options types.ContainerL
 func (m *MockClient) Containers(ctx context.Context, filters ...string) ([]containerd.Container, error) {
 	if err := mock.On("ContainersError"); err != nil {
 		return nil, err.(error)
+	}
+
+	if mock.On("emptyContainers") != nil {
+		return []containerd.Container{}, nil
 	}
 
 	return []containerd.Container{&MockContainer{}}, nil

@@ -16,7 +16,7 @@
  */
 import * as Yup from 'yup'
 
-import { ExperimentKind } from 'components/NewExperiment/types'
+import { type ExperimentKind } from '@/components/NewExperiment/types'
 
 export type Kind = Exclude<ExperimentKind, 'PhysicalMachineChaos' | 'AzureChaos'>
 export type KindPhysic =
@@ -369,9 +369,6 @@ const data: Record<Kind, Definition> = {
       },
     ],
   },
-  CertificateChaos: {},
-  CloudStackHostChaos: {},
-  CloudStackVMChaos: {},
   // DNS Fault
   DNSChaos: {
     categories: [
@@ -730,6 +727,9 @@ const data: Record<Kind, Definition> = {
     ],
   },
   NodeSelectorChaos: {},
+  CertificateChaos: {},
+  CloudStackHostChaos: {},
+  CloudStackVMChaos: {},
   CiliumChaos: {},
   // Pod Fault
   PodChaos: {

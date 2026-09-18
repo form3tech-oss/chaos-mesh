@@ -17,6 +17,9 @@ package netem
 
 import (
 	"math"
+	"strconv"
+	"strings"
+	"time"
 
 	chaosdaemon "github.com/chaos-mesh/chaos-mesh/pkg/chaosdaemon/pb"
 )
@@ -40,8 +43,8 @@ func MergeNetem(a, b *chaosdaemon.Netem) *chaosdaemon.Netem {
 		b = &chaosdaemon.Netem{}
 	}
 	return &chaosdaemon.Netem{
-		Time:          maxu32(a.GetTime(), b.GetTime()),
-		Jitter:        maxu32(a.GetJitter(), b.GetJitter()),
+		Time:          maxDurationString(a.GetTime(), b.GetTime()),
+		Jitter:        maxDurationString(a.GetJitter(), b.GetJitter()),
 		DelayCorr:     maxf32(a.GetDelayCorr(), b.GetDelayCorr()),
 		Limit:         maxu32(a.GetLimit(), b.GetLimit()),
 		Loss:          maxf32(a.GetLoss(), b.GetLoss()),
@@ -53,7 +56,23 @@ func MergeNetem(a, b *chaosdaemon.Netem) *chaosdaemon.Netem {
 		ReorderCorr:   maxf32(a.GetReorderCorr(), b.GetReorderCorr()),
 		Corrupt:       maxf32(a.GetCorrupt(), b.GetCorrupt()),
 		CorruptCorr:   maxf32(a.GetCorruptCorr(), b.GetCorruptCorr()),
+		Rate:          maxRateString(a.GetRate(), b.GetRate()),
 	}
+}
+
+func maxDurationString(a, b string) string {
+	ad, err := time.ParseDuration(a)
+	if err != nil {
+		ad = 0
+	}
+	bd, err := time.ParseDuration(b)
+	if err != nil {
+		bd = 0
+	}
+	if ad > bd {
+		return a
+	}
+	return b
 }
 
 func maxu32(a, b uint32) uint32 {
@@ -65,4 +84,59 @@ func maxu32(a, b uint32) uint32 {
 
 func maxf32(a, b float32) float32 {
 	return float32(math.Max(float64(a), float64(b)))
+}
+
+func parseRate(nu string) uint64 {
+	// normalize input
+	s := strings.ToLower(strings.TrimSpace(nu))
+
+	for i, u := range []string{"tbps", "gbps", "mbps", "kbps", "bps"} {
+		if strings.HasSuffix(s, u) {
+			ts := strings.TrimSuffix(s, u)
+			s := strings.TrimSpace(ts)
+
+			n, err := strconv.ParseUint(s, 10, 64)
+
+			if err != nil {
+				return 0
+			}
+
+			// convert unit to bytes
+			for j := 4 - i; j > 0; j-- {
+				n = n * 1024
+			}
+
+			return n
+		}
+	}
+
+	for i, u := range []string{"tbit", "gbit", "mbit", "kbit", "bit"} {
+		if strings.HasSuffix(s, u) {
+			ts := strings.TrimSuffix(s, u)
+			s := strings.TrimSpace(ts)
+
+			n, err := strconv.ParseUint(s, 10, 64)
+
+			if err != nil {
+				return 0
+			}
+
+			// convert unit to bytes
+			for j := 4 - i; j > 0; j-- {
+				n = n * 1000
+			}
+			n = n / 8
+
+			return n
+		}
+	}
+
+	return 0
+}
+
+func maxRateString(a, b string) string {
+	if parseRate(a) > parseRate(b) {
+		return a
+	}
+	return b
 }

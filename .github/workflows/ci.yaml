@@ -77,27 +77,42 @@ jobs:
             exit 1
           fi
 
+  publish-multiarch:
+    needs: [calculate-tag]
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    uses: ./.github/workflows/upload_multiarch_images.yaml
+    with:
+      image_tag: ${{ needs.calculate-tag.outputs.tag }}
+
   release:
     runs-on: ubuntu-latest
-    needs: [calculate-tag, build-targets]
+    needs: [calculate-tag, build-targets, publish-multiarch]
     permissions: write-all
     steps:
       - name: Download saved images
         id: download-images
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: ${{ needs.build-targets.outputs.images-artifact-name }}
           path: ./output/${{ needs.build-targets.outputs.images-artifact-name }}
 
       - name: Download chart
         id: download-chart
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: ${{ needs.build-targets.outputs.chart-artifact-name }}
           path: ./output/${{ needs.build-targets.outputs.chart-artifact-name }}
 
+      - name: Download per-arch images
+        id: download-release-images
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: release-images-*
+          merge-multiple: true
+          path: ./output/release-images
+
       - name: Create GH release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         id: release
         with:
           generate_release_notes: true
@@ -106,10 +121,11 @@ jobs:
           prerelease: "${{ github.event_name == 'pull_request' }}"
           files: |
             ./output/${{ needs.build-targets.outputs.images-artifact-name }}/*
+            ./output/release-images/*
             ./output/${{ needs.build-targets.outputs.chart-artifact-name }}/*
 
       - name: Comment release
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
         if: github.event_name == 'pull_request'
         with:
           script: |

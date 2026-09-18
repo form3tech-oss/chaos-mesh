@@ -40,8 +40,13 @@ func (s *DaemonServer) SetIptablesChains(ctx context.Context, req *pb.IptablesCh
 
 	pid, err := s.crClient.GetPidFromContainerID(ctx, req.ContainerId)
 	if err != nil {
-		log.Error(err, "error while getting PID")
-		return nil, err
+		log.Info("container PID unavailable, falling back to sandbox", "error", err.Error())
+
+		pid, err = s.crClient.GetSandboxPidFromPodUID(ctx, req.PodUid)
+		if err != nil {
+			log.Error(err, "error while getting PID")
+			return nil, err
+		}
 	}
 
 	iptables := buildIptablesClient(ctx, req.EnterNS, pid)
@@ -150,24 +155,18 @@ func (iptables *iptablesClient) setIptablesChain(chain *pb.Chain) error {
 		return err
 	}
 
-	if chain.Direction == pb.Chain_INPUT {
-		err := iptables.ensureRule(&iptablesChain{
+	switch chain.Direction {
+	case pb.Chain_INPUT:
+		return iptables.ensureRule(&iptablesChain{
 			Name: "CHAOS-INPUT",
 		}, "-A CHAOS-INPUT -j "+chain.Name)
-		if err != nil {
-			return err
-		}
-	} else if chain.Direction == pb.Chain_OUTPUT {
-		iptables.ensureRule(&iptablesChain{
+	case pb.Chain_OUTPUT:
+		return iptables.ensureRule(&iptablesChain{
 			Name: "CHAOS-OUTPUT",
 		}, "-A CHAOS-OUTPUT -j "+chain.Name)
-		if err != nil {
-			return err
-		}
-	} else {
+	default:
 		return errors.Errorf("unknown direction %d", chain.Direction)
 	}
-	return nil
 }
 
 func (iptables *iptablesClient) initializeEnv() error {

@@ -115,7 +115,12 @@ func (s *DaemonServer) SetTcs(ctx context.Context, in *pb.TcsRequest) (*empty.Em
 
 	pid, err := s.crClient.GetPidFromContainerID(ctx, in.ContainerId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "get pid from containerID error: %v", err)
+		log.Info("container PID unavailable, falling back to sandbox", "error", err.Error())
+
+		pid, err = s.crClient.GetSandboxPidFromPodUID(ctx, in.PodUid)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "get pid from containerID error: %v", err)
+		}
 	}
 
 	tcCli := buildTcClient(ctx, log, in.EnterNS, pid)
@@ -420,10 +425,10 @@ func (c *tcClient) addTbf(device string, parent string, handle string, tbf *pb.T
 
 func convertNetemToArgs(netem *pb.Netem) string {
 	args := ""
-	if netem.Time > 0 {
-		args = fmt.Sprintf("delay %d", netem.Time)
-		if netem.Jitter > 0 {
-			args = fmt.Sprintf("%s %d", args, netem.Jitter)
+	if netem.Time > "0ms" {
+		args = fmt.Sprintf("delay %s", netem.Time)
+		if netem.Jitter > "0ms" {
+			args = fmt.Sprintf("%s %s", args, netem.Jitter)
 
 			if netem.DelayCorr > 0 {
 				args = fmt.Sprintf("%s %f", args, netem.DelayCorr)
@@ -466,6 +471,10 @@ func convertNetemToArgs(netem *pb.Netem) string {
 		if netem.CorruptCorr > 0 {
 			args = fmt.Sprintf("%s %f", args, netem.CorruptCorr)
 		}
+	}
+
+	if len(netem.Rate) > 0 {
+		args = fmt.Sprintf("%s rate %s", args, netem.Rate)
 	}
 
 	trimedArgs := []string{}

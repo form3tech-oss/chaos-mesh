@@ -59,8 +59,8 @@ message NetemRequest {
 }
 
 message Netem {
-  uint32 time = 1;
-  uint32 jitter = 2;
+  string time = 1;
+  string jitter = 2;
   float delay_corr = 3;
   uint32 limit = 4;
   float loss = 5;
@@ -74,6 +74,7 @@ message Netem {
   float corrupt_corr = 13;
   TcHandle parent = 14;
   TcHandle handle = 15;
+  string rate = 16;
 }
 
 message TbfRequest {
@@ -125,6 +126,7 @@ message IPSetsRequest {
   repeated IPSet ipsets = 1;
   string container_id = 2;
   bool enterNS = 3;
+  string pod_uid = 4;
 }
 
 message IPSet {
@@ -144,6 +146,7 @@ message IptablesChainsRequest {
   repeated Chain chains = 1;
   string container_id = 2;
   bool enterNS = 3;
+  string pod_uid = 4;
 }
 
 message Chain {
@@ -253,6 +256,7 @@ message TcsRequest {
   repeated Tc tcs = 1;
   string container_id = 2;
   bool enterNS = 4;
+  string pod_uid = 5;
 }
 
 message Tc {
