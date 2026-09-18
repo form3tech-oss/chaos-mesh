@@ -155,7 +155,60 @@ type Task struct {
 
 	Labels map[string]string `json:"labels,omitempty"`
 
+	// +optional
+	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
+
+	// +optional
+	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
+
+	// +optional
+	// +mapType=atomic
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+
+	// +optional
+	ServiceAccountName string `json:"serviceAccountName,omitempty"`
+
+	// +optional
+	AutomountServiceAccountToken *bool `json:"automountServiceAccountToken,omitempty"`
+
+	// +optional
+	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
+
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge
+	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty" patchStrategy:"merge" patchMergeKey:"name"`
+
+	// +optional
+	Affinity *corev1.Affinity `json:"affinity,omitempty"`
+
+	// +optional
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
+	// +optional
+	// +patchMergeKey=topologyKey
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=topologyKey
+	// +listMapKey=whenUnsatisfiable
+	TopologySpreadConstraints []corev1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey"`
+
 	// TODO: maybe we could specify parameters in other ways, like loading context from file
+}
+
+func (t *Task) PodSpec() corev1.PodSpec {
+	return corev1.PodSpec{
+		Volumes:                       t.Volumes,
+		TerminationGracePeriodSeconds: t.TerminationGracePeriodSeconds,
+		ActiveDeadlineSeconds:         t.ActiveDeadlineSeconds,
+		NodeSelector:                  t.NodeSelector,
+		ServiceAccountName:            t.ServiceAccountName,
+		AutomountServiceAccountToken:  t.AutomountServiceAccountToken,
+		SecurityContext:               t.SecurityContext,
+		ImagePullSecrets:              t.ImagePullSecrets,
+		Affinity:                      t.Affinity,
+		TopologySpreadConstraints:     t.TopologySpreadConstraints,
+	}
 }
 
 // +kubebuilder:object:root=true
