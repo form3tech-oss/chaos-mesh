@@ -4447,7 +4447,7 @@ const docTemplate = `{
                     ]
                 },
                 "duration": {
-                    "description": "Duration represents the duration of the chaos action",
+                    "description": "Duration represents the duration of the chaos action\n+optional",
                     "type": "string"
                 },
                 "remoteCluster": {

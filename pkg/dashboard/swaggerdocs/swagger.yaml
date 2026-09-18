@@ -1918,7 +1918,9 @@ definitions:
         - $ref: '#/definitions/github_com_chaos-mesh_chaos-mesh_api_v1alpha1.K8SChaosAPIObjects'
         description: +kubebuilder:validation:Required
       duration:
-        description: Duration represents the duration of the chaos action
+        description: |-
+          Duration represents the duration of the chaos action
+          +optional
         type: string
       remoteCluster:
         description: |-
