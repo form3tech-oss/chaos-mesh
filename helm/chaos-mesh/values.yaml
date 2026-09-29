@@ -70,7 +70,7 @@ logging:
     # timestamp: ts
   # Optional configuration to determine the maximum size of a log field when serializing an object.
   # This can be useful to avoid extremely long log entries that can cause problems with log synchronization.
-  maxFieldSize:
+  maxFieldSize: # @schema type:[integer, null]
 
 controllerManager:
   # securityContext if needed

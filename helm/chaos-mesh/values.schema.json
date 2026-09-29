@@ -736,7 +736,10 @@
                     "type": "string"
                 },
                 "maxFieldSize": {
-                    "type": ["number", "null"]
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
                 },
                 "timestampFormat": {
                     "type": "string"
