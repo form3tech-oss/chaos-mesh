@@ -43,10 +43,10 @@ kubectl apply -f ./cluster-viewer.yaml
 kubectl apply -f ./busybox-manager.yaml
 kubectl apply -f ./busybox-viewer.yaml
 
-CLUSTER_MANAGER_TOKEN=`kubectl -n chaos-mesh describe secret $(kubectl -n chaos-mesh get secret | grep account-cluster-manager | awk '{print $1}') | grep "token:" | awk '{print $2}'`
-CLUSTER_VIEWER_TOKEN=`kubectl -n chaos-mesh describe secret $(kubectl -n chaos-mesh get secret | grep account-cluster-viewer | awk '{print $1}') | grep "token:" | awk '{print $2}'`
-BUSYBOX_MANAGER_TOKEN=`kubectl -n busybox describe secret $(kubectl -n busybox get secret | grep account-busybox-manager | awk '{print $1}') | grep "token:" | awk '{print $2}'`
-BUSYBOX_VIEWER_TOKEN=`kubectl -n busybox describe secret $(kubectl -n busybox get secret | grep account-busybox-viewer | awk '{print $1}') | grep "token:" | awk '{print $2}'`
+CLUSTER_MANAGER_TOKEN=$(kubectl create token -n chaos-mesh account-cluster-manager)
+CLUSTER_VIEWER_TOKEN=$(kubectl create token -n chaos-mesh account-cluster-viewer)
+BUSYBOX_MANAGER_TOKEN=$(kubectl create token -n busybox account-busybox-manager)
+BUSYBOX_VIEWER_TOKEN=$(kubectl create token -n busybox account-busybox-viewer)
 
 BUSYBOX_MANAGER_TOKEN_LIST=($BUSYBOX_MANAGER_TOKEN)
 CLUSTER_MANAGER_TOKEN_LIST=($CLUSTER_MANAGER_TOKEN)
@@ -90,13 +90,23 @@ echo "only manager can create experiments success"
 # here just use busybox manager because experiment can be created only one time
 REQUEST BUSYBOX_MANAGER_TOKEN_LIST[@] "POST" "/api/experiments" "create_exp.out" '"name":"ci-test"'
 
-
 echo "***** list chaos experiments *****"
 
 echo "all token can list experiments under namespace busybox"
 REQUEST BUSYBOX_VIEW_TOKEN_LIST[@] "GET" "/api/experiments?namespace=busybox" "list_exp.out" '"name":"ci-test"'
 
 EXP_UID=`cat list_exp.out | sed 's/.*\"uid\":\"\([0-9,a-z,-]*\)\".*/\1/g'`
+
+# pause/delete use the dashboard DB; wait until the collector indexes the experiment.
+echo "wait for chaos dashboard collector to sync experiment"
+for ((k=0; k<30; k++)); do
+    curl -s -X GET "localhost:2333/api/experiments/${EXP_UID}?namespace=busybox" \
+        -H "Authorization: Bearer ${BUSYBOX_MANAGER_TOKEN}" > exp_index.out || true
+    if ! grep -Fq 'not found' exp_index.out && ! grep -Fq 'NotFound' exp_index.out; then
+        break
+    fi
+    sleep 1
+done
 
 echo "cluster manager and viewer can list all chaos experiments in the cluster"
 REQUEST CLUSTER_VIEW_TOKEN_LIST[@] "GET" "/api/experiments" "list_exp.out" '"name":"ci-test"'
@@ -191,6 +201,25 @@ REQUEST CLUSTER_VIEW_FORBIDDEN_TOKEN_LIST[@] "GET" "/api/events/$EVENT_ID?namesp
 
 
 echo "***** list archive chaos experiments *****"
+
+# archiving happens after the CR is fully removed and the collector reconciles NotFound.
+echo "wait for experiment CR to be deleted"
+for ((k=0; k<60; k++)); do
+    if ! kubectl get networkchaos ci-test -n busybox > /dev/null 2>&1; then
+        break
+    fi
+    sleep 1
+done
+
+echo "wait for experiment to be archived"
+for ((k=0; k<60; k++)); do
+    curl -sf -X GET "localhost:2333/api/archives?namespace=busybox" \
+        -H "Authorization: Bearer ${CLUSTER_MANAGER_TOKEN}" > list_archives.out || true
+    if grep -Fq '"name":"ci-test"' list_archives.out; then
+        break
+    fi
+    sleep 1
+done
 
 echo "all token can list archive experiments under namespace busybox"
 REQUEST BUSYBOX_VIEW_TOKEN_LIST[@] "GET" "/api/archives?namespace=busybox" "list_archives.out" '"name":"ci-test"'

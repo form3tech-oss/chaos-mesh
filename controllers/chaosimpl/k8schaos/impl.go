@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"go.uber.org/fx"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"

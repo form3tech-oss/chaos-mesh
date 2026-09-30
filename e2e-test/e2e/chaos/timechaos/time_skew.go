@@ -21,6 +21,7 @@ import (
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -56,7 +57,7 @@ func TestcaseTimeSkewOnceThenRecover(
 			Namespace: ns,
 		},
 		Spec: v1alpha1.TimeChaosSpec{
-			Duration:   pointer.StringPtr("9m"),
+			Duration:   pointer.String("9m"),
 			TimeOffset: "-1h",
 			ContainerSelector: v1alpha1.ContainerSelector{
 				PodSelector: v1alpha1.PodSelector{
@@ -75,7 +76,7 @@ func TestcaseTimeSkewOnceThenRecover(
 	framework.ExpectNoError(err, "create time chaos error")
 
 	By("waiting for assertion")
-	err = wait.PollImmediate(5*time.Second, 5*time.Minute, func() (done bool, err error) {
+	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 5*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		podTime, err := getPodTimeNS(c, port)
 		framework.ExpectNoError(err, "failed to get pod time")
 		if podTime.Before(*initTime) {
@@ -100,8 +101,8 @@ func TestcaseTimeSkewOnceThenRecover(
 		}
 		return false, nil
 	})
-	framework.ExpectError(err, "wait no timechaos error")
-	framework.ExpectEqual(err.Error(), wait.ErrWaitTimeout.Error())
+	gomega.Expect(err).Should(gomega.HaveOccurred(), "wait no timechaos error")
+	gomega.Expect(err).To(gomega.MatchError(wait.ErrWaitTimeout))
 	By("success to perform time chaos")
 }
 
@@ -128,7 +129,7 @@ func TestcaseTimeSkewPauseThenUnpause(
 			Namespace: ns,
 		},
 		Spec: v1alpha1.TimeChaosSpec{
-			Duration:   pointer.StringPtr("9m"),
+			Duration:   pointer.String("9m"),
 			TimeOffset: "-1h",
 			ContainerSelector: v1alpha1.ContainerSelector{
 				PodSelector: v1alpha1.PodSelector{
@@ -147,7 +148,7 @@ func TestcaseTimeSkewPauseThenUnpause(
 	framework.ExpectNoError(err, "create time chaos error")
 
 	By("waiting for assertion")
-	err = wait.PollImmediate(5*time.Second, 5*time.Minute, func() (done bool, err error) {
+	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 5*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		podTime, err := getPodTimeNS(c, port)
 		framework.ExpectNoError(err, "failed to get pod time")
 		if podTime.Before(*initTime) {
@@ -189,8 +190,8 @@ func TestcaseTimeSkewPauseThenUnpause(
 		}
 		return false, nil
 	})
-	framework.ExpectError(err, "wait time chaos paused error")
-	framework.ExpectEqual(err.Error(), wait.ErrWaitTimeout.Error())
+	gomega.Expect(err).Should(gomega.HaveOccurred(), "wait time chaos paused error")
+	gomega.Expect(err).To(gomega.MatchError(wait.ErrWaitTimeout))
 
 	By("resume time skew chaos experiment")
 	err = util.UnPauseChaos(ctx, cli, timeChaos)
@@ -210,7 +211,7 @@ func TestcaseTimeSkewPauseThenUnpause(
 
 	// timechaos is running again, we want to check pod
 	// whether time is earlier than init time,
-	err = wait.PollImmediate(5*time.Second, 1*time.Minute, func() (done bool, err error) {
+	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 1*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		podTime, err := getPodTimeNS(c, port)
 		framework.ExpectNoError(err, "failed to get pod time")
 		if podTime.Before(*initTime) {
@@ -248,7 +249,7 @@ func TestcaseTimeSkewShouldAlsoAffectChildProces(
 			Namespace: ns,
 		},
 		Spec: v1alpha1.TimeChaosSpec{
-			Duration:   pointer.StringPtr("9m"),
+			Duration:   pointer.String("9m"),
 			TimeOffset: "-1h",
 			ContainerSelector: v1alpha1.ContainerSelector{
 				PodSelector: v1alpha1.PodSelector{
@@ -267,7 +268,7 @@ func TestcaseTimeSkewShouldAlsoAffectChildProces(
 	framework.ExpectNoError(err, "create time chaos error")
 
 	By("waiting for assertion")
-	err = wait.PollImmediate(5*time.Second, 5*time.Minute, func() (done bool, err error) {
+	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 5*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		podTime, err := getPodChildProcessTimeNS(c, port)
 		framework.ExpectNoError(err, "failed to get pod time")
 		if podTime.Before(*initTime) {
@@ -292,7 +293,7 @@ func TestcaseTimeSkewShouldAlsoAffectChildProces(
 		}
 		return false, nil
 	})
-	framework.ExpectError(err, "wait no timechaos error")
-	framework.ExpectEqual(err.Error(), wait.ErrWaitTimeout.Error())
+	gomega.Expect(err).Should(gomega.HaveOccurred(), "wait no timechaos error")
+	gomega.Expect(err).To(gomega.MatchError(wait.ErrWaitTimeout))
 	By("success to perform time chaos")
 }

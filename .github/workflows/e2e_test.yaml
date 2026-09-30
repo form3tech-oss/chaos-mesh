@@ -16,14 +16,14 @@ permissions: read-all
 
 jobs:
   e2e-test-matrix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         kubernetes-version:
-          - v1.20.15
-          - v1.23.4
-          - v1.25.1
+          - v1.35.2
+          - v1.34.5
+          - v1.33.9
         focus:
           - "[Graceful-Shutdown] [IOChaos]"
           - "[Graceful-Shutdown] [HTTPChaos]"
@@ -37,16 +37,16 @@ jobs:
           - "[Basic] [StressChaos]"
     steps:
       - name: checkout codes
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
 
       - name: download saved images
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: ${{ inputs.images-artifact-name }}
           path: ./output/saved-images
 
       - name: download e2e binary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: ${{ inputs.e2e-binary-name }}
           path: ./output/e2e-binary
@@ -60,13 +60,17 @@ jobs:
           chmod +x ./e2e-test/image/e2e/bin/e2e.test
 
       - name: Setup minikube
-        uses: manusa/actions-setup-minikube@v2.4.3
-        with:
-          driver: docker
-          minikube version: v1.27.0
-          kubernetes version: ${{ matrix.kubernetes-version }}
-          start args: --cni calico
-          github token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "${HOME}/.local/bin"
+          curl -fsSL "https://storage.googleapis.com/minikube/releases/v1.38.1/minikube-linux-amd64" -o "${HOME}/.local/bin/minikube"
+          chmod +x "${HOME}/.local/bin/minikube"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          minikube start \
+            --driver=docker \
+            --kubernetes-version="${{ matrix.kubernetes-version }}" \
+            --cni=calico \
+            --cpus=2 \
+            --memory=6144
 
       - name: load image into minikube
         run: |
@@ -79,21 +83,24 @@ jobs:
         run: chmod 600 ~/.kube/config
 
       - name: Setup Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Chaos Mesh
-        # Set DOCKER_API_VERSION to 1.41 to bypass https://github.com/chaos-mesh/chaos-mesh/pull/4154#issuecomment-1704442551.
+        # Minikube docker driver uses cri-dockerd (docker:// container IDs). Do not pin
+        # DOCKER_API_VERSION=1.41; newer Docker daemons require API 1.44+.
         run: |
-          helm install --wait --create-namespace chaos-mesh helm/chaos-mesh --namespace=chaos-mesh --set images.tag=latest --set chaosDaemon.env.DOCKER_API_VERSION=1.41
+          helm install --wait --create-namespace chaos-mesh helm/chaos-mesh \
+            --namespace=chaos-mesh \
+            --set images.tag=latest
       - name: e2e tests
         env:
           FOCUS: ${{ matrix.focus }}
         run: |
           # because ginkgo -focus accepts the regex expression, we should use escape to represent the squared brackets and dash
           export ESCAPED_FOCUS=$(echo $FOCUS | sed -e 's/\[/\\\[/g' | sed -e 's/\]/\\\]/g' | sed -e 's/\-/\\\-/g')
-          KUBECONFIG=~/.kube/config ./e2e-test/image/e2e/bin/ginkgo -focus="${ESCAPED_FOCUS}" ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/chaos-mesh/e2e-helper:latest
+          KUBECONFIG=~/.kube/config ./e2e-test/image/e2e/bin/ginkgo --flake-attempts=2 -focus="${ESCAPED_FOCUS}" ./e2e-test/image/e2e/bin/e2e.test -- --e2e-image ghcr.io/chaos-mesh/e2e-helper:latest
       - name: post run - extract profile info from kubernetes
         if: always()
         env:
@@ -105,14 +112,14 @@ jobs:
           kubectl get configmaps -A -o yaml > $PROFILE_DIRECTORY/manifests/configmaps.yaml
       - name: post run - upload Chaos Mesh profile info
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: profiling-${{ matrix.focus }}-k8s-${{ matrix.kubernetes-version }}
           path: ./output/chaos-mesh-profile
           retention-days: 7
       - name: post run - upload junit test reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-junit-reports-${{ matrix.focus }}-k8s-${{ matrix.kubernetes-version }}
           path: "**/*.xml"

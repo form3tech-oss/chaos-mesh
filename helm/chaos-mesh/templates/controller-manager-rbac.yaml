@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 {{- if .Values.rbac.create }}
+{{- if .Values.controllerManager.serviceAccountCreate }}
 kind: ServiceAccount
 apiVersion: v1
 metadata:
@@ -25,7 +26,7 @@ metadata:
   labels:
     {{- include "chaos-mesh.labels" . | nindent 4 }}
     app.kubernetes.io/component: controller-manager
-
+{{- end }}
 ---
 # roles
 kind: ClusterRole
@@ -39,9 +40,6 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "pods", "configmaps", "secrets"]
     verbs: [ "get", "list", "watch", "delete", "update", "patch" ]
-  - apiGroups: [ "apps" ]
-    resources: [ "replicasets", "deployments", "daemonsets", "statefulsets"]
-    verbs: [ "get", "watch", "list", "patch" ]
   - apiGroups:
       - ""
     resources:
@@ -58,7 +56,7 @@ rules:
       - ""
     resources:
       - persistentvolumeclaims
-    verbs:
+    verbs: 
       - get
       - list
       - delete
@@ -89,6 +87,9 @@ rules:
       - patch
       - list
       - watch
+  - apiGroups: [ "apps" ]
+    resources: [ "replicasets", "deployments", "daemonsets", "statefulsets"]
+    verbs: [ "get", "watch", "list", "patch" ]
   - apiGroups:
       - ""
     resources:
@@ -115,6 +116,7 @@ metadata:
 rules:
   - apiGroups: [ "" ]
     resources:
+      - nodes
       - persistentvolumes
       - persistentvolumeclaims
       {{- if .Values.clusterScoped }}
@@ -122,15 +124,10 @@ rules:
       - services
       {{- end }}
     verbs: [ "get", "list", "watch" ]
-  - apiGroups: [ "" ]
-    resources:
-      - nodes
-    verbs: [ "get", "list", "update", "watch" ]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
     verbs: [ "create" ]
-
 
 ---
 kind: Role
@@ -143,17 +140,18 @@ metadata:
     app.kubernetes.io/component: controller-manager
 rules:
   - apiGroups: [ "" ]
-    resources: [ "services", "endpoints", "secrets" ]
+    resources: [ "services", "secrets" ]
     verbs: [ "get", "list", "watch" ]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch"]
   - apiGroups: [ "authorization.k8s.io" ]
     resources:
       - subjectaccessreviews
     verbs: [ "create" ]
-{{- if .Values.enableCtrlServer}}
   - apiGroups: [ "" ]
     resources: [ "pods/exec" ]
     verbs: [ "create" ]
-{{- end }}
   - apiGroups: [ "coordination.k8s.io" ]
     resources: [ "leases" ]
     verbs: [ "*" ]

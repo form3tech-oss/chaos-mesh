@@ -16,7 +16,7 @@ package chaosdaemon
 import (
 	"context"
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
@@ -125,11 +125,27 @@ func (c *ciliumClient) writePolicyFile(ctx context.Context) (string, error) {
 "egressDeny": [{"toEntities": ["all"]}],
 "labels":[{"key": "chaos-experiment-type","value":"node-isolation","source":"chaos-mesh"}]
 }]`
-	stdin := strings.NewReader(policy)
+	tmpfile, err := os.CreateTemp("", "cilium-policy-*.json")
+	if err != nil {
+		return "", errors.Wrap(err, "create temp policy file")
+	}
+	defer os.Remove(tmpfile.Name())
+	defer tmpfile.Close()
+
+	if _, err := tmpfile.WriteString(policy); err != nil {
+		return "", errors.Wrap(err, "write temp policy file")
+	}
+	if _, err := tmpfile.Seek(0, 0); err != nil {
+		return "", errors.Wrap(err, "rewind temp policy file")
+	}
 
 	c.log.V(1).Info("writePolicyFile", "policy", policy)
 
-	processBuilder := bpm.DefaultProcessBuilder("/bin/cp", "/dev/stdin", filename).SetContext(ctx).SetNS(c.pid, bpm.MountNS).SetNS(c.pid, bpm.PidNS).SetStdin(stdin)
+	processBuilder := bpm.DefaultProcessBuilder("sh", "-c", fmt.Sprintf("cat > %s", filename)).
+		SetContext(ctx).
+		SetNS(c.pid, bpm.MountNS).
+		SetNS(c.pid, bpm.PidNS).
+		SetStdin(tmpfile)
 	cmd := processBuilder.Build(ctx)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

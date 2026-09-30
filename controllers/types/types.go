@@ -148,6 +148,13 @@ var ChaosObjects = fx.Supply(
 			Object: &v1alpha1.BlockChaos{},
 		},
 	},
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "nodeselectorchaos",
+			Object: &v1alpha1.NodeSelectorChaos{},
+		},
+	},
 
 	fx.Annotated{
 		Group: "objs",
@@ -160,8 +167,16 @@ var ChaosObjects = fx.Supply(
 	fx.Annotated{
 		Group: "objs",
 		Target: Object{
-			Name:   "nodeselectorchaos",
-			Object: &v1alpha1.NodeSelectorChaos{},
+			Name:   "cloudstackvmchaos",
+			Object: &v1alpha1.CloudStackVMChaos{},
+		},
+	},
+
+	fx.Annotated{
+		Group: "objs",
+		Target: Object{
+			Name:   "cloudstackhostchaos",
+			Object: &v1alpha1.CloudStackHostChaos{},
 		},
 	},
 )
@@ -193,15 +208,15 @@ var WebhookObjects = fx.Supply(
 		},
 	},
 	fx.Annotated{
-		Group: "objs",
-		Target: Object{
+		Group: "webhookObjs",
+		Target: WebhookObject{
 			Name:   "cloudstackvmchaos",
 			Object: &v1alpha1.CloudStackVMChaos{},
 		},
 	},
 	fx.Annotated{
-		Group: "objs",
-		Target: Object{
+		Group: "webhookObjs",
+		Target: WebhookObject{
 			Name:   "cloudstackhostchaos",
 			Object: &v1alpha1.CloudStackHostChaos{},
 		},

@@ -33,7 +33,6 @@ func SpawnPodForTask(task v1alpha1.Task) (corev1.PodSpec, error) {
 		deepCopiedContainer.Resources.Limits.Cpu().SetMilli(1000)
 		deepCopiedContainer.Resources.Limits.Memory().Set(1000)
 	}
-
 	spec := task.PodSpec()
 	spec.RestartPolicy = corev1.RestartPolicyNever
 	spec.Containers = []corev1.Container{
